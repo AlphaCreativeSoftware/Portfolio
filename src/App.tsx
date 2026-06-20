@@ -11,13 +11,11 @@ import {
   Database,
   ExternalLink,
   Gamepad2,
-  Menu,
   Monitor,
   Moon,
   Play,
   Sparkles,
   Sun,
-  X,
 } from 'lucide-react'
 
 type Project = {
@@ -112,17 +110,22 @@ const adaptationRows = [
 
 function CibelesShowcase() {
   const [activePhase, setActivePhase] = useState(0)
+  const [expanded, setExpanded] = useState(false)
   const stageRef = useRef<HTMLDivElement>(null)
   const [matchLayout, setMatchLayout] = useState<{ width: number; height: number; paths: MatchPath[] }>({ width: 1, height: 1, paths: [] })
 
   useEffect(() => {
+    if (!expanded) {
+      setActivePhase(0)
+      return
+    }
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
       setActivePhase(cibelesPhases.length - 1)
       return
     }
     const timer = window.setInterval(() => setActivePhase((phase) => (phase + 1) % cibelesPhases.length), 1800)
     return () => window.clearInterval(timer)
-  }, [])
+  }, [expanded])
 
   useLayoutEffect(() => {
     const stage = stageRef.current
@@ -168,7 +171,7 @@ function CibelesShowcase() {
         </div>
         <div className="cibeles-summary">
           <p>Diseñé una herramienta para reconstruir la trazabilidad entre facturas de obra y adecuaciones inmobiliarias, aplicando una lógica progresiva de transformación, validación y conciliación.</p>
-          <div className="cibeles-highlights"><span>3 meses</span><span>Millones de registros</span><span>Seguimiento ejecutivo</span></div>
+          <div className="project-tags"><span>Python</span><span>Conciliación financiera</span><span>Millones de registros</span><span>Reporting automático</span></div>
         </div>
       </div>
 
@@ -178,6 +181,12 @@ function CibelesShowcase() {
         <div><strong>97%</strong><span>de precisión al auditar relaciones existentes</span></div>
       </div>
 
+      <button className="details-toggle" onClick={() => setExpanded(!expanded)} aria-expanded={expanded}>
+        <span><small>Caso interactivo</small>{expanded ? 'Ocultar funcionamiento' : 'Ver cómo funciona'}</span><ChevronRight />
+      </button>
+
+      <div className={`project-details ${expanded ? 'project-details-open' : ''}`}>
+        <div className="project-details-inner" aria-hidden={!expanded} inert={!expanded}>
       <div className="cibeles-demo">
         <div className="reconciliation-panel">
           <div className="demo-toolbar">
@@ -229,12 +238,15 @@ function CibelesShowcase() {
         <p><strong>Representación conceptual.</strong> Todos los identificadores, importes y visualizaciones son sintéticos. No contiene datos, código ni documentación propiedad del cliente.</p>
         <a href="https://www.ejeprime.com/residencial/blackstone-pone-en-marcha-la-venta-de-la-cartera-de-fidere-y-recibira-ofertas-en-noviembre" target="_blank" rel="noreferrer">Contexto público de la operación <ExternalLink /></a>
       </div>
+        </div>
+      </div>
     </article>
   )
 }
 
 function App() {
   const [menuOpen, setMenuOpen] = useState(false)
+  const [fruitExpanded, setFruitExpanded] = useState(false)
   const [scrolled, setScrolled] = useState(false)
   const [theme, setTheme] = useState<Theme>(() => (localStorage.getItem('portfolio-theme') as Theme) || 'system')
 
@@ -250,6 +262,11 @@ function App() {
     localStorage.setItem('portfolio-theme', theme)
   }, [theme])
 
+  useEffect(() => {
+    document.body.style.overflow = menuOpen ? 'hidden' : ''
+    return () => { document.body.style.overflow = '' }
+  }, [menuOpen])
+
   const closeMenu = () => setMenuOpen(false)
 
   return (
@@ -257,10 +274,10 @@ function App() {
       <header className={`topbar ${scrolled ? 'topbar-scrolled' : ''}`}>
         <a className="brand" href="#inicio" aria-label="Ir al inicio">MR<span>.</span></a>
         <nav className={menuOpen ? 'nav nav-open' : 'nav'} aria-label="Navegación principal">
-          <a href="#proyectos" onClick={closeMenu}>Proyectos</a>
-          <a href="#experiencia" onClick={closeMenu}>Experiencia</a>
-          <a href="#sobre-mi" onClick={closeMenu}>Sobre mí</a>
-          <a href="#contacto" onClick={closeMenu}>Contacto</a>
+          <a href="#proyectos" onClick={closeMenu}><span>01</span>Proyectos</a>
+          <a href="#experiencia" onClick={closeMenu}><span>02</span>Experiencia</a>
+          <a href="#sobre-mi" onClick={closeMenu}><span>03</span>Sobre mí</a>
+          <a href="#contacto" onClick={closeMenu}><span>04</span>Contacto</a>
         </nav>
         <div className="header-actions">
           <div className="theme-switcher" aria-label="Apariencia">
@@ -270,9 +287,10 @@ function App() {
           </div>
           <a className="availability" href="#contacto"><span />Disponible</a>
         </div>
-        <button className="menu-button" onClick={() => setMenuOpen(!menuOpen)} aria-label="Abrir menú">
-          {menuOpen ? <X /> : <Menu />}
+        <button className={`menu-button ${menuOpen ? 'menu-button-open' : ''}`} onClick={() => setMenuOpen(!menuOpen)} aria-label={menuOpen ? 'Cerrar menú' : 'Abrir menú'} aria-expanded={menuOpen}>
+          <span className="hamburger"><i /><i /><i /></span>
         </button>
+        <button className={`nav-backdrop ${menuOpen ? 'nav-backdrop-open' : ''}`} onClick={closeMenu} aria-label="Cerrar menú" tabIndex={menuOpen ? 0 : -1} />
       </header>
 
       <main>
@@ -310,18 +328,28 @@ function App() {
               if (project.index === '01') return <CibelesShowcase key={project.title} />
               if (project.index === '03') {
                 return (
-                  <article className="fruit-showcase" key={project.title}>
+                  <article className={`fruit-showcase ${fruitExpanded ? 'fruit-showcase-open' : ''}`} key={project.title}>
                     <div className="fruit-content">
                       <div className="project-top"><span>{project.index}</span><span className="published-pill"><span /> Disponible en Google Play</span></div>
                       <div className="fruit-title-row">
                         <img src="/projects/fruit-drop/icon.png" alt="Icono de Fruit Drop" />
                         <div><p className="project-eyebrow">{project.eyebrow}</p><h3>{project.title}</h3></div>
                       </div>
+                      <div className="fruit-summary-art"><img src="/projects/fruit-drop/feature.png" alt="Personajes y logotipo de Fruit Drop" /></div>
                       <p className="project-description">{project.description}</p>
                       <div className="fruit-metrics">
                         <div><strong>3 meses</strong><span>De desarrollo hasta publicación</span></div>
                         <div><strong>100%</strong><span>Diseñado y desarrollado por mí</span></div>
                       </div>
+                      <div className="project-tags"><span>Unity · C#</span><span>Producto end-to-end</span><span>Monetización</span><span>Servicios cloud</span></div>
+                      <button className="details-toggle" onClick={() => setFruitExpanded(!fruitExpanded)} aria-expanded={fruitExpanded}>
+                        <span><small>Caso interactivo</small>{fruitExpanded ? 'Ocultar funcionamiento' : 'Explorar integraciones'}</span><ChevronRight />
+                      </button>
+                    </div>
+                    <div className={`project-details fruit-project-details ${fruitExpanded ? 'project-details-open' : ''}`}>
+                      <div className="project-details-inner" aria-hidden={!fruitExpanded} inert={!fruitExpanded}>
+                        <div className="fruit-detail-grid">
+                          <div className="fruit-detail-copy">
                       <div className="fruit-integrations">
                         <div className="integration-heading"><span>Ecosistema de producto</span><strong>6 sistemas integrados</strong></div>
                         <div className="integration-map" aria-label="Integraciones técnicas de Fruit Drop">
@@ -340,15 +368,17 @@ function App() {
                           ].map(([message, className]) => <span className={`integration-packet ${className}`} key={message}>{message}</span>)}
                         </div>
                       </div>
-                      <div className="tag-list">{project.tags.map((tag) => <span key={tag}>{tag}</span>)}</div>
                       <a className="store-link" href="https://play.google.com/store/apps/details?id=com.alphacreative.fruitdrop" target="_blank" rel="noreferrer">
                         Ver en Google Play <ExternalLink size={17} />
                       </a>
-                    </div>
+                          </div>
                     <div className="fruit-visual" aria-label="Imágenes del videojuego Fruit Drop">
                       <div className="fruit-feature"><img src="/projects/fruit-drop/feature.png" alt="Arte promocional de Fruit Drop con sus personajes" /></div>
                       <div className="phone-frame"><div className="phone-speaker" /><img src="/projects/fruit-drop/rankings.png" alt="Ranking global dentro de Fruit Drop" /></div>
                       <img className="floating-fruit-icon" src="/projects/fruit-drop/icon.png" alt="" aria-hidden="true" />
+                    </div>
+                        </div>
+                      </div>
                     </div>
                   </article>
                 )
