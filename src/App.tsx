@@ -12,8 +12,11 @@ import {
   ExternalLink,
   Gamepad2,
   Menu,
+  Monitor,
+  Moon,
   Play,
   Sparkles,
+  Sun,
   X,
 } from 'lucide-react'
 
@@ -27,6 +30,8 @@ type Project = {
   className: string
   icon: typeof Code2
 }
+
+type Theme = 'system' | 'light' | 'dark'
 
 const projects: Project[] = [
   {
@@ -80,6 +85,7 @@ const capabilities = [
 function App() {
   const [menuOpen, setMenuOpen] = useState(false)
   const [scrolled, setScrolled] = useState(false)
+  const [theme, setTheme] = useState<Theme>(() => (localStorage.getItem('portfolio-theme') as Theme) || 'system')
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 24)
@@ -87,6 +93,11 @@ function App() {
     window.addEventListener('scroll', onScroll)
     return () => window.removeEventListener('scroll', onScroll)
   }, [])
+
+  useEffect(() => {
+    document.documentElement.dataset.theme = theme
+    localStorage.setItem('portfolio-theme', theme)
+  }, [theme])
 
   const closeMenu = () => setMenuOpen(false)
 
@@ -100,7 +111,14 @@ function App() {
           <a href="#sobre-mi" onClick={closeMenu}>Sobre mí</a>
           <a href="#contacto" onClick={closeMenu}>Contacto</a>
         </nav>
-        <a className="availability" href="#contacto"><span />Disponible para oportunidades</a>
+        <div className="header-actions">
+          <div className="theme-switcher" aria-label="Apariencia">
+            <button className={theme === 'system' ? 'active' : ''} onClick={() => setTheme('system')} title="Usar tema del dispositivo" aria-label="Tema automático"><Monitor /></button>
+            <button className={theme === 'light' ? 'active' : ''} onClick={() => setTheme('light')} title="Usar tema claro" aria-label="Tema claro"><Sun /></button>
+            <button className={theme === 'dark' ? 'active' : ''} onClick={() => setTheme('dark')} title="Usar tema oscuro" aria-label="Tema oscuro"><Moon /></button>
+          </div>
+          <a className="availability" href="#contacto"><span />Disponible</a>
+        </div>
         <button className="menu-button" onClick={() => setMenuOpen(!menuOpen)} aria-label="Abrir menú">
           {menuOpen ? <X /> : <Menu />}
         </button>
@@ -108,7 +126,6 @@ function App() {
 
       <main>
         <section className="hero" id="inicio">
-          <div className="hero-noise" />
           <div className="hero-orbit orbit-one" />
           <div className="hero-orbit orbit-two" />
           <p className="kicker reveal"><span>01</span> Software developer · Madrid</p>
@@ -128,7 +145,7 @@ function App() {
         </section>
 
         <section className="marquee" aria-hidden="true">
-          <div>SOFTWARE <span>✦</span> AUTOMATIZACIÓN <span>✦</span> INTELIGENCIA ARTIFICIAL <span>✦</span> PRODUCTO <span>✦</span> DATOS <span>✦</span></div>
+          <div>SOFTWARE <span>·</span> AUTOMATIZACIÓN <span>·</span> INTELIGENCIA ARTIFICIAL <span>·</span> PRODUCTO <span>·</span> DATOS <span>·</span></div>
         </section>
 
         <section className="section projects-section" id="proyectos">
