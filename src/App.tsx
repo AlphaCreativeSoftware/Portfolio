@@ -5,15 +5,18 @@ import {
   Bot,
   Boxes,
   Braces,
+  CalendarDays,
   Check,
   ChevronRight,
   Code2,
   Database,
   ExternalLink,
   Gamepad2,
+  Mail,
   Monitor,
   Moon,
   Play,
+  Phone,
   Sparkles,
   Sun,
 } from 'lucide-react'
@@ -164,6 +167,7 @@ function CibelesShowcase() {
 
   return (
     <article className="cibeles-showcase">
+      <div className="cibeles-project-meta"><span>01</span><span className="professional-pill"><i /> Proyecto profesional · Testa Homes</span></div>
       <div className="cibeles-heading">
         <div>
           <p className="project-eyebrow">Proyecto Cibeles · Python · Análisis de datos de negocio</p>
@@ -342,6 +346,9 @@ function App() {
                         <div><strong>100%</strong><span>Diseñado y desarrollado por mí</span></div>
                       </div>
                       <div className="project-tags"><span>Unity · C#</span><span>Producto end-to-end</span><span>Monetización</span><span>Servicios cloud</span></div>
+                      <a className="store-link" href="https://play.google.com/store/apps/details?id=com.alphacreative.fruitdrop" target="_blank" rel="noreferrer">
+                        Ver en Google Play <ExternalLink size={17} />
+                      </a>
                       <button className="details-toggle" onClick={() => setFruitExpanded(!fruitExpanded)} aria-expanded={fruitExpanded}>
                         <span><small>Caso interactivo</small>{fruitExpanded ? 'Ocultar funcionamiento' : 'Explorar integraciones'}</span><ChevronRight />
                       </button>
@@ -368,9 +375,6 @@ function App() {
                           ].map(([message, className]) => <span className={`integration-packet ${className}`} key={message}>{message}</span>)}
                         </div>
                       </div>
-                      <a className="store-link" href="https://play.google.com/store/apps/details?id=com.alphacreative.fruitdrop" target="_blank" rel="noreferrer">
-                        Ver en Google Play <ExternalLink size={17} />
-                      </a>
                           </div>
                     <div className="fruit-visual" aria-label="Imágenes del videojuego Fruit Drop">
                       <div className="fruit-feature"><img src="/projects/fruit-drop/feature.png" alt="Arte promocional de Fruit Drop con sus personajes" /></div>
@@ -464,10 +468,21 @@ function App() {
           <div className="contact-glow" />
           <p className="kicker"><span>05</span> El siguiente proyecto</p>
           <h2>¿Construimos algo<br /><em>que importe?</em></h2>
-          <p className="contact-intro">Estoy abierto a oportunidades donde pueda aportar, aprender y resolver problemas que merezcan la pena.</p>
-          <a className="button button-primary contact-button" href="https://www.youtube.com/@alpha.creative" target="_blank" rel="noreferrer">Conocer Alpha Creative <ExternalLink size={18} /></a>
-          <div className="social-row">
-            <a href="https://www.youtube.com/@alpha.creative" target="_blank" rel="noreferrer"><Play /> YouTube</a>
+          <p className="contact-intro">Estoy abierto a oportunidades donde pueda aportar, aprender y resolver problemas que merezcan la pena. Elige la vía que te resulte más cómoda.</p>
+          <div className="contact-actions">
+            <a className="contact-card contact-card-primary" href="mailto:alphacreativesoftware@gmail.com">
+              <span className="contact-icon"><Mail /></span><span><small>Contacto directo</small><strong>Escribirme por correo</strong></span><ArrowRight />
+            </a>
+            <a className="contact-card" href="https://www.youtube.com/@alpha.creative" target="_blank" rel="noreferrer">
+              <span className="contact-icon"><Play /></span><span><small>Alpha Creative</small><strong>Visitar YouTube</strong></span><ExternalLink />
+            </a>
+            <a className="contact-card" href="mailto:alphacreativesoftware@gmail.com?subject=Propuesta%20de%20reuni%C3%B3n&body=Hola%20Mikael%2C%0A%0AMe%20gustar%C3%ADa%20proponerte%20una%20reuni%C3%B3n%20para%20hablar%20sobre...">
+              <span className="contact-icon"><CalendarDays /></span><span><small>Primera conversación</small><strong>Proponer una reunión</strong></span><ArrowRight />
+            </a>
+          </div>
+          <div className="contact-details">
+            <a href="mailto:alphacreativesoftware@gmail.com"><Mail /> alphacreativesoftware@gmail.com</a>
+            <a href="tel:+34634460084"><Phone /> +34 634 460 084</a>
           </div>
         </section>
       </main>
