@@ -539,7 +539,7 @@ function App() {
           <div className="timeline">
             <article className="timeline-item current">
               <div className="timeline-date">Feb. 2026 — Ahora</div>
-              <div><p className="timeline-company">Prosegur AVOS Tech · BPO Ibercaja</p><h3>Responsable de desarrollo y mantenimiento</h3><p>Evolución de aplicaciones modernas con ASP.NET, React, TypeScript y Azure, junto al mantenimiento de sistemas heredados en Delphi, C y Windows Forms.</p></div>
+              <div><p className="timeline-company">Prosegur AVOS Tech · BPO Ibercaja</p><h3>Responsable de desarrollo y mantenimiento</h3><p>Desarrollo de nuevas aplicaciones y evolución de soluciones existentes con ASP.NET, React, TypeScript y Azure. Estimación y organización del trabajo técnico, junto con la gestión de aplicaciones y componentes críticos de la red operativa del BPO. Responsabilidad también sobre sistemas heredados en Delphi, C y Windows Forms.</p></div>
               <span className="timeline-status">Actual</span>
             </article>
             <article className="timeline-item">
