@@ -85,9 +85,9 @@ const projects: Project[] = [
 ]
 
 const capabilities = [
-  { number: '01', title: 'Software & producto', text: 'De la idea al producto funcional: arquitectura, interfaces, integraciones y puesta en producción.', icon: Braces },
-  { number: '02', title: 'Automatización & datos', text: 'Procesos que reducen trabajo manual, transforman información y generan resultados medibles.', icon: Database },
-  { number: '03', title: 'IA aplicada', text: 'Exploro soluciones de IA con propósito: privacidad, procesos financieros y herramientas de negocio.', icon: Sparkles },
+  { number: '01', title: 'Desarrollo end-to-end', text: 'Arquitectura, lógica, interfaz, integraciones y despliegue. Me responsabilizo del producto completo, no solo de una capa.', icon: Braces },
+  { number: '02', title: 'Producto & negocio', text: 'Traduzco necesidades operativas en software útil, entendiendo el proceso, el usuario y el resultado que debe generar.', icon: Boxes },
+  { number: '03', title: 'Datos, automatización & IA', text: 'Transformo información y procesos complejos en herramientas medibles, explorando IA cuando aporta valor real.', icon: Sparkles },
 ]
 
 const cibelesPhases = [
@@ -399,7 +399,7 @@ function App() {
           <div className="hero-stats">
             <div><strong>97<span>%</span></strong><small>Precisión sobre millones de registros</small></div>
             <div><strong>185<span>K</span></strong><small>Visualizaciones en YouTube</small></div>
-            <div><strong>9<span>+</span></strong><small>Años creando y aprendiendo</small></div>
+            <div><strong>10<span>+</span></strong><small>Años creando y aprendiendo</small></div>
           </div>
         </section>
 
@@ -523,8 +523,9 @@ function App() {
         </section>
 
         <section className="section capabilities-section" id="sobre-mi">
-          <div className="section-heading compact">
-            <div><p className="kicker"><span>04</span> Más allá del stack</p><h2>Una trayectoria difícil<br />de <em>encasillar.</em></h2></div>
+          <div className="section-heading about-heading">
+            <div><p className="kicker"><span>04</span> Cómo trabajo</p><h2>Ingeniería con<br /><em>visión de producto.</em></h2></div>
+            <p>Construyo software entendiendo el sistema completo: la tecnología, el usuario, el proceso y el objetivo de negocio.</p>
           </div>
           <div className="capabilities-list">
             {capabilities.map((item) => {
@@ -536,27 +537,27 @@ function App() {
               )
             })}
           </div>
-          <div className="about-grid">
-            <div className="about-statement">
-              <span className="quote-mark">“</span>
-              <p>Mi perfil no nació de una sola disciplina. Nació de querer comprender sistemas completos y descubrir hasta dónde podía llevarlos.</p>
+          <div className="about-profile">
+            <div className="about-profile-lead">
+              <span>Mi punto de partida</span>
+              <h3>Siempre he aprendido construyendo.</h3>
+              <p>Empecé haciendo de todo: mods, videojuegos, herramientas propias y pruebas con Linux. No seguía un camino diseñado; aprendía porque quería crear cosas que todavía no sabía hacer.</p>
             </div>
-            <div className="about-copy">
-              <p>Aprendí explorando Linux, redes y seguridad; modificando juegos, creando mundos, motores gráficos y herramientas propias. Con el tiempo, esa curiosidad se convirtió en una forma de resolver problemas profesionales.</p>
-              <p>Hoy aplico la misma mentalidad a software empresarial, datos y procesos de negocio: entender el sistema de principio a fin, cuestionar sus límites y construir una solución que pueda demostrarse.</p>
-              <div className="principles">
-                <span>Aprender construyendo</span><span>Ownership real</span><span>Profundidad con propósito</span><span>Impacto medible</span>
-              </div>
+            <div className="about-profile-copy">
+              <p>Con los años, esa curiosidad se convirtió en una forma de trabajar. Hoy desarrollo software end-to-end: entiendo el problema, diseño la solución, construyo el producto y compruebo si realmente aporta valor.</p>
+              <p>Me importa la calidad técnica, pero también el contexto. Saber quién utilizará una herramienta, qué proceso mejora y qué resultado necesita el negocio me permite tomar mejores decisiones de desarrollo.</p>
+              <div className="profile-focus"><span>Software</span><span>Producto</span><span>Datos</span><span>IA aplicada</span></div>
             </div>
           </div>
-          <div className="about-journey" aria-label="Evolución de mi perfil">
-            <article><span>01 · Explorar</span><h3>Sistemas & seguridad</h3><p>Linux, redes, laboratorios de ciberseguridad y curiosidad por entender qué ocurre debajo de la interfaz.</p></article>
-            <article><span>02 · Construir</span><h3>Producto interactivo</h3><p>Mods, videojuegos 2D y 3D, motores gráficos y productos publicados de principio a fin.</p></article>
-            <article><span>03 · Aplicar</span><h3>Datos & negocio</h3><p>Conciliación financiera, automatización y aplicaciones que convierten procesos complejos en decisiones.</p></article>
-            <article><span>04 · Evolucionar</span><h3>IA & liderazgo técnico</h3><p>Mi siguiente frontera: soluciones de IA aplicadas, arquitectura y responsabilidad sobre equipos y producto.</p></article>
+          <div className="work-method" aria-label="Mi proceso de trabajo">
+            <div className="method-label"><span>Mi proceso</span><strong>Del problema al resultado</strong></div>
+            <article><span>01</span><h3>Entender</h3><p>Contexto, usuario, proceso y restricciones.</p></article>
+            <article><span>02</span><h3>Diseñar</h3><p>Arquitectura, experiencia e integraciones.</p></article>
+            <article><span>03</span><h3>Construir</h3><p>Desarrollo end-to-end con ownership real.</p></article>
+            <article><span>04</span><h3>Validar</h3><p>Datos, feedback e impacto medible.</p></article>
           </div>
           <div className="about-now">
-            <span><i /> Ahora</span><p>Responsable de desarrollo y mantenimiento de aplicaciones en el BPO de Ibercaja.</p><strong>Madrid · Software · Datos · IA aplicada</strong>
+            <span><i /> Ahora</span><p>Responsable de desarrollo y mantenimiento de aplicaciones en el BPO de Ibercaja.</p><strong>Madrid · Software · Producto · IA aplicada</strong>
           </div>
         </section>
 
