@@ -473,38 +473,9 @@ function App() {
           </div>
         </section>
 
-        <section className="section capabilities-section" id="sobre-mi">
-          <div className="section-heading compact">
-            <div><p className="kicker"><span>03</span> Cómo aporto valor</p><h2>Curiosidad técnica.<br /><em>Criterio de producto.</em></h2></div>
-          </div>
-          <div className="capabilities-list">
-            {capabilities.map((item) => {
-              const Icon = item.icon
-              return (
-                <article className="capability" key={item.title}>
-                  <span>{item.number}</span><Icon /><h3>{item.title}</h3><p>{item.text}</p><ChevronRight />
-                </article>
-              )
-            })}
-          </div>
-          <div className="about-grid">
-            <div className="about-statement">
-              <span className="quote-mark">“</span>
-              <p>Empecé creando videojuegos porque quería entender cómo funcionaban las cosas. Hoy sigo haciéndome la misma pregunta, pero aplicada a problemas reales de negocio.</p>
-            </div>
-            <div className="about-copy">
-              <p>Mi trayectoria no empezó en una gran empresa ni en una universidad. Empezó aprendiendo por mi cuenta, desmontando problemas y construyendo cosas que parecían demasiado ambiciosas.</p>
-              <p>Esa mezcla de iniciativa, profundidad técnica y orientación a resultados sigue siendo mi forma de trabajar.</p>
-              <div className="principles">
-                <span>Aprendizaje continuo</span><span>Ownership real</span><span>Impacto medible</span><span>Comunicación clara</span>
-              </div>
-            </div>
-          </div>
-        </section>
-
         <section className="section experience-section" id="experiencia">
           <div className="section-heading compact">
-            <div><p className="kicker"><span>04</span> Trayectoria</p><h2>Aprender rápido.<br /><em>Entregar mejor.</em></h2></div>
+            <div><p className="kicker"><span>03</span> Trayectoria</p><h2>Aprender rápido.<br /><em>Entregar mejor.</em></h2></div>
           </div>
           <div className="timeline">
             <article className="timeline-item current">
@@ -528,6 +499,35 @@ function App() {
               <div className="timeline-date">2023 — 2024</div>
               <div><p className="timeline-company">DAM · Proyecto destacado</p><h3>AlphaEngine2D</h3><p>Motor gráfico desarrollado desde cero en Java, convertido en proyecto de referencia académica para promociones posteriores.</p></div>
             </article>
+          </div>
+        </section>
+
+        <section className="section capabilities-section" id="sobre-mi">
+          <div className="section-heading compact">
+            <div><p className="kicker"><span>04</span> Cómo aporto valor</p><h2>Curiosidad técnica.<br /><em>Criterio de producto.</em></h2></div>
+          </div>
+          <div className="capabilities-list">
+            {capabilities.map((item) => {
+              const Icon = item.icon
+              return (
+                <article className="capability" key={item.title}>
+                  <span>{item.number}</span><Icon /><h3>{item.title}</h3><p>{item.text}</p><ChevronRight />
+                </article>
+              )
+            })}
+          </div>
+          <div className="about-grid">
+            <div className="about-statement">
+              <span className="quote-mark">“</span>
+              <p>Empecé creando videojuegos porque quería entender cómo funcionaban las cosas. Hoy sigo haciéndome la misma pregunta, pero aplicada a problemas reales de negocio.</p>
+            </div>
+            <div className="about-copy">
+              <p>Mi trayectoria no empezó en una gran empresa ni en una universidad. Empezó aprendiendo por mi cuenta, desmontando problemas y construyendo cosas que parecían demasiado ambiciosas.</p>
+              <p>Esa mezcla de iniciativa, profundidad técnica y orientación a resultados sigue siendo mi forma de trabajar.</p>
+              <div className="principles">
+                <span>Aprendizaje continuo</span><span>Ownership real</span><span>Impacto medible</span><span>Comunicación clara</span>
+              </div>
+            </div>
           </div>
         </section>
 
