@@ -1,10 +1,10 @@
 import { useEffect, useLayoutEffect, useRef, useState } from 'react'
+import type { CSSProperties } from 'react'
 import {
   ArrowDownRight,
   ArrowRight,
   Bot,
   Boxes,
-  Braces,
   CalendarDays,
   Check,
   ChevronRight,
@@ -18,7 +18,6 @@ import {
   Moon,
   Play,
   Phone,
-  Sparkles,
   Sun,
 } from 'lucide-react'
 
@@ -82,12 +81,6 @@ const projects: Project[] = [
     className: 'project-blue',
     icon: Bot,
   },
-]
-
-const capabilities = [
-  { number: '01', title: 'Desarrollo end-to-end', text: 'Arquitectura, lógica, interfaz, integraciones y despliegue. Me responsabilizo del producto completo, no solo de una capa.', icon: Braces },
-  { number: '02', title: 'Producto & negocio', text: 'Traduzco necesidades operativas en software útil, entendiendo el proceso, el usuario y el resultado que debe generar.', icon: Boxes },
-  { number: '03', title: 'Datos, automatización & IA', text: 'Transformo información y procesos complejos en herramientas medibles, explorando IA cuando aporta valor real.', icon: Sparkles },
 ]
 
 const skillGroups = [
@@ -353,34 +346,128 @@ function AlphaEngineShowcase({ project }: { project: Project }) {
 }
 
 function App() {
+  const navRef = useRef<HTMLElement>(null)
+  const indicatorTimerRef = useRef<number | null>(null)
+  const navigationTargetRef = useRef<string | null>(null)
+  const navigationTimerRef = useRef<number | null>(null)
   const [menuOpen, setMenuOpen] = useState(false)
   const [fruitExpanded, setFruitExpanded] = useState(false)
   const [scrolled, setScrolled] = useState(false)
   const [scrollProgress, setScrollProgress] = useState(0)
   const [activeSection, setActiveSection] = useState('inicio')
+  const [navIndicator, setNavIndicator] = useState({ x: 0, y: 0, width: 0, height: 0, visible: false, moving: false })
   const [theme, setTheme] = useState<Theme>(() => (localStorage.getItem('portfolio-theme') as Theme) || 'system')
 
   useEffect(() => {
-    const onScroll = () => {
+    let frame = 0
+    const updatePageState = () => {
+      frame = 0
       setScrolled(window.scrollY > 24)
       const scrollable = document.documentElement.scrollHeight - window.innerHeight
       setScrollProgress(scrollable > 0 ? (window.scrollY / scrollable) * 100 : 0)
+
+      const marker = window.innerHeight * .32
+      const navigationTarget = navigationTargetRef.current
+      if (navigationTarget) {
+        const destination = document.getElementById(navigationTarget)
+        const destinationBox = destination?.getBoundingClientRect()
+        if (!destinationBox || destinationBox.top > marker || destinationBox.bottom <= marker) return
+        navigationTargetRef.current = null
+        if (navigationTimerRef.current) window.clearTimeout(navigationTimerRef.current)
+        setActiveSection(navigationTarget)
+        return
+      }
+
+      const sectionIds = ['inicio', 'proyectos', 'experiencia', 'habilidades', 'sobre-mi', 'contacto']
+      let currentSection = 'inicio'
+      for (const id of sectionIds) {
+        const section = document.getElementById(id)
+        if (section && section.getBoundingClientRect().top <= marker) currentSection = id
+        else break
+      }
+      if (window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 2) currentSection = 'contacto'
+      setActiveSection(currentSection)
     }
-    onScroll()
+    const onScroll = () => {
+      if (!frame) frame = window.requestAnimationFrame(updatePageState)
+    }
+    updatePageState()
     window.addEventListener('scroll', onScroll)
-    return () => window.removeEventListener('scroll', onScroll)
+    window.addEventListener('resize', onScroll)
+    return () => {
+      if (frame) window.cancelAnimationFrame(frame)
+      window.removeEventListener('scroll', onScroll)
+      window.removeEventListener('resize', onScroll)
+    }
   }, [])
 
-  useEffect(() => {
-    const sections = ['inicio', 'proyectos', 'experiencia', 'habilidades', 'sobre-mi', 'contacto']
-      .map((id) => document.getElementById(id))
-      .filter((section): section is HTMLElement => Boolean(section))
-    const observer = new IntersectionObserver((entries) => {
-      const visible = entries.filter((entry) => entry.isIntersecting).sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0]
-      if (visible?.target.id) setActiveSection(visible.target.id)
-    }, { rootMargin: '-28% 0px -58% 0px', threshold: [0, .1, .25, .5] })
-    sections.forEach((section) => observer.observe(section))
-    return () => observer.disconnect()
+  useLayoutEffect(() => {
+    let disposed = false
+    let retryTimer: number | null = null
+    const updateIndicator = () => {
+      const nav = navRef.current
+      const target = nav?.querySelector<HTMLAnchorElement>(`a[href="#${activeSection}"]`)
+      if (!nav || !target) {
+        setNavIndicator((current) => ({ ...current, visible: false }))
+        return
+      }
+      const navBox = nav.getBoundingClientRect()
+      const targetBox = target.getBoundingClientRect()
+      if (targetBox.width < 1 || targetBox.height < 1) {
+        retryTimer = window.setTimeout(updateIndicator, 80)
+        return
+      }
+      setNavIndicator((current) => {
+        const next = {
+          x: targetBox.left - navBox.left,
+          y: targetBox.top - navBox.top,
+          width: targetBox.width,
+          height: targetBox.height,
+        }
+        const changed = !current.visible || Math.abs(current.x - next.x) > .5 || Math.abs(current.y - next.y) > .5 || Math.abs(current.width - next.width) > .5
+        return { ...next, visible: true, moving: changed }
+      })
+      if (indicatorTimerRef.current) window.clearTimeout(indicatorTimerRef.current)
+      indicatorTimerRef.current = window.setTimeout(() => {
+        setNavIndicator((current) => ({ ...current, moving: false }))
+      }, 520)
+    }
+    const frame = window.requestAnimationFrame(updateIndicator)
+    const settleTimer = window.setTimeout(updateIndicator, 180)
+    const resizeObserver = new ResizeObserver(updateIndicator)
+    if (navRef.current) resizeObserver.observe(navRef.current)
+    document.fonts?.ready.then(() => { if (!disposed) updateIndicator() })
+    window.addEventListener('resize', updateIndicator)
+    return () => {
+      disposed = true
+      window.cancelAnimationFrame(frame)
+      window.clearTimeout(settleTimer)
+      if (retryTimer) window.clearTimeout(retryTimer)
+      resizeObserver.disconnect()
+      window.removeEventListener('resize', updateIndicator)
+      if (indicatorTimerRef.current) window.clearTimeout(indicatorTimerRef.current)
+    }
+  }, [activeSection, menuOpen])
+
+  useLayoutEffect(() => {
+    const targets = document.querySelectorAll<HTMLElement>('.section-heading, .project-card, .cibeles-showcase, .timeline-item, .skill-group, .strengths-panel, .about-profile, .work-method, .about-now, .contact-card')
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      targets.forEach((target) => target.classList.add('in-view'))
+      return
+    }
+    targets.forEach((target, index) => {
+      target.classList.add('scroll-reveal')
+      target.style.setProperty('--reveal-delay', `${(index % 4) * 55}ms`)
+    })
+    const revealObserver = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (!entry.isIntersecting) return
+        entry.target.classList.add('in-view')
+        revealObserver.unobserve(entry.target)
+      })
+    }, { rootMargin: '0px 0px -8% 0px', threshold: .08 })
+    targets.forEach((target) => revealObserver.observe(target))
+    return () => revealObserver.disconnect()
   }, [])
 
   useEffect(() => {
@@ -393,23 +480,53 @@ function App() {
     return () => { document.body.style.overflow = '' }
   }, [menuOpen])
 
+  useEffect(() => () => {
+    if (navigationTimerRef.current) window.clearTimeout(navigationTimerRef.current)
+  }, [])
+
   const closeMenu = () => setMenuOpen(false)
+  const currentSectionLabel = ({
+    inicio: 'Inicio',
+    proyectos: 'Proyectos',
+    experiencia: 'Experiencia',
+    habilidades: 'Habilidades',
+    'sobre-mi': 'Sobre mí',
+    contacto: 'Contacto',
+  } as Record<string, string>)[activeSection] || 'Inicio'
+  const navigateTo = (section: string) => {
+    navigationTargetRef.current = section
+    setActiveSection(section)
+    closeMenu()
+    if (navigationTimerRef.current) window.clearTimeout(navigationTimerRef.current)
+    navigationTimerRef.current = window.setTimeout(() => { navigationTargetRef.current = null }, 1400)
+  }
 
   return (
     <div className="site-shell">
       <a className="skip-link" href="#main-content">Saltar al contenido</a>
-      <header className={`topbar ${scrolled ? 'topbar-scrolled' : ''}`}>
+      <header className={`topbar ${scrolled ? 'topbar-scrolled' : ''} ${menuOpen ? 'topbar-menu-open' : ''}`}>
         <span className="scroll-progress" style={{ width: `${scrollProgress}%` }} />
         <a className="brand" href="#inicio" aria-label="Ir al inicio">MR<span>.</span></a>
-        <nav className={menuOpen ? 'nav nav-open' : 'nav'} aria-label="Navegación principal">
-          <a className={activeSection === 'proyectos' ? 'active' : ''} aria-current={activeSection === 'proyectos' ? 'page' : undefined} href="#proyectos" onClick={closeMenu}><span>02</span>Proyectos</a>
-          <a className={activeSection === 'experiencia' ? 'active' : ''} aria-current={activeSection === 'experiencia' ? 'page' : undefined} href="#experiencia" onClick={closeMenu}><span>03</span>Experiencia</a>
-          <a className={activeSection === 'habilidades' ? 'active' : ''} aria-current={activeSection === 'habilidades' ? 'page' : undefined} href="#habilidades" onClick={closeMenu}><span>04</span>Habilidades</a>
-          <a className={activeSection === 'sobre-mi' ? 'active' : ''} aria-current={activeSection === 'sobre-mi' ? 'page' : undefined} href="#sobre-mi" onClick={closeMenu}><span>05</span>Sobre mí</a>
-          <a className={activeSection === 'contacto' ? 'active' : ''} aria-current={activeSection === 'contacto' ? 'page' : undefined} href="#contacto" onClick={closeMenu}><span>06</span>Contacto</a>
+        <span className="mobile-section-label" key={activeSection}>{currentSectionLabel}</span>
+        <nav ref={navRef} className={menuOpen ? 'nav nav-open' : 'nav'} aria-label="Navegación principal">
+          <span
+            className={`nav-indicator ${navIndicator.visible ? 'nav-indicator-visible' : ''} ${navIndicator.moving ? 'nav-indicator-moving' : ''}`}
+            style={{
+              '--indicator-x': `${navIndicator.x}px`,
+              '--indicator-y': `${navIndicator.y}px`,
+              '--indicator-width': `${navIndicator.width}px`,
+              '--indicator-height': `${navIndicator.height}px`,
+            } as CSSProperties}
+            aria-hidden="true"
+          ><i /></span>
+          <a className={activeSection === 'proyectos' ? 'active' : ''} aria-current={activeSection === 'proyectos' ? 'page' : undefined} href="#proyectos" onClick={() => navigateTo('proyectos')}><span>02</span>Proyectos</a>
+          <a className={activeSection === 'experiencia' ? 'active' : ''} aria-current={activeSection === 'experiencia' ? 'page' : undefined} href="#experiencia" onClick={() => navigateTo('experiencia')}><span>03</span>Experiencia</a>
+          <a className={activeSection === 'habilidades' ? 'active' : ''} aria-current={activeSection === 'habilidades' ? 'page' : undefined} href="#habilidades" onClick={() => navigateTo('habilidades')}><span>04</span>Habilidades</a>
+          <a className={activeSection === 'sobre-mi' ? 'active' : ''} aria-current={activeSection === 'sobre-mi' ? 'page' : undefined} href="#sobre-mi" onClick={() => navigateTo('sobre-mi')}><span>05</span>Sobre mí</a>
+          <a className={activeSection === 'contacto' ? 'active' : ''} aria-current={activeSection === 'contacto' ? 'page' : undefined} href="#contacto" onClick={() => navigateTo('contacto')}><span>06</span>Contacto</a>
         </nav>
         <div className="header-actions">
-          <div className="theme-switcher" aria-label="Apariencia">
+          <div className="theme-switcher" data-active-theme={theme} aria-label="Apariencia">
             <button className={theme === 'system' ? 'active' : ''} onClick={() => setTheme('system')} title="Usar tema del dispositivo" aria-label="Tema automático"><Monitor /></button>
             <button className={theme === 'light' ? 'active' : ''} onClick={() => setTheme('light')} title="Usar tema claro" aria-label="Tema claro"><Sun /></button>
             <button className={theme === 'dark' ? 'active' : ''} onClick={() => setTheme('dark')} title="Usar tema oscuro" aria-label="Tema oscuro"><Moon /></button>
@@ -593,16 +710,6 @@ function App() {
           <div className="section-heading about-heading">
             <div><p className="kicker"><span>05</span> Cómo trabajo</p><h2>Ingeniería con<br /><em>visión de producto.</em></h2></div>
             <p>Construyo software entendiendo el sistema completo: la tecnología, el usuario, el proceso y el objetivo de negocio.</p>
-          </div>
-          <div className="capabilities-list">
-            {capabilities.map((item) => {
-              const Icon = item.icon
-              return (
-                <article className="capability" key={item.title}>
-                  <span>{item.number}</span><Icon /><h3>{item.title}</h3><p>{item.text}</p><ChevronRight />
-                </article>
-              )
-            })}
           </div>
           <div className="about-profile">
             <div className="about-profile-lead">
