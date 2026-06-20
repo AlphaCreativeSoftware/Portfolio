@@ -11,6 +11,7 @@ import {
   Code2,
   Database,
   ExternalLink,
+  FileText,
   Gamepad2,
   Mail,
   Monitor,
@@ -248,6 +249,71 @@ function CibelesShowcase() {
   )
 }
 
+function AlphaEngineShowcase({ project }: { project: Project }) {
+  const [expanded, setExpanded] = useState(false)
+  const modules = [
+    ['Render', 'Graphics2D, transformaciones, alpha y descarte fuera de cámara'],
+    ['Escenas', 'GameState, jerarquía de objetos y transiciones con carga asíncrona'],
+    ['Objetos', 'GameObject y GameEntity como base extensible por herencia'],
+    ['Físicas', 'BoxCollider2D, triggers y detección direccional con márgenes'],
+    ['Recursos', 'Carga centralizada de imágenes, fuentes, animaciones y sonido'],
+    ['Sistemas', 'Input, UI interactiva, partículas y persistencia de datos'],
+  ]
+
+  return (
+    <article className="alpha-showcase">
+      <div className="alpha-project-meta"><span>02</span><span className="engine-pill"><i /> Motor propio · Java</span></div>
+      <div className="alpha-summary">
+        <div>
+          <p className="project-eyebrow">Arquitectura · Gráficos 2D · Sistemas de juego</p>
+          <h3>Un motor construido<br />desde los fundamentos.</h3>
+        </div>
+        <div className="alpha-summary-copy">
+          <p>{project.description}</p>
+          <div className="project-tags"><span>Java 17</span><span>AWT · Graphics2D</span><span>Swing · JFrame</span><span>Arquitectura propia</span></div>
+        </div>
+      </div>
+      <div className="alpha-proof">
+        <div><strong>42</strong><span>clases Java</span></div>
+        <div><strong>21</strong><span>páginas de documentación</span></div>
+        <div><strong>1</strong><span>juego funcional incluido</span></div>
+      </div>
+      <button className="details-toggle" onClick={() => setExpanded(!expanded)} aria-expanded={expanded}>
+        <span><small>Caso interactivo</small>{expanded ? 'Ocultar arquitectura' : 'Explorar el motor'}</span><ChevronRight />
+      </button>
+      <div className={`project-details ${expanded ? 'project-details-open' : ''}`}>
+        <div className="project-details-inner" aria-hidden={!expanded} inert={!expanded}>
+          <div className="alpha-detail">
+            <div className="engine-visual">
+              <div className="engine-splash"><img src="/projects/alpha-engine/splash.png" alt="Pantalla de inicio de AlphaEngine2D" /></div>
+              <div className="engine-console">
+                <div className="console-head"><span><i /><i /><i /></span><small>AlphaEngine2D · frame pipeline</small><b>RUNNING</b></div>
+                <div className="engine-pipeline">
+                  {['Input', 'Update', 'Collisions', 'Render'].map((step, index) => <div className={`pipeline-step step-${index + 1}`} key={step}><span>{String(index + 1).padStart(2, '0')}</span><strong>{step}</strong><i /></div>)}
+                </div>
+                <div className="engine-hierarchy">
+                  <span>Window.run()</span><i />
+                  <span>GameState</span><i />
+                  <span>SceneObjects</span><i />
+                  <span>GameObject → GameEntity</span>
+                </div>
+              </div>
+            </div>
+            <div className="engine-modules">
+              <div className="module-heading"><span>Sistemas del motor</span><strong>Diseñados desde cero</strong></div>
+              {modules.map(([name, description], index) => <div className="engine-module" key={name}><span>{String(index + 1).padStart(2, '0')}</span><strong>{name}</strong><p>{description}</p></div>)}
+              <div className="engine-links">
+                <a href="https://github.com/AlphaCreativeSoftware/AlphaEngine2D" target="_blank" rel="noreferrer"><Code2 /> Ver código <ExternalLink /></a>
+                <a href="https://github.com/AlphaCreativeSoftware/AlphaEngine2D/blob/main/DOCUMENTACION(LEER).pdf" target="_blank" rel="noreferrer"><FileText /> Leer documentación <ExternalLink /></a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </article>
+  )
+}
+
 function App() {
   const [menuOpen, setMenuOpen] = useState(false)
   const [fruitExpanded, setFruitExpanded] = useState(false)
@@ -330,6 +396,7 @@ function App() {
             {projects.map((project) => {
               const Icon = project.icon
               if (project.index === '01') return <CibelesShowcase key={project.title} />
+              if (project.index === '02') return <AlphaEngineShowcase project={project} key={project.title} />
               if (project.index === '03') {
                 return (
                   <article className={`fruit-showcase ${fruitExpanded ? 'fruit-showcase-open' : ''}`} key={project.title}>
