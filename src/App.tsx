@@ -40,6 +40,16 @@ type MatchPath = {
   grouped?: boolean
 }
 
+const sectionIds = ['inicio', 'proyectos', 'experiencia', 'habilidades', 'sobre-mi', 'contacto'] as const
+const sectionLabels: Record<(typeof sectionIds)[number], string> = {
+  inicio: 'Inicio',
+  proyectos: 'Proyectos',
+  experiencia: 'Experiencia',
+  habilidades: 'Habilidades',
+  'sobre-mi': 'Sobre mí',
+  contacto: 'Contacto',
+}
+
 const projects: Project[] = [
   {
     index: '01',
@@ -121,6 +131,8 @@ const professionalStrengths = [
   ['Comunicación transversal', 'Traduzco complejidad para perfiles técnicos y de dirección.'],
 ]
 
+const marqueeItems = ['Software', 'Automatización', 'Inteligencia artificial', 'Producto', 'Datos']
+
 const cibelesPhases = [
   'Estandarizando millones de registros',
   'Calculando ventanas temporales',
@@ -146,6 +158,8 @@ const adaptationRows = [
 function CibelesShowcase() {
   const [activePhase, setActivePhase] = useState(0)
   const [expanded, setExpanded] = useState(false)
+  const [isVisible, setIsVisible] = useState(false)
+  const showcaseRef = useRef<HTMLElement>(null)
   const stageRef = useRef<HTMLDivElement>(null)
   const [matchLayout, setMatchLayout] = useState<{ width: number; height: number; paths: MatchPath[] }>({ width: 1, height: 1, paths: [] })
 
@@ -154,15 +168,25 @@ function CibelesShowcase() {
       setActivePhase(0)
       return
     }
+    if (!isVisible) return
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
       setActivePhase(cibelesPhases.length - 1)
       return
     }
     const timer = window.setInterval(() => setActivePhase((phase) => (phase + 1) % cibelesPhases.length), 1800)
     return () => window.clearInterval(timer)
-  }, [expanded])
+  }, [expanded, isVisible])
+
+  useEffect(() => {
+    const showcase = showcaseRef.current
+    if (!showcase) return
+    const observer = new IntersectionObserver(([entry]) => setIsVisible(entry.isIntersecting), { rootMargin: '120px 0px', threshold: .01 })
+    observer.observe(showcase)
+    return () => observer.disconnect()
+  }, [])
 
   useLayoutEffect(() => {
+    if (!expanded) return
     const stage = stageRef.current
     if (!stage) return
 
@@ -195,10 +219,10 @@ function CibelesShowcase() {
     observer.observe(stage)
     updateConnections()
     return () => observer.disconnect()
-  }, [])
+  }, [expanded])
 
   return (
-    <article className="cibeles-showcase">
+    <article className="cibeles-showcase" ref={showcaseRef} data-visible={isVisible}>
       <div className="cibeles-project-meta"><span>01</span><span className="professional-pill"><i /> Proyecto profesional · Testa Homes</span></div>
       <div className="cibeles-heading">
         <div>
@@ -217,17 +241,17 @@ function CibelesShowcase() {
         <div><strong>97%</strong><span>de precisión al auditar relaciones existentes</span></div>
       </div>
 
-      <button className="details-toggle" onClick={() => setExpanded(!expanded)} aria-expanded={expanded}>
+      <button className="details-toggle" onClick={() => setExpanded(!expanded)} aria-expanded={expanded} aria-controls="cibeles-details">
         <span><small>Caso interactivo</small>{expanded ? 'Ocultar funcionamiento' : 'Ver cómo funciona'}</span><ChevronRight />
       </button>
 
-      <div className={`project-details ${expanded ? 'project-details-open' : ''}`}>
+      <div id="cibeles-details" className={`project-details ${expanded ? 'project-details-open' : ''}`}>
         <div className="project-details-inner" aria-hidden={!expanded} inert={!expanded}>
       <div className="cibeles-demo">
         <div className="reconciliation-panel">
           <div className="demo-toolbar">
             <span className="demo-live"><i /> Motor de conciliación</span>
-            <span className="python-runtime"><img src="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/python/python-original.svg" alt="" /> Python · motor activo</span>
+            <span className="python-runtime"><img src="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/python/python-original.svg" alt="" loading="lazy" decoding="async" /> Python · motor activo</span>
             <span>{String(activePhase + 1).padStart(2, '0')} / 06</span>
           </div>
           <div className="phase-track">
@@ -309,14 +333,14 @@ function AlphaEngineShowcase({ project }: { project: Project }) {
         <div><strong>21</strong><span>páginas de documentación</span></div>
         <div><strong>1</strong><span>juego funcional incluido</span></div>
       </div>
-      <button className="details-toggle" onClick={() => setExpanded(!expanded)} aria-expanded={expanded}>
+      <button className="details-toggle" onClick={() => setExpanded(!expanded)} aria-expanded={expanded} aria-controls="alpha-engine-details">
         <span><small>Caso interactivo</small>{expanded ? 'Ocultar arquitectura' : 'Explorar el motor'}</span><ChevronRight />
       </button>
-      <div className={`project-details ${expanded ? 'project-details-open' : ''}`}>
+      <div id="alpha-engine-details" className={`project-details ${expanded ? 'project-details-open' : ''}`}>
         <div className="project-details-inner" aria-hidden={!expanded} inert={!expanded}>
           <div className="alpha-detail">
             <div className="engine-visual">
-              <div className="engine-splash"><img src="/projects/alpha-engine/splash.png" alt="Pantalla de inicio de AlphaEngine2D" /></div>
+              <div className="engine-splash"><img src="/projects/alpha-engine/splash.png" alt="Pantalla de inicio de AlphaEngine2D" loading="lazy" decoding="async" /></div>
               <div className="engine-console">
                 <div className="console-head"><span><i /><i /><i /></span><small>AlphaEngine2D · frame pipeline</small><b>RUNNING</b></div>
                 <div className="engine-pipeline">
@@ -347,24 +371,38 @@ function AlphaEngineShowcase({ project }: { project: Project }) {
 
 function App() {
   const navRef = useRef<HTMLElement>(null)
+  const menuButtonRef = useRef<HTMLButtonElement>(null)
+  const marqueeRef = useRef<HTMLElement>(null)
+  const scrollProgressRef = useRef<HTMLSpanElement>(null)
+  const scrolledRef = useRef(false)
+  const activeSectionRef = useRef('inicio')
   const indicatorTimerRef = useRef<number | null>(null)
   const navigationTargetRef = useRef<string | null>(null)
   const navigationTimerRef = useRef<number | null>(null)
   const [menuOpen, setMenuOpen] = useState(false)
   const [fruitExpanded, setFruitExpanded] = useState(false)
   const [scrolled, setScrolled] = useState(false)
-  const [scrollProgress, setScrollProgress] = useState(0)
   const [activeSection, setActiveSection] = useState('inicio')
   const [navIndicator, setNavIndicator] = useState({ x: 0, y: 0, width: 0, height: 0, visible: false, moving: false })
   const [theme, setTheme] = useState<Theme>(() => (localStorage.getItem('portfolio-theme') as Theme) || 'system')
+  const updateActiveSection = (section: string) => {
+    if (activeSectionRef.current === section) return
+    activeSectionRef.current = section
+    setActiveSection(section)
+  }
 
   useEffect(() => {
     let frame = 0
     const updatePageState = () => {
       frame = 0
-      setScrolled(window.scrollY > 24)
+      const nextScrolled = window.scrollY > 24
+      if (scrolledRef.current !== nextScrolled) {
+        scrolledRef.current = nextScrolled
+        setScrolled(nextScrolled)
+      }
       const scrollable = document.documentElement.scrollHeight - window.innerHeight
-      setScrollProgress(scrollable > 0 ? (window.scrollY / scrollable) * 100 : 0)
+      const progress = scrollable > 0 ? window.scrollY / scrollable : 0
+      if (scrollProgressRef.current) scrollProgressRef.current.style.transform = `scaleX(${Math.min(1, Math.max(0, progress))})`
 
       const marker = window.innerHeight * .32
       const navigationTarget = navigationTargetRef.current
@@ -374,11 +412,10 @@ function App() {
         if (!destinationBox || destinationBox.top > marker || destinationBox.bottom <= marker) return
         navigationTargetRef.current = null
         if (navigationTimerRef.current) window.clearTimeout(navigationTimerRef.current)
-        setActiveSection(navigationTarget)
+        updateActiveSection(navigationTarget)
         return
       }
 
-      const sectionIds = ['inicio', 'proyectos', 'experiencia', 'habilidades', 'sobre-mi', 'contacto']
       let currentSection = 'inicio'
       for (const id of sectionIds) {
         const section = document.getElementById(id)
@@ -386,16 +423,19 @@ function App() {
         else break
       }
       if (window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 2) currentSection = 'contacto'
-      setActiveSection(currentSection)
+      updateActiveSection(currentSection)
     }
     const onScroll = () => {
       if (!frame) frame = window.requestAnimationFrame(updatePageState)
     }
     updatePageState()
+    const pageResizeObserver = new ResizeObserver(onScroll)
+    pageResizeObserver.observe(document.documentElement)
     window.addEventListener('scroll', onScroll)
     window.addEventListener('resize', onScroll)
     return () => {
       if (frame) window.cancelAnimationFrame(frame)
+      pageResizeObserver.disconnect()
       window.removeEventListener('scroll', onScroll)
       window.removeEventListener('resize', onScroll)
     }
@@ -450,7 +490,7 @@ function App() {
   }, [activeSection, menuOpen])
 
   useLayoutEffect(() => {
-    const targets = document.querySelectorAll<HTMLElement>('.section-heading, .project-card, .cibeles-showcase, .timeline-item, .skill-group, .strengths-panel, .about-profile, .work-method, .about-now, .contact-card')
+    const targets = document.querySelectorAll<HTMLElement>('.section-heading, .project-card, .cibeles-showcase, .alpha-showcase, .fruit-showcase, .timeline-item, .skill-group, .strengths-panel, .about-profile, .work-method, .about-now, .contact-card')
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
       targets.forEach((target) => target.classList.add('in-view'))
       return
@@ -471,44 +511,87 @@ function App() {
   }, [])
 
   useEffect(() => {
+    const marquee = marqueeRef.current
+    if (!marquee) return
+    const observer = new IntersectionObserver(([entry]) => marquee.classList.toggle('marquee-running', entry.isIntersecting), { threshold: .01 })
+    observer.observe(marquee)
+    return () => observer.disconnect()
+  }, [])
+
+  useEffect(() => {
     document.documentElement.dataset.theme = theme
     localStorage.setItem('portfolio-theme', theme)
+    const systemTheme = window.matchMedia('(prefers-color-scheme: dark)')
+    const syncBrowserTheme = () => {
+      const darkTheme = theme === 'dark' || (theme === 'system' && systemTheme.matches)
+      document.querySelector<HTMLMetaElement>('meta[name="theme-color"]')?.setAttribute('content', darkTheme ? '#000000' : '#ffffff')
+    }
+    syncBrowserTheme()
+    if (theme === 'system') systemTheme.addEventListener('change', syncBrowserTheme)
+    return () => systemTheme.removeEventListener('change', syncBrowserTheme)
   }, [theme])
 
   useEffect(() => {
     document.body.style.overflow = menuOpen ? 'hidden' : ''
-    return () => { document.body.style.overflow = '' }
+    if (!menuOpen) return () => { document.body.style.overflow = '' }
+    const closeOnEscape = (event: KeyboardEvent) => {
+      if (event.key !== 'Escape') return
+      setMenuOpen(false)
+      window.requestAnimationFrame(() => menuButtonRef.current?.focus())
+    }
+    const desktopQuery = window.matchMedia('(min-width: 901px)')
+    const closeOnDesktop = (event: MediaQueryListEvent) => { if (event.matches) setMenuOpen(false) }
+    window.addEventListener('keydown', closeOnEscape)
+    desktopQuery.addEventListener('change', closeOnDesktop)
+    return () => {
+      document.body.style.overflow = ''
+      window.removeEventListener('keydown', closeOnEscape)
+      desktopQuery.removeEventListener('change', closeOnDesktop)
+    }
   }, [menuOpen])
 
   useEffect(() => () => {
     if (navigationTimerRef.current) window.clearTimeout(navigationTimerRef.current)
   }, [])
 
+  useEffect(() => {
+    const cancelProgrammaticNavigation = () => {
+      if (!navigationTargetRef.current) return
+      navigationTargetRef.current = null
+      if (navigationTimerRef.current) window.clearTimeout(navigationTimerRef.current)
+      window.dispatchEvent(new Event('scroll'))
+    }
+    window.addEventListener('wheel', cancelProgrammaticNavigation, { passive: true })
+    window.addEventListener('touchstart', cancelProgrammaticNavigation, { passive: true })
+    return () => {
+      window.removeEventListener('wheel', cancelProgrammaticNavigation)
+      window.removeEventListener('touchstart', cancelProgrammaticNavigation)
+    }
+  }, [])
+
   const closeMenu = () => setMenuOpen(false)
-  const currentSectionLabel = ({
-    inicio: 'Inicio',
-    proyectos: 'Proyectos',
-    experiencia: 'Experiencia',
-    habilidades: 'Habilidades',
-    'sobre-mi': 'Sobre mí',
-    contacto: 'Contacto',
-  } as Record<string, string>)[activeSection] || 'Inicio'
+  const currentSectionLabel = sectionLabels[activeSection as keyof typeof sectionLabels] || 'Inicio'
   const navigateTo = (section: string) => {
+    const restoreMenuFocus = menuOpen
     navigationTargetRef.current = section
-    setActiveSection(section)
+    updateActiveSection(section)
     closeMenu()
+    if (restoreMenuFocus) window.requestAnimationFrame(() => menuButtonRef.current?.focus({ preventScroll: true }))
     if (navigationTimerRef.current) window.clearTimeout(navigationTimerRef.current)
-    navigationTimerRef.current = window.setTimeout(() => { navigationTargetRef.current = null }, 1400)
+    navigationTimerRef.current = window.setTimeout(() => {
+      navigationTargetRef.current = null
+      window.dispatchEvent(new Event('scroll'))
+    }, 1400)
   }
 
   return (
     <div className="site-shell">
       <a className="skip-link" href="#main-content">Saltar al contenido</a>
       <header className={`topbar ${scrolled ? 'topbar-scrolled' : ''} ${menuOpen ? 'topbar-menu-open' : ''}`}>
-        <span className="scroll-progress" style={{ width: `${scrollProgress}%` }} />
-        <a className="brand" href="#inicio" aria-label="Ir al inicio">MR<span>.</span></a>
+        <span className="scroll-progress" ref={scrollProgressRef} />
+        <a className="brand" href="#inicio" aria-label="Ir al inicio" onClick={() => navigateTo('inicio')}>MR<span>.</span></a>
         <span className="mobile-section-label" key={activeSection}>{currentSectionLabel}</span>
-        <nav ref={navRef} className={menuOpen ? 'nav nav-open' : 'nav'} aria-label="Navegación principal">
+        <nav id="site-navigation" ref={navRef} className={menuOpen ? 'nav nav-open' : 'nav'} aria-label="Navegación principal">
           <span
             className={`nav-indicator ${navIndicator.visible ? 'nav-indicator-visible' : ''} ${navIndicator.moving ? 'nav-indicator-moving' : ''}`}
             style={{
@@ -526,17 +609,17 @@ function App() {
           <a className={activeSection === 'contacto' ? 'active' : ''} aria-current={activeSection === 'contacto' ? 'page' : undefined} href="#contacto" onClick={() => navigateTo('contacto')}><span>06</span>Contacto</a>
         </nav>
         <div className="header-actions">
-          <div className="theme-switcher" data-active-theme={theme} aria-label="Apariencia">
-            <button className={theme === 'system' ? 'active' : ''} onClick={() => setTheme('system')} title="Usar tema del dispositivo" aria-label="Tema automático"><Monitor /></button>
-            <button className={theme === 'light' ? 'active' : ''} onClick={() => setTheme('light')} title="Usar tema claro" aria-label="Tema claro"><Sun /></button>
-            <button className={theme === 'dark' ? 'active' : ''} onClick={() => setTheme('dark')} title="Usar tema oscuro" aria-label="Tema oscuro"><Moon /></button>
+          <div className="theme-switcher" data-active-theme={theme} role="group" aria-label="Apariencia">
+            <button className={theme === 'system' ? 'active' : ''} aria-pressed={theme === 'system'} onClick={() => setTheme('system')} title="Usar tema del dispositivo" aria-label="Tema automático"><Monitor /></button>
+            <button className={theme === 'light' ? 'active' : ''} aria-pressed={theme === 'light'} onClick={() => setTheme('light')} title="Usar tema claro" aria-label="Tema claro"><Sun /></button>
+            <button className={theme === 'dark' ? 'active' : ''} aria-pressed={theme === 'dark'} onClick={() => setTheme('dark')} title="Usar tema oscuro" aria-label="Tema oscuro"><Moon /></button>
           </div>
-          <a className="availability" href="#contacto"><span />Disponible</a>
+          <a className="availability" href="#contacto" onClick={() => navigateTo('contacto')}><span />Disponible</a>
         </div>
-        <button className={`menu-button ${menuOpen ? 'menu-button-open' : ''}`} onClick={() => setMenuOpen(!menuOpen)} aria-label={menuOpen ? 'Cerrar menú' : 'Abrir menú'} aria-expanded={menuOpen}>
+        <button ref={menuButtonRef} className={`menu-button ${menuOpen ? 'menu-button-open' : ''}`} onClick={() => setMenuOpen(!menuOpen)} aria-label={menuOpen ? 'Cerrar menú' : 'Abrir menú'} aria-expanded={menuOpen} aria-controls="site-navigation">
           <span className="hamburger"><i /><i /><i /></span>
         </button>
-        <button className={`nav-backdrop ${menuOpen ? 'nav-backdrop-open' : ''}`} onClick={closeMenu} aria-label="Cerrar menú" tabIndex={menuOpen ? 0 : -1} />
+        <button className={`nav-backdrop ${menuOpen ? 'nav-backdrop-open' : ''}`} onClick={() => { closeMenu(); window.requestAnimationFrame(() => menuButtonRef.current?.focus()) }} aria-label="Cerrar menú" tabIndex={menuOpen ? 0 : -1} />
       </header>
 
       <main id="main-content" tabIndex={-1}>
@@ -549,8 +632,8 @@ function App() {
             <p>Hola, soy <strong>Mikael Rodríguez</strong>. Diseño productos, automatizaciones y soluciones de datos e IA con una obsesión sencilla: que funcionen y generen impacto real.</p>
           </div>
           <div className="hero-actions">
-            <a className="button button-primary" href="#proyectos">Explorar proyectos <ArrowDownRight size={18} /></a>
-            <a className="text-link" href="#sobre-mi">Conocer mi historia <ArrowRight size={17} /></a>
+            <a className="button button-primary" href="#proyectos" onClick={() => navigateTo('proyectos')}>Explorar proyectos <ArrowDownRight size={18} /></a>
+            <a className="text-link" href="#sobre-mi" onClick={() => navigateTo('sobre-mi')}>Conocer mi historia <ArrowRight size={17} /></a>
           </div>
           <div className="hero-stats">
             <div><strong>97<span>%</span></strong><small>Precisión sobre millones de registros</small></div>
@@ -559,8 +642,10 @@ function App() {
           </div>
         </section>
 
-        <section className="marquee" aria-hidden="true">
-          <div>SOFTWARE <span>·</span> AUTOMATIZACIÓN <span>·</span> INTELIGENCIA ARTIFICIAL <span>·</span> PRODUCTO <span>·</span> DATOS <span>·</span></div>
+        <section className="marquee" ref={marqueeRef} aria-hidden="true">
+          <div className="marquee-track">
+            {[0, 1].map((copy) => <div className="marquee-group" key={copy}>{marqueeItems.map((item) => <span key={item}>{item}<i>·</i></span>)}</div>)}
+          </div>
         </section>
 
         <section className="section projects-section" id="proyectos">
@@ -579,10 +664,10 @@ function App() {
                     <div className="fruit-content">
                       <div className="project-top"><span>{project.index}</span><span className="published-pill"><span /> Disponible en Google Play</span></div>
                       <div className="fruit-title-row">
-                        <img src="/projects/fruit-drop/icon.png" alt="Icono de Fruit Drop" />
+                        <img src="/projects/fruit-drop/icon.png" alt="Icono de Fruit Drop" loading="lazy" decoding="async" />
                         <div><p className="project-eyebrow">{project.eyebrow}</p><h3>{project.title}</h3></div>
                       </div>
-                      <div className="fruit-summary-art"><img src="/projects/fruit-drop/feature.png" alt="Personajes y logotipo de Fruit Drop" /></div>
+                      <div className="fruit-summary-art"><img src="/projects/fruit-drop/feature.png" alt="Personajes y logotipo de Fruit Drop" loading="lazy" decoding="async" /></div>
                       <p className="project-description">{project.description}</p>
                       <div className="fruit-metrics">
                         <div><strong>3 meses</strong><span>De desarrollo hasta publicación</span></div>
@@ -592,11 +677,11 @@ function App() {
                       <a className="store-link" href="https://play.google.com/store/apps/details?id=com.alphacreative.fruitdrop" target="_blank" rel="noreferrer">
                         Ver en Google Play <ExternalLink size={17} />
                       </a>
-                      <button className="details-toggle" onClick={() => setFruitExpanded(!fruitExpanded)} aria-expanded={fruitExpanded}>
+                      <button className="details-toggle" onClick={() => setFruitExpanded(!fruitExpanded)} aria-expanded={fruitExpanded} aria-controls="fruit-drop-details">
                         <span><small>Caso interactivo</small>{fruitExpanded ? 'Ocultar funcionamiento' : 'Explorar integraciones'}</span><ChevronRight />
                       </button>
                     </div>
-                    <div className={`project-details fruit-project-details ${fruitExpanded ? 'project-details-open' : ''}`}>
+                    <div id="fruit-drop-details" className={`project-details fruit-project-details ${fruitExpanded ? 'project-details-open' : ''}`}>
                       <div className="project-details-inner" aria-hidden={!fruitExpanded} inert={!fruitExpanded}>
                         <div className="fruit-detail-grid">
                           <div className="fruit-detail-copy">
@@ -607,7 +692,7 @@ function App() {
                             <path d="M50 50 L17 18" /><path d="M50 50 L83 18" /><path d="M50 50 L12 50" />
                             <path d="M50 50 L88 50" /><path d="M50 50 L17 82" /><path d="M50 50 L83 82" />
                           </svg>
-                          <div className="integration-core"><img src="/projects/fruit-drop/icon.png" alt="Fruit Drop" /><i /></div>
+                          <div className="integration-core"><img src="/projects/fruit-drop/icon.png" alt="Fruit Drop" loading="lazy" decoding="async" /><i /></div>
                           {[
                             ['UA', 'Unity Ads'], ['PS', 'Play Services'], ['GC', 'Google Cloud'],
                             ['#', 'Rankings'], ['FB', 'Firebase'], ['IAP', 'Unity IAP'],
@@ -620,9 +705,9 @@ function App() {
                       </div>
                           </div>
                     <div className="fruit-visual" aria-label="Imágenes del videojuego Fruit Drop">
-                      <div className="fruit-feature"><img src="/projects/fruit-drop/feature.png" alt="Arte promocional de Fruit Drop con sus personajes" /></div>
-                      <div className="phone-frame"><div className="phone-speaker" /><img src="/projects/fruit-drop/rankings.png" alt="Ranking global dentro de Fruit Drop" /></div>
-                      <img className="floating-fruit-icon" src="/projects/fruit-drop/icon.png" alt="" aria-hidden="true" />
+                      <div className="fruit-feature"><img src="/projects/fruit-drop/feature.png" alt="Arte promocional de Fruit Drop con sus personajes" loading="lazy" decoding="async" /></div>
+                      <div className="phone-frame"><div className="phone-speaker" /><img src="/projects/fruit-drop/rankings.png" alt="Ranking global dentro de Fruit Drop" loading="lazy" decoding="async" /></div>
+                      <img className="floating-fruit-icon" src="/projects/fruit-drop/icon.png" alt="" aria-hidden="true" loading="lazy" decoding="async" />
                     </div>
                         </div>
                       </div>
@@ -645,7 +730,7 @@ function App() {
           </div>
           <div className="more-work">
             <p>También he construido mundos abiertos 3D, herramientas de ciberseguridad y proyectos editoriales.</p>
-            <a href="#contacto">Hablemos de ellos <ArrowRight size={17} /></a>
+            <a href="#contacto" onClick={() => navigateTo('contacto')}>Hablemos de ellos <ArrowRight size={17} /></a>
           </div>
         </section>
 
@@ -759,9 +844,9 @@ function App() {
       </main>
 
       <footer>
-        <a className="brand" href="#inicio">MR<span>.</span></a>
+        <a className="brand" href="#inicio" onClick={() => navigateTo('inicio')}>MR<span>.</span></a>
         <p>Diseñado y desarrollado por Mikael Rodríguez.</p>
-        <a href="#inicio">Volver arriba <ArrowRight size={15} /></a>
+        <a href="#inicio" onClick={() => navigateTo('inicio')}>Volver arriba <ArrowRight size={15} /></a>
       </footer>
     </div>
   )

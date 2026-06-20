@@ -3,16 +3,21 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)" />
-    <meta name="theme-color" content="#000000" media="(prefers-color-scheme: dark)" />
+    <meta name="theme-color" content="#ffffff" />
     <meta name="description" content="Portfolio de Mikael Rodríguez — Desarrollo de software, automatización, datos e inteligencia artificial." />
     <meta property="og:title" content="Mikael Rodríguez — Software Developer" />
     <meta property="og:description" content="Construyo software que convierte problemas complejos en soluciones útiles." />
     <meta property="og:type" content="website" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet" />
     <script>
       try {
-        document.documentElement.dataset.theme = localStorage.getItem('portfolio-theme') || 'system'
+        const storedTheme = localStorage.getItem('portfolio-theme') || 'system'
+        const darkTheme = storedTheme === 'dark' || (storedTheme === 'system' && matchMedia('(prefers-color-scheme: dark)').matches)
+        document.documentElement.dataset.theme = storedTheme
+        document.querySelector('meta[name="theme-color"]').content = darkTheme ? '#000000' : '#ffffff'
       } catch (_) {}
     </script>
     <title>Mikael Rodríguez — Software Developer</title>
