@@ -318,13 +318,31 @@ function App() {
   const [menuOpen, setMenuOpen] = useState(false)
   const [fruitExpanded, setFruitExpanded] = useState(false)
   const [scrolled, setScrolled] = useState(false)
+  const [scrollProgress, setScrollProgress] = useState(0)
+  const [activeSection, setActiveSection] = useState('inicio')
   const [theme, setTheme] = useState<Theme>(() => (localStorage.getItem('portfolio-theme') as Theme) || 'system')
 
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 24)
+    const onScroll = () => {
+      setScrolled(window.scrollY > 24)
+      const scrollable = document.documentElement.scrollHeight - window.innerHeight
+      setScrollProgress(scrollable > 0 ? (window.scrollY / scrollable) * 100 : 0)
+    }
     onScroll()
     window.addEventListener('scroll', onScroll)
     return () => window.removeEventListener('scroll', onScroll)
+  }, [])
+
+  useEffect(() => {
+    const sections = ['inicio', 'proyectos', 'experiencia', 'sobre-mi', 'contacto']
+      .map((id) => document.getElementById(id))
+      .filter((section): section is HTMLElement => Boolean(section))
+    const observer = new IntersectionObserver((entries) => {
+      const visible = entries.filter((entry) => entry.isIntersecting).sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0]
+      if (visible?.target.id) setActiveSection(visible.target.id)
+    }, { rootMargin: '-28% 0px -58% 0px', threshold: [0, .1, .25, .5] })
+    sections.forEach((section) => observer.observe(section))
+    return () => observer.disconnect()
   }, [])
 
   useEffect(() => {
@@ -341,13 +359,15 @@ function App() {
 
   return (
     <div className="site-shell">
+      <a className="skip-link" href="#main-content">Saltar al contenido</a>
       <header className={`topbar ${scrolled ? 'topbar-scrolled' : ''}`}>
+        <span className="scroll-progress" style={{ width: `${scrollProgress}%` }} />
         <a className="brand" href="#inicio" aria-label="Ir al inicio">MR<span>.</span></a>
         <nav className={menuOpen ? 'nav nav-open' : 'nav'} aria-label="Navegación principal">
-          <a href="#proyectos" onClick={closeMenu}><span>01</span>Proyectos</a>
-          <a href="#experiencia" onClick={closeMenu}><span>02</span>Experiencia</a>
-          <a href="#sobre-mi" onClick={closeMenu}><span>03</span>Sobre mí</a>
-          <a href="#contacto" onClick={closeMenu}><span>04</span>Contacto</a>
+          <a className={activeSection === 'proyectos' ? 'active' : ''} aria-current={activeSection === 'proyectos' ? 'page' : undefined} href="#proyectos" onClick={closeMenu}><span>02</span>Proyectos</a>
+          <a className={activeSection === 'experiencia' ? 'active' : ''} aria-current={activeSection === 'experiencia' ? 'page' : undefined} href="#experiencia" onClick={closeMenu}><span>03</span>Experiencia</a>
+          <a className={activeSection === 'sobre-mi' ? 'active' : ''} aria-current={activeSection === 'sobre-mi' ? 'page' : undefined} href="#sobre-mi" onClick={closeMenu}><span>04</span>Sobre mí</a>
+          <a className={activeSection === 'contacto' ? 'active' : ''} aria-current={activeSection === 'contacto' ? 'page' : undefined} href="#contacto" onClick={closeMenu}><span>05</span>Contacto</a>
         </nav>
         <div className="header-actions">
           <div className="theme-switcher" aria-label="Apariencia">
@@ -363,7 +383,7 @@ function App() {
         <button className={`nav-backdrop ${menuOpen ? 'nav-backdrop-open' : ''}`} onClick={closeMenu} aria-label="Cerrar menú" tabIndex={menuOpen ? 0 : -1} />
       </header>
 
-      <main>
+      <main id="main-content" tabIndex={-1}>
         <section className="hero" id="inicio">
           <div className="hero-orbit orbit-one" />
           <div className="hero-orbit orbit-two" />
@@ -379,7 +399,7 @@ function App() {
           <div className="hero-stats">
             <div><strong>97<span>%</span></strong><small>Precisión sobre millones de registros</small></div>
             <div><strong>185<span>K</span></strong><small>Visualizaciones en YouTube</small></div>
-            <div><strong>10<span>+</span></strong><small>Años creando y aprendiendo</small></div>
+            <div><strong>9<span>+</span></strong><small>Años creando y aprendiendo</small></div>
           </div>
         </section>
 
@@ -462,7 +482,7 @@ function App() {
                   <p className="project-description">{project.description}</p>
                   <div className="project-result"><Check size={16} /> {project.result}</div>
                   <div className="tag-list">{project.tags.map((tag) => <span key={tag}>{tag}</span>)}</div>
-                  <span className="project-link">Caso de estudio <ArrowRight size={17} /></span>
+                  <span className="project-status"><Check size={14} /> Proyecto personal</span>
                 </article>
               )
             })}
@@ -479,12 +499,12 @@ function App() {
           </div>
           <div className="timeline">
             <article className="timeline-item current">
-              <div className="timeline-date">2026 — Ahora</div>
+              <div className="timeline-date">Feb. 2026 — Ahora</div>
               <div><p className="timeline-company">Prosegur AVOS Tech · BPO Ibercaja</p><h3>Responsable de desarrollo y mantenimiento</h3><p>Evolución de aplicaciones modernas con ASP.NET, React, TypeScript y Azure, junto al mantenimiento de sistemas heredados en Delphi, C y Windows Forms.</p></div>
               <span className="timeline-status">Actual</span>
             </article>
             <article className="timeline-item">
-              <div className="timeline-date">Nov. 2025 — 2026</div>
+              <div className="timeline-date">Nov. 2025 — Feb. 2026</div>
               <div><p className="timeline-company">Testa Homes · Proyecto Cibeles</p><h3>Software de conciliación y análisis</h3><p>Primer proyecto profesional: tres meses creando en Python una solución para transformar, validar y relacionar información financiera, generando análisis e informes automatizados.</p></div>
             </article>
             <article className="timeline-item">
@@ -504,7 +524,7 @@ function App() {
 
         <section className="section capabilities-section" id="sobre-mi">
           <div className="section-heading compact">
-            <div><p className="kicker"><span>04</span> Cómo aporto valor</p><h2>Curiosidad técnica.<br /><em>Criterio de producto.</em></h2></div>
+            <div><p className="kicker"><span>04</span> Más allá del stack</p><h2>Una trayectoria difícil<br />de <em>encasillar.</em></h2></div>
           </div>
           <div className="capabilities-list">
             {capabilities.map((item) => {
@@ -519,15 +539,24 @@ function App() {
           <div className="about-grid">
             <div className="about-statement">
               <span className="quote-mark">“</span>
-              <p>Empecé creando videojuegos porque quería entender cómo funcionaban las cosas. Hoy sigo haciéndome la misma pregunta, pero aplicada a problemas reales de negocio.</p>
+              <p>Mi perfil no nació de una sola disciplina. Nació de querer comprender sistemas completos y descubrir hasta dónde podía llevarlos.</p>
             </div>
             <div className="about-copy">
-              <p>Mi trayectoria no empezó en una gran empresa ni en una universidad. Empezó aprendiendo por mi cuenta, desmontando problemas y construyendo cosas que parecían demasiado ambiciosas.</p>
-              <p>Esa mezcla de iniciativa, profundidad técnica y orientación a resultados sigue siendo mi forma de trabajar.</p>
+              <p>Aprendí explorando Linux, redes y seguridad; modificando juegos, creando mundos, motores gráficos y herramientas propias. Con el tiempo, esa curiosidad se convirtió en una forma de resolver problemas profesionales.</p>
+              <p>Hoy aplico la misma mentalidad a software empresarial, datos y procesos de negocio: entender el sistema de principio a fin, cuestionar sus límites y construir una solución que pueda demostrarse.</p>
               <div className="principles">
-                <span>Aprendizaje continuo</span><span>Ownership real</span><span>Impacto medible</span><span>Comunicación clara</span>
+                <span>Aprender construyendo</span><span>Ownership real</span><span>Profundidad con propósito</span><span>Impacto medible</span>
               </div>
             </div>
+          </div>
+          <div className="about-journey" aria-label="Evolución de mi perfil">
+            <article><span>01 · Explorar</span><h3>Sistemas & seguridad</h3><p>Linux, redes, laboratorios de ciberseguridad y curiosidad por entender qué ocurre debajo de la interfaz.</p></article>
+            <article><span>02 · Construir</span><h3>Producto interactivo</h3><p>Mods, videojuegos 2D y 3D, motores gráficos y productos publicados de principio a fin.</p></article>
+            <article><span>03 · Aplicar</span><h3>Datos & negocio</h3><p>Conciliación financiera, automatización y aplicaciones que convierten procesos complejos en decisiones.</p></article>
+            <article><span>04 · Evolucionar</span><h3>IA & liderazgo técnico</h3><p>Mi siguiente frontera: soluciones de IA aplicadas, arquitectura y responsabilidad sobre equipos y producto.</p></article>
+          </div>
+          <div className="about-now">
+            <span><i /> Ahora</span><p>Responsable de desarrollo y mantenimiento de aplicaciones en el BPO de Ibercaja.</p><strong>Madrid · Software · Datos · IA aplicada</strong>
           </div>
         </section>
 
