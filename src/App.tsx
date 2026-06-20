@@ -319,8 +319,26 @@ function App() {
                       </div>
                       <p className="project-description">{project.description}</p>
                       <div className="fruit-metrics">
+                        <div><strong>3 meses</strong><span>De desarrollo hasta publicación</span></div>
                         <div><strong>100%</strong><span>Diseñado y desarrollado por mí</span></div>
-                        <div><strong>4</strong><span>Sistemas de producto integrados</span></div>
+                      </div>
+                      <div className="fruit-integrations">
+                        <div className="integration-heading"><span>Ecosistema de producto</span><strong>6 sistemas integrados</strong></div>
+                        <div className="integration-map" aria-label="Integraciones técnicas de Fruit Drop">
+                          <svg viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
+                            <path d="M50 50 L17 18" /><path d="M50 50 L83 18" /><path d="M50 50 L12 50" />
+                            <path d="M50 50 L88 50" /><path d="M50 50 L17 82" /><path d="M50 50 L83 82" />
+                          </svg>
+                          <div className="integration-core"><img src="/projects/fruit-drop/icon.png" alt="Fruit Drop" /><i /></div>
+                          {[
+                            ['UA', 'Unity Ads'], ['PS', 'Play Services'], ['GC', 'Google Cloud'],
+                            ['#', 'Rankings'], ['FB', 'Firebase'], ['IAP', 'Unity IAP'],
+                          ].map(([short, name], index) => <div className={`integration-node node-${index + 1}`} key={name}><b>{short}</b><span>{name}</span></div>)}
+                          {[
+                            ['reward +1', 'packet-1'], ['user · score', 'packet-2'], ['cloud save', 'packet-3'],
+                            ['#24 ↑', 'packet-4'], ['ES · session', 'packet-5'], ['purchase ✓', 'packet-6'],
+                          ].map(([message, className]) => <span className={`integration-packet ${className}`} key={message}>{message}</span>)}
+                        </div>
                       </div>
                       <div className="tag-list">{project.tags.map((tag) => <span key={tag}>{tag}</span>)}</div>
                       <a className="store-link" href="https://play.google.com/store/apps/details?id=com.alphacreative.fruitdrop" target="_blank" rel="noreferrer">
@@ -400,6 +418,10 @@ function App() {
             <article className="timeline-item">
               <div className="timeline-date">2024 — 2025</div>
               <div><p className="timeline-company">DAM · Proyecto final</p><h3>Mundo abierto en Unity 3D</h3><p>Arquitectura de entidades, IA de peatones, vehículos, streaming asíncrono y optimización gráfica en un entorno completo e interactivo.</p></div>
+            </article>
+            <article className="timeline-item">
+              <div className="timeline-date">2024 · 3 meses</div>
+              <div><p className="timeline-company">Alpha Creative · Producto independiente</p><h3>Fruit Drop</h3><p>Diseño, desarrollo y publicación de un videojuego móvil completo, integrando monetización, servicios cloud, rankings globales y persistencia de datos.</p></div>
             </article>
             <article className="timeline-item">
               <div className="timeline-date">2023 — 2024</div>
