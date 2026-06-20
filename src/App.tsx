@@ -82,6 +82,103 @@ const capabilities = [
   { number: '03', title: 'IA aplicada', text: 'Exploro soluciones de IA con propósito: privacidad, procesos financieros y herramientas de negocio.', icon: Sparkles },
 ]
 
+const cibelesPhases = [
+  'Normalizando perímetros',
+  'Comparando fechas',
+  'Validando importes',
+  'Comprobando tipologías',
+  'Generando entregables',
+]
+
+const invoiceRows = [
+  { id: 'FAC-024', meta: 'ROI · 14/02', amount: '12.480 €', phase: 1 },
+  { id: 'FAC-117', meta: 'CHURN · 03/03', amount: '4.220 €', phase: 2 },
+  { id: 'FAC-302', meta: 'ROI · 18/03', amount: '8.760 €', phase: 3 },
+]
+
+const adaptationRows = [
+  { id: 'ADE-081', meta: 'ROI · 12–19/02', amount: '12.480 €', phase: 1 },
+  { id: 'ADE-194', meta: 'CHURN · 01–05/03', amount: '4.220 €', phase: 2 },
+  { id: 'ADE-276', meta: 'ROI · 16–21/03', amount: '8.760 €', phase: 3 },
+]
+
+function CibelesShowcase() {
+  const [activePhase, setActivePhase] = useState(0)
+
+  useEffect(() => {
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      setActivePhase(cibelesPhases.length - 1)
+      return
+    }
+    const timer = window.setInterval(() => setActivePhase((phase) => (phase + 1) % cibelesPhases.length), 1800)
+    return () => window.clearInterval(timer)
+  }, [])
+
+  return (
+    <article className="cibeles-showcase">
+      <div className="cibeles-heading">
+        <div>
+          <p className="project-eyebrow">Proyecto Cibeles · Python · Análisis de negocio</p>
+          <h3>De datos inconexos a<br />decisiones demostrables.</h3>
+        </div>
+        <div className="cibeles-summary">
+          <p>Diseñé una herramienta para reconstruir la trazabilidad entre facturas de obra y adecuaciones inmobiliarias, aplicando una lógica progresiva de transformación, validación y conciliación.</p>
+          <div className="cibeles-highlights"><span>3 meses</span><span>≈95% conciliado</span><span>Seguimiento ejecutivo</span></div>
+        </div>
+      </div>
+
+      <div className="cibeles-demo">
+        <div className="reconciliation-panel">
+          <div className="demo-toolbar">
+            <span className="demo-live"><i /> Motor de conciliación</span>
+            <span>{String(activePhase + 1).padStart(2, '0')} / 05</span>
+          </div>
+          <div className="phase-track">
+            {cibelesPhases.map((phase, index) => <span className={index === activePhase ? 'active' : index < activePhase ? 'complete' : ''} key={phase}>{index + 1}</span>)}
+          </div>
+          <div className="phase-status"><span>{cibelesPhases[activePhase]}</span><span>{(activePhase + 1) * 20}%</span></div>
+          <div className="reconciliation-stage">
+            <div className="data-table">
+              <div className="table-label"><Database /> Facturas <small>Perímetro A</small></div>
+              {invoiceRows.map((row) => <div className={`data-row ${activePhase >= row.phase ? 'matched' : ''}`} key={row.id}><span><strong>{row.id}</strong><small>{row.meta}</small></span><b>{row.amount}</b><i /></div>)}
+            </div>
+            <svg className="match-lines" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
+              {[31, 56, 81].map((y, index) => <path className={activePhase >= index + 1 ? 'matched' : ''} key={y} d={`M 43 ${y} C 48 ${y}, 52 ${y}, 57 ${y}`} />)}
+            </svg>
+            <div className="data-table">
+              <div className="table-label"><Boxes /> Adecuaciones <small>Perímetro B</small></div>
+              {adaptationRows.map((row) => <div className={`data-row reverse ${activePhase >= row.phase ? 'matched' : ''}`} key={row.id}><i /><span><strong>{row.id}</strong><small>{row.meta}</small></span><b>{row.amount}</b></div>)}
+            </div>
+          </div>
+        </div>
+
+        <div className="report-panel">
+          <div className="demo-toolbar"><span>Informe automático</span><span className="report-saving">Guardando…</span></div>
+          <div className="report-window">
+            <div className="slide-sidebar">
+              {[0, 1, 2].map((slide) => <span className={activePhase >= slide + 2 ? 'ready' : ''} key={slide}><i /><i /><i /></span>)}
+            </div>
+            <div className="slide-canvas">
+              <small>ANÁLISIS DE CONCILIACIÓN</small>
+              <strong>Resumen ejecutivo</strong>
+              <div className="slide-kpis"><span><b>{activePhase >= 3 ? '95%' : '—'}</b><small>Trazabilidad</small></span><span><b>{activePhase >= 2 ? '3' : '—'}</b><small>Validaciones</small></span></div>
+              <div className="slide-chart">{[64, 82, 53, 92, 73, 88].map((height, index) => <i style={{ height: activePhase >= 2 ? `${height}%` : '4%' }} key={index} />)}</div>
+            </div>
+          </div>
+          <div className="export-progress"><span style={{ width: `${(activePhase + 1) * 20}%` }} /></div>
+          <div className="export-row"><span><b className="powerpoint-badge">P</b> Informe ejecutivo.pptx</span><span className={activePhase === 4 ? 'export-ready' : ''}>{activePhase === 4 ? 'Generado' : 'Procesando'}</span></div>
+          <div className="export-row"><span><b className="excel-badge">X</b> Detalle validado.xlsx</span><span className={activePhase === 4 ? 'export-ready' : ''}>{activePhase === 4 ? 'Generado' : 'Procesando'}</span></div>
+        </div>
+      </div>
+
+      <div className="cibeles-footer">
+        <p><strong>Representación conceptual.</strong> Todos los identificadores, importes y visualizaciones son sintéticos. No contiene datos, código ni documentación propiedad del cliente.</p>
+        <a href="https://www.ejeprime.com/residencial/blackstone-pone-en-marcha-la-venta-de-la-cartera-de-fidere-y-recibira-ofertas-en-noviembre" target="_blank" rel="noreferrer">Contexto público de la operación <ExternalLink /></a>
+      </div>
+    </article>
+  )
+}
+
 function App() {
   const [menuOpen, setMenuOpen] = useState(false)
   const [scrolled, setScrolled] = useState(false)
@@ -156,6 +253,7 @@ function App() {
           <div className="project-grid">
             {projects.map((project) => {
               const Icon = project.icon
+              if (project.index === '01') return <CibelesShowcase key={project.title} />
               if (project.index === '03') {
                 return (
                   <article className="fruit-showcase" key={project.title}>
@@ -237,9 +335,13 @@ function App() {
           </div>
           <div className="timeline">
             <article className="timeline-item current">
-              <div className="timeline-date">2025 — Ahora</div>
-              <div><p className="timeline-company">Prosegur AVOS Tech</p><h3>Desarrollo & automatización</h3><p>Desarrollo de aplicaciones internas, automatización de procesos, conciliación financiera e infraestructura de software para operaciones BPO.</p></div>
+              <div className="timeline-date">2026 — Ahora</div>
+              <div><p className="timeline-company">Prosegur AVOS Tech · BPO Ibercaja</p><h3>Responsable de desarrollo y mantenimiento</h3><p>Evolución de aplicaciones modernas con ASP.NET, React, TypeScript y Azure, junto al mantenimiento de sistemas heredados en Delphi, C y Windows Forms.</p></div>
               <span className="timeline-status">Actual</span>
+            </article>
+            <article className="timeline-item">
+              <div className="timeline-date">Nov. 2025 — 2026</div>
+              <div><p className="timeline-company">Testa Homes · Proyecto Cibeles</p><h3>Software de conciliación y análisis</h3><p>Primer proyecto profesional: tres meses creando en Python una solución para transformar, validar y relacionar información financiera, generando análisis e informes automatizados.</p></div>
             </article>
             <article className="timeline-item">
               <div className="timeline-date">2024 — 2025</div>
