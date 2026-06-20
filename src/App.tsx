@@ -24,6 +24,7 @@ import {
 type Project = {
   index: string
   title: string
+  tagline?: string
   eyebrow: string
   description: string
   result: string
@@ -74,8 +75,9 @@ const projects: Project[] = [
   {
     index: '03',
     title: 'Fruit Drop',
+    tagline: 'Un ecosistema móvil ideado desde cero hasta su lanzamiento.',
     eyebrow: 'Producto · Mobile · Monetización',
-    description: 'Videojuego Android ideado, diseñado, desarrollado y publicado de principio a fin, incluyendo compras, anuncios, ranking y sincronización en la nube.',
+    description: 'Videojuego Android diseñado, desarrollado y publicado de principio a fin, incluyendo compras, anuncios, ranking y sincronización en la nube.',
     result: 'Publicado en Google Play',
     tags: ['Unity', 'C#', 'Google Play'],
     className: 'project-orange',
@@ -84,6 +86,7 @@ const projects: Project[] = [
   {
     index: '04',
     title: 'Asistente de IA local',
+    tagline: 'Inteligencia útil que respeta tus datos en tu hardware.',
     eyebrow: 'IA · Privacidad · Infraestructura',
     description: 'Ecosistema híbrido de asistentes personalizados que combina modelos locales con servicios cloud para equilibrar capacidad, coste y privacidad.',
     result: 'IA útil sobre hardware propio',
@@ -226,8 +229,9 @@ function CibelesShowcase() {
       <div className="cibeles-project-meta"><span>01</span><span className="professional-pill"><i /> Proyecto profesional · Testa Homes</span></div>
       <div className="cibeles-heading">
         <div>
-          <p className="project-eyebrow">Proyecto Cibeles · Python · Análisis de datos de negocio</p>
-          <h3>De datos inconexos a<br />decisiones demostrables.</h3>
+          <p className="project-eyebrow">Python · Análisis de datos de negocio</p>
+          <h3>Proyecto Cibeles</h3>
+          <p className="project-tagline">De datos inconexos a decisiones demostrables.</p>
         </div>
         <div className="cibeles-summary">
           <p>Diseñé una herramienta para reconstruir la trazabilidad entre facturas de obra y adecuaciones inmobiliarias, aplicando una lógica progresiva de transformación, validación y conciliación.</p>
@@ -321,7 +325,8 @@ function AlphaEngineShowcase({ project }: { project: Project }) {
       <div className="alpha-summary">
         <div>
           <p className="project-eyebrow">Arquitectura · Gráficos 2D · Sistemas de juego</p>
-          <h3>Un motor construido<br />desde los fundamentos.</h3>
+          <h3>AlphaEngine2D</h3>
+          <p className="project-tagline">Un motor construido desde los fundamentos.</p>
         </div>
         <div className="alpha-summary-copy">
           <p>{project.description}</p>
@@ -666,7 +671,11 @@ function App() {
                       <div className="project-top"><span>{project.index}</span><span className="published-pill"><span /> Disponible en Google Play</span></div>
                       <div className="fruit-title-row">
                         <img src="/projects/fruit-drop/icon.png" alt="Icono de Fruit Drop" loading="lazy" decoding="async" />
-                        <div><p className="project-eyebrow">{project.eyebrow}</p><h3>{project.title}</h3></div>
+                        <div>
+                          <p className="project-eyebrow">{project.eyebrow}</p>
+                          <h3>{project.title}</h3>
+                          {project.tagline && <p className="project-tagline">{project.tagline}</p>}
+                        </div>
                       </div>
                       <div className="fruit-summary-art"><img src="/projects/fruit-drop/feature.png" alt="Personajes y logotipo de Fruit Drop" loading="lazy" decoding="async" /></div>
                       <p className="project-description">{project.description}</p>
@@ -721,6 +730,7 @@ function App() {
                   <div className="project-top"><span>{project.index}</span><Icon size={28} /></div>
                   <p className="project-eyebrow">{project.eyebrow}</p>
                   <h3>{project.title}</h3>
+                  {project.tagline && <p className="project-tagline">{project.tagline}</p>}
                   <p className="project-description">{project.description}</p>
                   <div className="project-result"><Check size={16} /> {project.result}</div>
                   <div className="tag-list">{project.tags.map((tag) => <span key={tag}>{tag}</span>)}</div>
