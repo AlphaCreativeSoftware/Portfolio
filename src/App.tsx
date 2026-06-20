@@ -90,6 +90,44 @@ const capabilities = [
   { number: '03', title: 'Datos, automatización & IA', text: 'Transformo información y procesos complejos en herramientas medibles, explorando IA cuando aporta valor real.', icon: Sparkles },
 ]
 
+const skillGroups = [
+  {
+    number: '01',
+    title: 'Desarrollo de software',
+    description: 'Aplicaciones modernas, sistemas heredados, motores y producto interactivo.',
+    icon: Code2,
+    skills: ['C#', 'ASP.NET / .NET', 'React', 'TypeScript', 'JavaScript', 'Python', 'Java', 'C', 'Delphi', 'Windows Forms', 'HTML & CSS', 'SQL'],
+  },
+  {
+    number: '02',
+    title: 'Cloud, datos & entrega',
+    description: 'Integraciones, automatización y despliegue de soluciones de principio a fin.',
+    icon: Database,
+    skills: ['Azure', 'Docker', 'Git', 'GitHub', 'REST APIs', 'Firebase', 'Google Cloud', 'Vercel', 'ETL', 'Excel & PowerPoint'],
+  },
+  {
+    number: '03',
+    title: 'Entornos & creación',
+    description: 'Herramientas utilizadas para programar, diseñar y construir experiencias completas.',
+    icon: Boxes,
+    skills: ['Visual Studio', 'VS Code', 'IntelliJ IDEA', 'Android Studio', 'Unity Editor', 'Java AWT / Swing', 'Blender', 'Mixamo'],
+  },
+  {
+    number: '04',
+    title: 'IA, sistemas & seguridad',
+    description: 'IA comercial y local, infraestructura propia y laboratorios técnicos controlados.',
+    icon: Bot,
+    skills: ['OpenAI / ChatGPT', 'Codex', 'LM Studio', 'OpenClaw', 'LLMs locales', 'Linux', 'Kali Linux', 'Metasploit'],
+  },
+]
+
+const professionalStrengths = [
+  ['Aprendizaje autónomo', 'Investigo y convierto conocimiento nuevo en software funcional.'],
+  ['Ownership end-to-end', 'Asumo el problema completo, desde el análisis hasta la entrega.'],
+  ['Criterio de producto', 'Conecto decisiones técnicas con usuario, proceso y negocio.'],
+  ['Comunicación transversal', 'Traduzco complejidad para perfiles técnicos y de dirección.'],
+]
+
 const cibelesPhases = [
   'Estandarizando millones de registros',
   'Calculando ventanas temporales',
@@ -334,7 +372,7 @@ function App() {
   }, [])
 
   useEffect(() => {
-    const sections = ['inicio', 'proyectos', 'experiencia', 'sobre-mi', 'contacto']
+    const sections = ['inicio', 'proyectos', 'experiencia', 'habilidades', 'sobre-mi', 'contacto']
       .map((id) => document.getElementById(id))
       .filter((section): section is HTMLElement => Boolean(section))
     const observer = new IntersectionObserver((entries) => {
@@ -366,8 +404,9 @@ function App() {
         <nav className={menuOpen ? 'nav nav-open' : 'nav'} aria-label="Navegación principal">
           <a className={activeSection === 'proyectos' ? 'active' : ''} aria-current={activeSection === 'proyectos' ? 'page' : undefined} href="#proyectos" onClick={closeMenu}><span>02</span>Proyectos</a>
           <a className={activeSection === 'experiencia' ? 'active' : ''} aria-current={activeSection === 'experiencia' ? 'page' : undefined} href="#experiencia" onClick={closeMenu}><span>03</span>Experiencia</a>
-          <a className={activeSection === 'sobre-mi' ? 'active' : ''} aria-current={activeSection === 'sobre-mi' ? 'page' : undefined} href="#sobre-mi" onClick={closeMenu}><span>04</span>Sobre mí</a>
-          <a className={activeSection === 'contacto' ? 'active' : ''} aria-current={activeSection === 'contacto' ? 'page' : undefined} href="#contacto" onClick={closeMenu}><span>05</span>Contacto</a>
+          <a className={activeSection === 'habilidades' ? 'active' : ''} aria-current={activeSection === 'habilidades' ? 'page' : undefined} href="#habilidades" onClick={closeMenu}><span>04</span>Habilidades</a>
+          <a className={activeSection === 'sobre-mi' ? 'active' : ''} aria-current={activeSection === 'sobre-mi' ? 'page' : undefined} href="#sobre-mi" onClick={closeMenu}><span>05</span>Sobre mí</a>
+          <a className={activeSection === 'contacto' ? 'active' : ''} aria-current={activeSection === 'contacto' ? 'page' : undefined} href="#contacto" onClick={closeMenu}><span>06</span>Contacto</a>
         </nav>
         <div className="header-actions">
           <div className="theme-switcher" aria-label="Apariencia">
@@ -522,9 +561,37 @@ function App() {
           </div>
         </section>
 
+        <section className="section skills-section" id="habilidades">
+          <div className="section-heading">
+            <div><p className="kicker"><span>04</span> Habilidades</p><h2>Un stack amplio.<br /><em>Un mismo criterio.</em></h2></div>
+            <p>Tecnologías y herramientas que he utilizado para construir aplicaciones empresariales, productos propios, automatizaciones y experiencias interactivas.</p>
+          </div>
+          <div className="skills-matrix">
+            {skillGroups.map((group) => {
+              const Icon = group.icon
+              return (
+                <article className="skill-group" key={group.title}>
+                  <div className="skill-group-heading">
+                    <span>{group.number}</span>
+                    <Icon />
+                    <div><h3>{group.title}</h3><p>{group.description}</p></div>
+                  </div>
+                  <div className="skill-tags">
+                    {group.skills.map((skill) => <span key={skill}>{skill}</span>)}
+                  </div>
+                </article>
+              )
+            })}
+          </div>
+          <div className="strengths-panel">
+            <div className="strengths-intro"><span>Más allá del stack</span><h3>Cómo aporto al equipo</h3></div>
+            {professionalStrengths.map(([title, text]) => <article key={title}><h4>{title}</h4><p>{text}</p></article>)}
+          </div>
+        </section>
+
         <section className="section capabilities-section" id="sobre-mi">
           <div className="section-heading about-heading">
-            <div><p className="kicker"><span>04</span> Cómo trabajo</p><h2>Ingeniería con<br /><em>visión de producto.</em></h2></div>
+            <div><p className="kicker"><span>05</span> Cómo trabajo</p><h2>Ingeniería con<br /><em>visión de producto.</em></h2></div>
             <p>Construyo software entendiendo el sistema completo: la tecnología, el usuario, el proceso y el objetivo de negocio.</p>
           </div>
           <div className="capabilities-list">
@@ -563,7 +630,7 @@ function App() {
 
         <section className="contact-section" id="contacto">
           <div className="contact-glow" />
-          <p className="kicker"><span>05</span> El siguiente proyecto</p>
+          <p className="kicker"><span>06</span> El siguiente proyecto</p>
           <h2>¿Construimos algo<br /><em>que importe?</em></h2>
           <p className="contact-intro">Estoy abierto a oportunidades donde pueda aportar, aprender y resolver problemas que merezcan la pena. Elige la vía que te resulte más cómoda.</p>
           <div className="contact-actions">
