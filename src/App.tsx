@@ -403,6 +403,7 @@ function App() {
       const scrollable = document.documentElement.scrollHeight - window.innerHeight
       const progress = scrollable > 0 ? window.scrollY / scrollable : 0
       if (scrollProgressRef.current) scrollProgressRef.current.style.transform = `scaleX(${Math.min(1, Math.max(0, progress))})`
+      document.documentElement.style.setProperty('--scroll-y', `${window.scrollY}px`)
 
       const marker = window.innerHeight * .32
       const navigationTarget = navigationTargetRef.current

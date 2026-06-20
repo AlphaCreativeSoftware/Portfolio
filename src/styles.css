@@ -112,9 +112,9 @@ section[id] { scroll-margin-top: 72px; }
 
 .hero { position: relative; min-height: 820px; height: 100svh; max-height: 960px; padding: 135px max(8vw, 34px) 46px; display: grid; grid-template-columns: 1.45fr .55fr; grid-template-rows: auto 1fr auto; isolation: isolate; }
 .hero::before { content: ''; position: absolute; width: 780px; height: 520px; left: 20%; top: 17%; z-index: -2; background: radial-gradient(ellipse, color-mix(in srgb, var(--blue) 15%, transparent), transparent 65%); filter: blur(32px); opacity: .7; }
-.hero-orbit { position: absolute; z-index: -1; border-radius: 50%; border: 1px solid color-mix(in srgb, var(--blue) 12%, transparent); }
-.orbit-one { width: 420px; height: 420px; right: -130px; top: 160px; }
-.orbit-two { width: 620px; height: 620px; right: -240px; top: 60px; opacity: .55; }
+.hero-orbit { position: absolute; z-index: -1; border-radius: 50%; border: 1px solid color-mix(in srgb, var(--blue) 12%, transparent); will-change: transform; }
+.orbit-one { width: 420px; height: 420px; right: -130px; top: 160px; transform: translateY(calc(var(--scroll-y, 0px) * -0.15)); }
+.orbit-two { width: 620px; height: 620px; right: -240px; top: 60px; opacity: .55; transform: translateY(calc(var(--scroll-y, 0px) * -0.3)); }
 .kicker { margin: 0; text-transform: uppercase; letter-spacing: .17em; font-size: 10px; font-weight: 600; color: var(--faint); }
 .kicker span { color: var(--blue); margin-right: 14px; }
 .hero > .kicker { grid-column: 1 / -1; }
@@ -487,9 +487,9 @@ footer { min-height: 82px; padding: 0 max(4vw,24px); border-top: 1px solid var(-
 footer p { text-align: center; }
 footer > a:last-child { justify-self: end; display: flex; align-items: center; gap: 9px; }
 
-.scroll-reveal { opacity: 0; translate: 0 14px; }
-.scroll-reveal.in-view { animation: reveal-in .68s var(--ease-premium) var(--reveal-delay, 0ms) both; }
-@keyframes reveal-in { from { opacity: 0; translate: 0 14px; } to { opacity: 1; translate: none; } }
+.scroll-reveal { opacity: 0; translate: 0 24px; scale: 0.96; filter: blur(6px); will-change: opacity, translate, scale, filter; }
+.scroll-reveal.in-view { animation: reveal-in .85s cubic-bezier(0.2, 0.8, 0.2, 1) var(--reveal-delay, 0ms) both; }
+@keyframes reveal-in { from { opacity: 0; translate: 0 24px; scale: 0.96; filter: blur(6px); } to { opacity: 1; translate: none; scale: 1; filter: blur(0px); } }
 
 @media (max-width: 900px) {
   .topbar { height: 64px; grid-template-columns: auto minmax(0, 1fr) auto auto; gap: 9px; padding: 0 18px; background: color-mix(in srgb, var(--page) 92%, transparent); backdrop-filter: saturate(180%) blur(22px); border-bottom: 1px solid var(--line); }
