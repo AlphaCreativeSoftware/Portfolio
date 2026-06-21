@@ -824,6 +824,7 @@ footer > a:last-child { justify-self: end; display: flex; align-items: center; g
   .about-profile-lead h3 { font-size: 36px; }
   .work-method { grid-template-columns: 1fr; }
   .work-method > :not(.method-progress) { min-height: 125px; border-right: 0; border-bottom: 1px solid var(--line); }
+  .work-method article:not(:last-child) { border-bottom: 1px solid var(--line); }
   .work-method > :last-child { border-bottom: 0; }
   .method-progress { display: none; }
   .method-step-head { position: relative; z-index: 2; }
