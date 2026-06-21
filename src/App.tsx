@@ -20,6 +20,7 @@ import {
   Moon,
   Play,
   Phone,
+  Search,
   Sun,
 } from 'lucide-react'
 
@@ -167,6 +168,13 @@ const professionalStrengths = [
   ['Ownership end-to-end', 'Asumo el problema completo, desde el análisis hasta la entrega.'],
   ['Criterio de producto', 'Conecto decisiones técnicas con usuario, proceso y negocio.'],
   ['Comunicación transversal', 'Traduzco complejidad para perfiles técnicos y de dirección.'],
+]
+
+const workMethodSteps = [
+  { number: '01', title: 'Entender', text: 'Contexto, usuario, proceso y restricciones.', icon: Search },
+  { number: '02', title: 'Diseñar', text: 'Arquitectura, experiencia e integraciones.', icon: Boxes },
+  { number: '03', title: 'Construir', text: 'Desarrollo end-to-end con ownership real.', icon: Code2 },
+  { number: '04', title: 'Validar', text: 'Datos, feedback e impacto medible.', icon: Check },
 ]
 
 const marqueeItems = ['Software', 'Automatización', 'Inteligencia artificial', 'Producto', 'Datos']
@@ -562,6 +570,7 @@ function App() {
   const navigationTargetRef = useRef<string | null>(null)
   const navigationTimerRef = useRef<number | null>(null)
   const fruitMetricsReveal = useOnceVisible<HTMLDivElement>()
+  const workMethodReveal = useOnceVisible<HTMLDivElement>(.3)
   const [menuOpen, setMenuOpen] = useState(false)
   const [solarMenuOpen, setSolarMenuOpen] = useState(false)
   const [fruitExpanded, setFruitExpanded] = useState(false)
@@ -682,7 +691,7 @@ function App() {
   }, [activeSection, menuOpen])
 
   useLayoutEffect(() => {
-    const targets = document.querySelectorAll<HTMLElement>('.section-heading, .project-card, .cibeles-showcase, .alpha-showcase, .fruit-showcase, .timeline-item, .skill-group, .strengths-panel, .about-profile, .work-method, .about-now, .contact-card, .social-presence')
+    const targets = document.querySelectorAll<HTMLElement>('.section-heading, .project-card, .cibeles-showcase, .alpha-showcase, .fruit-showcase, .timeline-item, .skill-group, .strengths-panel, .about-profile, .about-now, .contact-card, .social-presence')
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
       targets.forEach((target) => target.classList.add('in-view'))
       return
@@ -1083,12 +1092,15 @@ function App() {
               <div className="profile-focus"><span>Software</span><span>Producto</span><span>Datos</span><span>IA aplicada</span></div>
             </div>
           </div>
-          <div className="work-method" aria-label="Mi proceso de trabajo">
+          <div ref={workMethodReveal.elementRef} className={`work-method ${workMethodReveal.visible ? 'work-method-active' : ''}`} aria-label="Mi proceso de trabajo">
+            <span className="method-progress" aria-hidden="true"><i /></span>
             <div className="method-label"><span>Mi proceso</span><strong>Del problema al resultado</strong></div>
-            <article><span>01</span><h3>Entender</h3><p>Contexto, usuario, proceso y restricciones.</p></article>
-            <article><span>02</span><h3>Diseñar</h3><p>Arquitectura, experiencia e integraciones.</p></article>
-            <article><span>03</span><h3>Construir</h3><p>Desarrollo end-to-end con ownership real.</p></article>
-            <article><span>04</span><h3>Validar</h3><p>Datos, feedback e impacto medible.</p></article>
+            {workMethodSteps.map(({ number, title, text, icon: Icon }, index) => (
+              <article key={title} style={{ '--method-delay': `${index * 550}ms` } as CSSProperties}>
+                <div className="method-step-head"><span>{number}</span><span className="method-step-icon"><Icon /></span></div>
+                <h3>{title}</h3><p>{text}</p>
+              </article>
+            ))}
           </div>
           <div className="about-now">
             <span><i /> Ahora</span><p>Responsable de desarrollo y mantenimiento de aplicaciones en el BPO de Ibercaja.</p><strong>Madrid · Software · Producto · IA aplicada</strong>
