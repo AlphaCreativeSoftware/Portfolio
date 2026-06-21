@@ -361,13 +361,7 @@ function CibelesShowcase() {
     const observer = new ResizeObserver(updateConnections)
     observer.observe(stage)
     updateConnections()
-    const earlySettle = window.setTimeout(updateConnections, 90)
-    const finalSettle = window.setTimeout(updateConnections, 720)
-    return () => {
-      window.clearTimeout(earlySettle)
-      window.clearTimeout(finalSettle)
-      observer.disconnect()
-    }
+    return () => observer.disconnect()
   }, [expanded])
 
   return (
