@@ -3,6 +3,7 @@ import type { CSSProperties } from 'react'
 import {
   ArrowDownRight,
   ArrowRight,
+  BookOpen,
   Bot,
   Boxes,
   CalendarDays,
@@ -195,6 +196,18 @@ function AlphaCreativeMark() {
       <span className="alpha-brand-label">Alpha Creative</span>
     </span>
   )
+}
+
+function LinkedInIcon() {
+  return <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M20.45 20.45h-3.56v-5.57c0-1.33-.02-3.04-1.85-3.04-1.85 0-2.14 1.45-2.14 2.94v5.67H9.35V9h3.41v1.56h.05c.48-.9 1.64-1.85 3.37-1.85 3.6 0 4.27 2.37 4.27 5.46v6.28ZM5.34 7.43a2.06 2.06 0 1 1 0-4.12 2.06 2.06 0 0 1 0 4.12ZM3.56 9h3.56v11.45H3.56V9Z" /></svg>
+}
+
+function GitHubIcon() {
+  return <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 .3a12 12 0 0 0-3.79 23.4c.6.11.82-.26.82-.58v-2.23c-3.34.73-4.04-1.42-4.04-1.42-.55-1.39-1.33-1.76-1.33-1.76-1.09-.74.08-.73.08-.73 1.2.09 1.84 1.24 1.84 1.24 1.07 1.83 2.81 1.3 3.5 1 .11-.78.42-1.31.76-1.61-2.67-.3-5.47-1.33-5.47-5.93 0-1.31.47-2.38 1.24-3.22-.13-.3-.54-1.52.11-3.18 0 0 1.01-.32 3.3 1.23a11.5 11.5 0 0 1 6 0c2.29-1.55 3.3-1.23 3.3-1.23.65 1.66.24 2.88.12 3.18a4.64 4.64 0 0 1 1.23 3.22c0 4.61-2.81 5.62-5.48 5.92.43.37.81 1.1.81 2.22v3.3c0 .32.22.7.82.58A12 12 0 0 0 12 .3Z" /></svg>
+}
+
+function YouTubeIcon() {
+  return <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M23.5 6.19a3 3 0 0 0-2.12-2.13C19.5 3.55 12 3.55 12 3.55s-7.5 0-9.38.51A3 3 0 0 0 .5 6.19 31.2 31.2 0 0 0 0 12a31.2 31.2 0 0 0 .5 5.81 3 3 0 0 0 2.12 2.13c1.88.51 9.38.51 9.38.51s7.5 0 9.38-.51a3 3 0 0 0 2.12-2.13A31.2 31.2 0 0 0 24 12a31.2 31.2 0 0 0-.5-5.81ZM9.55 15.57V8.43L15.82 12l-6.27 3.57Z" /></svg>
 }
 
 type AnimatedMetricProps = {
@@ -614,7 +627,7 @@ function App() {
   }, [activeSection, menuOpen])
 
   useLayoutEffect(() => {
-    const targets = document.querySelectorAll<HTMLElement>('.section-heading, .project-card, .cibeles-showcase, .alpha-showcase, .fruit-showcase, .timeline-item, .skill-group, .strengths-panel, .about-profile, .work-method, .about-now, .contact-card')
+    const targets = document.querySelectorAll<HTMLElement>('.section-heading, .project-card, .cibeles-showcase, .alpha-showcase, .fruit-showcase, .timeline-item, .skill-group, .strengths-panel, .about-profile, .work-method, .about-now, .contact-card, .social-presence')
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
       targets.forEach((target) => target.classList.add('in-view'))
       return
@@ -963,14 +976,23 @@ function App() {
             <a className="contact-card contact-card-primary" href="mailto:alphacreativesoftware@gmail.com">
               <span className="contact-icon"><Mail /></span><span><small>Contacto directo</small><strong>Escribirme por correo</strong></span><ArrowRight />
             </a>
-            <a className="contact-card" href="https://www.youtube.com/@alpha.creative" target="_blank" rel="noreferrer">
-              <span className="contact-icon"><Play /></span><span><small>Alpha Creative</small><strong>Visitar YouTube</strong></span><ExternalLink />
+            <a className="contact-card" href="https://www.linkedin.com/in/mikael-rodr%C3%ADguez-l%C3%B3pez-512b50329/" target="_blank" rel="noreferrer">
+              <span className="contact-icon"><LinkedInIcon /></span><span><small>Perfil profesional</small><strong>Conectar en LinkedIn</strong></span><ExternalLink />
             </a>
-            <a className="contact-card" href="mailto:alphacreativesoftware@gmail.com?subject=Propuesta%20de%20reuni%C3%B3n&body=Hola%20Mikael%2C%0A%0AMe%20gustar%C3%ADa%20proponerte%20una%20reuni%C3%B3n%20para%20hablar%20sobre...">
-              <span className="contact-icon"><CalendarDays /></span><span><small>Primera conversación</small><strong>Proponer una reunión</strong></span><ArrowRight />
+            <a className="contact-card" href="https://github.com/AlphaCreativeSoftware" target="_blank" rel="noreferrer">
+              <span className="contact-icon"><GitHubIcon /></span><span><small>Código y proyectos</small><strong>Explorar GitHub</strong></span><ExternalLink />
             </a>
           </div>
+          <div className="social-presence" aria-label="Otros perfiles y publicaciones">
+            <span className="social-presence-label">También publico en</span>
+            <div className="social-presence-links">
+              <a href="https://www.youtube.com/@alpha.creative" target="_blank" rel="noreferrer"><YouTubeIcon /><span>YouTube</span><ExternalLink /></a>
+              <a href="https://play.google.com/store/apps/dev?id=4852540663954087438&amp;hl=es_SV" target="_blank" rel="noreferrer"><Play /><span>Google Play</span><ExternalLink /></a>
+              <a href="https://www.amazon.es/s?i=stripbooks&amp;rh=p_27%3AMikael%2BRodr%25C3%25ADguez%2BL%25C3%25B3pez&amp;ref=dp_byline_sr_book_1" target="_blank" rel="noreferrer"><BookOpen /><span>Amazon</span><ExternalLink /></a>
+            </div>
+          </div>
           <div className="contact-details">
+            <a href="mailto:alphacreativesoftware@gmail.com?subject=Propuesta%20de%20reuni%C3%B3n&amp;body=Hola%20Mikael%2C%0A%0AMe%20gustar%C3%ADa%20proponerte%20una%20reuni%C3%B3n%20para%20hablar%20sobre..."><CalendarDays /> Proponer una reunión</a>
             <a href="mailto:alphacreativesoftware@gmail.com"><Mail /> alphacreativesoftware@gmail.com</a>
             <a href="tel:+34634460084"><Phone /> +34 634 460 084</a>
           </div>

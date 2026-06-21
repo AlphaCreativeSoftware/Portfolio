@@ -509,7 +509,14 @@ h1 em, h2 em { color: var(--blue); font-style: normal; font-weight: inherit; }
 .contact-card strong { overflow: hidden; font-size: 11px; font-weight: 600; text-overflow: ellipsis; white-space: nowrap; }
 .contact-card > svg { width: 15px; color: var(--faint); }
 .contact-card-primary > svg { color: white; }
-.contact-details { display: flex; gap: 24px; margin-top: 28px; }
+.social-presence { width: min(760px, 100%); display: flex; align-items: center; justify-content: center; gap: 18px; margin-top: 20px; padding: 14px 18px; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+.social-presence-label { flex: none; color: var(--faint); font-size: 7px; font-weight: 600; letter-spacing: .11em; text-transform: uppercase; }
+.social-presence-links { display: flex; align-items: center; justify-content: center; gap: 8px; }
+.social-presence-links a { min-height: 34px; display: inline-flex; align-items: center; gap: 7px; padding: 8px 11px; border: 1px solid transparent; border-radius: 999px; color: var(--text-2); font-size: 9px; transition: color .25s, border-color .25s, background .25s, transform .25s; }
+.social-presence-links a:hover { color: var(--blue); border-color: color-mix(in srgb, var(--blue) 18%, var(--line)); background: var(--soft-blue); transform: translateY(-1px); }
+.social-presence-links svg:first-child { width: 14px; }
+.social-presence-links svg:last-child { width: 10px; color: var(--faint); }
+.contact-details { display: flex; flex-wrap: wrap; justify-content: center; gap: 14px 24px; margin-top: 22px; }
 .contact-details a { display: flex; align-items: center; gap: 7px; color: var(--muted); font-size: 9px; transition: color .2s; }
 .contact-details a:hover { color: var(--blue); }
 .contact-details svg { width: 13px; }
@@ -698,13 +705,15 @@ footer > a:last-child { justify-self: end; display: flex; align-items: center; g
   .contact-section { padding-inline: 22px; }
   .contact-actions { grid-template-columns: 1fr; }
   .contact-card { min-height: 88px; }
+  .social-presence { flex-direction: column; gap: 9px; padding-inline: 0; }
+  .social-presence-links { width: 100%; flex-wrap: wrap; }
   .contact-details { align-items: center; flex-direction: column; gap: 12px; }
   footer { grid-template-columns: 1fr 1fr; }
   footer p { display: none; }
 }
 
 @media (hover: none) {
-  .button:hover, .project-card:hover, .details-toggle:hover, .store-link:hover, .contact-card:hover { transform: none; }
+  .button:hover, .project-card:hover, .details-toggle:hover, .store-link:hover, .contact-card:hover, .social-presence-links a:hover { transform: none; }
   .button-primary:hover { background: var(--blue); }
   .project-card:hover { border-color: color-mix(in srgb, var(--line) 78%, transparent); box-shadow: var(--shadow); }
   .project-card:hover::before { opacity: .14; transform: none; }
