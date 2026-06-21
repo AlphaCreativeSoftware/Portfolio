@@ -211,6 +211,51 @@ h1 em, h2 em { color: var(--blue); font-style: normal; font-weight: inherit; }
 .project-details:not(.project-details-open) .project-details-inner * { animation-play-state: paused !important; }
 .cibeles-showcase[data-visible='false'] .project-details-inner * { animation-play-state: paused !important; }
 .featured-showcase[data-onscreen='false'] .project-details-inner * { animation-play-state: paused !important; }
+
+/* Layered entrances keep each case study legible while the container expands. */
+.project-details-open .reconciliation-panel { animation: detail-enter-left .7s .08s var(--ease-premium) backwards; }
+.project-details-open .report-panel { animation: detail-enter-right .7s .16s var(--ease-premium) backwards; }
+.project-details-open .reconciliation-stage > .data-table:first-child { animation: detail-fade-in .5s .3s ease backwards; }
+.project-details-open .reconciliation-stage > .data-table:last-of-type { animation: detail-fade-in .5s .38s ease backwards; }
+.project-details-open .report-window { animation: detail-enter-up .58s .32s var(--ease-premium) backwards; }
+.project-details-open .export-progress { animation: detail-enter-up .5s .42s var(--ease-premium) backwards; }
+.project-details-open .export-row:nth-of-type(4) { animation: detail-enter-up .5s .48s var(--ease-premium) backwards; }
+.project-details-open .export-row:nth-of-type(5) { animation: detail-enter-up .5s .54s var(--ease-premium) backwards; }
+.project-details-open .cibeles-footer { animation: detail-enter-up .55s .5s var(--ease-premium) backwards; }
+
+.project-details-open .engine-visual { animation: detail-enter-left .7s .08s var(--ease-premium) backwards; }
+.project-details-open .engine-modules { animation: detail-enter-right .7s .16s var(--ease-premium) backwards; }
+.project-details-open .engine-splash { animation: detail-enter-up .62s .25s var(--ease-premium) backwards; }
+.project-details-open .engine-console { animation: detail-enter-up .62s .34s var(--ease-premium) backwards; }
+.project-details-open .pipeline-step { animation: detail-enter-up .45s var(--pipeline-enter-delay, .44s) var(--ease-premium) backwards; }
+.project-details-open .pipeline-step:nth-child(1) { --pipeline-enter-delay: .44s; }
+.project-details-open .pipeline-step:nth-child(2) { --pipeline-enter-delay: .49s; }
+.project-details-open .pipeline-step:nth-child(3) { --pipeline-enter-delay: .54s; }
+.project-details-open .pipeline-step:nth-child(4) { --pipeline-enter-delay: .59s; }
+.project-details-open .module-heading { animation: detail-enter-up .5s .28s var(--ease-premium) backwards; }
+.project-details-open .engine-module { animation: detail-enter-up .48s var(--detail-delay, .34s) var(--ease-premium) backwards; }
+.project-details-open .engine-module:nth-child(2) { --detail-delay: .34s; }
+.project-details-open .engine-module:nth-child(3) { --detail-delay: .39s; }
+.project-details-open .engine-module:nth-child(4) { --detail-delay: .44s; }
+.project-details-open .engine-module:nth-child(5) { --detail-delay: .49s; }
+.project-details-open .engine-module:nth-child(6) { --detail-delay: .54s; }
+.project-details-open .engine-module:nth-child(7) { --detail-delay: .59s; }
+.project-details-open .engine-links { animation: detail-enter-up .5s .64s var(--ease-premium) backwards; }
+
+.fruit-project-details.project-details-open .fruit-detail-copy { animation: detail-enter-left .72s .08s var(--ease-premium) backwards; }
+.fruit-project-details.project-details-open .fruit-visual { animation: detail-enter-right .72s .14s var(--ease-premium) backwards; }
+.fruit-project-details.project-details-open .fruit-integrations { animation: detail-enter-up .62s .28s var(--ease-premium) backwards; }
+.fruit-project-details.project-details-open .fruit-feature { animation: fruit-art-enter .72s .28s var(--ease-premium) backwards; }
+.fruit-project-details.project-details-open .phone-frame { animation: fruit-phone-enter .82s .4s var(--ease-premium) backwards; }
+.fruit-project-details.project-details-open .floating-fruit-icon { animation: fruit-icon-enter .72s .52s var(--ease-premium) backwards; }
+
+@keyframes detail-enter-left { from { opacity: 0; transform: translate3d(-18px, 8px, 0); filter: blur(var(--detail-blur, 7px)); } to { opacity: 1; transform: none; filter: blur(0); } }
+@keyframes detail-enter-right { from { opacity: 0; transform: translate3d(18px, 8px, 0); filter: blur(var(--detail-blur, 7px)); } to { opacity: 1; transform: none; filter: blur(0); } }
+@keyframes detail-enter-up { from { opacity: 0; transform: translate3d(0, 15px, 0) scale(.985); filter: blur(var(--detail-blur, 5px)); } to { opacity: 1; transform: none; filter: blur(0); } }
+@keyframes detail-fade-in { from { opacity: 0; } to { opacity: 1; } }
+@keyframes fruit-art-enter { from { opacity: 0; transform: translate3d(12px, 20px, 0) rotate(3deg) scale(.97); filter: blur(var(--detail-blur, 6px)); } to { opacity: 1; transform: rotate(1deg); filter: blur(0); } }
+@keyframes fruit-phone-enter { from { opacity: 0; transform: translate3d(20px, 48px, 0) rotate(9deg) scale(.96); filter: blur(var(--detail-blur, 7px)); } to { opacity: 1; transform: rotate(5deg); filter: blur(0); } }
+@keyframes fruit-icon-enter { from { opacity: 0; transform: translate3d(-18px, 20px, 0) rotate(-12deg) scale(.82); } to { opacity: 1; transform: rotate(-7deg) scale(1); } }
 .project-status { position: absolute; right: 32px; bottom: 35px; display: flex; gap: 7px; align-items: center; color: var(--faint); font-size: 9px; }
 .project-status svg { color: #34c759; }
 .more-work { max-width: 1320px; margin: 20px auto 0; display: flex; justify-content: space-between; align-items: center; padding: 24px 4px; color: var(--muted); font-size: 12px; }
@@ -630,6 +675,20 @@ footer > a:last-child { justify-self: end; display: flex; align-items: center; g
 @media (max-width: 600px) {
   .section { padding: 100px 22px; }
   .hero { padding-inline: 22px; min-height: 850px; }
+  .project-details { --detail-blur: 0px; }
+  .project-details-open .reconciliation-stage > .data-table,
+  .project-details-open .report-window,
+  .project-details-open .export-progress,
+  .project-details-open .export-row,
+  .project-details-open .cibeles-footer,
+  .project-details-open .engine-splash,
+  .project-details-open .engine-console,
+  .project-details-open .pipeline-step,
+  .project-details-open .module-heading,
+  .project-details-open .engine-module,
+  .project-details-open .engine-links,
+  .fruit-project-details.project-details-open .fruit-integrations,
+  .fruit-project-details.project-details-open .fruit-visual { animation: none; }
   h1 { font-size: clamp(48px, 15vw, 67px); }
   .hero-copy { padding-top: 78px; }
   .hero-copy > p { font-size: 14px; }
