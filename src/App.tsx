@@ -214,6 +214,7 @@ type AnimatedMetricProps = {
   value: number
   play: boolean
   suffix?: string
+  accentSuffix?: boolean
   prefix?: string
   delay?: number
   duration?: number
@@ -239,7 +240,7 @@ function useOnceVisible<T extends HTMLElement>(threshold = .32) {
   return { elementRef, visible }
 }
 
-function AnimatedMetric({ value, play, suffix = '', prefix = '', delay = 0, duration = 1250, count = true }: AnimatedMetricProps) {
+function AnimatedMetric({ value, play, suffix = '', accentSuffix = false, prefix = '', delay = 0, duration = 1250, count = true }: AnimatedMetricProps) {
   const animatedRef = useRef(false)
   const [displayValue, setDisplayValue] = useState(count ? 0 : value)
   const [animating, setAnimating] = useState(false)
@@ -249,21 +250,30 @@ function AnimatedMetric({ value, play, suffix = '', prefix = '', delay = 0, dura
     if (!play || animatedRef.current) return
     let frame = 0
     let timer = 0
-    animatedRef.current = true
+    let finishTimer = 0
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      animatedRef.current = true
       setDisplayValue(value)
       setComplete(true)
       return
     }
-    setAnimating(true)
     if (!count) {
       timer = window.setTimeout(() => {
-        setAnimating(false)
-        setComplete(true)
-      }, delay + duration)
-      return () => window.clearTimeout(timer)
+        animatedRef.current = true
+        setAnimating(true)
+        finishTimer = window.setTimeout(() => {
+          setAnimating(false)
+          setComplete(true)
+        }, duration)
+      }, delay)
+      return () => {
+        window.clearTimeout(timer)
+        window.clearTimeout(finishTimer)
+      }
     }
     timer = window.setTimeout(() => {
+      animatedRef.current = true
+      setAnimating(true)
       const startedAt = performance.now()
       const tick = (now: number) => {
         const progress = Math.min(1, (now - startedAt) / duration)
@@ -279,11 +289,12 @@ function AnimatedMetric({ value, play, suffix = '', prefix = '', delay = 0, dura
     }, delay)
     return () => {
       window.clearTimeout(timer)
+      window.clearTimeout(finishTimer)
       if (frame) window.cancelAnimationFrame(frame)
     }
   }, [count, delay, duration, play, value])
 
-  return <strong className={`metric-value ${animating ? 'metric-counting' : ''} ${complete ? 'metric-complete' : ''}`} style={{ '--metric-duration': `${duration}ms` } as CSSProperties} aria-label={`${prefix}${value}${suffix}`}>{prefix}{displayValue}{suffix}</strong>
+  return <strong className={`metric-value ${animating ? 'metric-counting' : ''} ${complete ? 'metric-complete' : ''}`} style={{ '--metric-duration': `${duration}ms` } as CSSProperties} aria-label={`${prefix}${value}${suffix}`}>{prefix}{displayValue}{accentSuffix ? <span>{suffix}</span> : suffix}</strong>
 }
 
 function CibelesShowcase() {
@@ -763,9 +774,13 @@ function App() {
         <section className="hero" id="inicio">
           <div className="hero-orbit orbit-one" />
           <div className="hero-orbit orbit-two" />
-          <p className="kicker reveal"><span>01</span> Software developer · Madrid</p>
+          <p className="kicker hero-kicker"><span>01</span> Software developer · Madrid</p>
           <div className="hero-copy">
-            <h1>Construyo software<br />que convierte lo<br /><em>complejo</em> en útil.</h1>
+            <h1 aria-label="Construyo software que convierte lo complejo en útil.">
+              <span className="hero-title-line"><span>Construyo software</span></span>
+              <span className="hero-title-line"><span>que convierte lo</span></span>
+              <span className="hero-title-line"><span><em>complejo</em> en útil.</span></span>
+            </h1>
             <p>Hola, soy <strong>Mikael Rodríguez</strong>. Diseño productos, automatizaciones y soluciones de datos e IA con una obsesión sencilla: que funcionen y generen impacto real.</p>
           </div>
           <div className="hero-actions">
@@ -773,9 +788,9 @@ function App() {
             <a className="text-link" href="#sobre-mi" onClick={() => navigateTo('sobre-mi')}>Conocer mi historia <ArrowRight size={17} /></a>
           </div>
           <div className="hero-stats">
-            <div><strong>97<span>%</span></strong><small>Precisión sobre millones de registros</small></div>
-            <div><strong>185<span>K</span></strong><small>Visualizaciones en YouTube</small></div>
-            <div><strong>10<span>+</span></strong><small>Años creando y aprendiendo</small></div>
+            <div><AnimatedMetric value={97} suffix="%" accentSuffix play delay={820} duration={950} /><small>Precisión sobre millones de registros</small></div>
+            <div><AnimatedMetric value={185} suffix="K" accentSuffix play delay={920} duration={950} /><small>Visualizaciones en YouTube</small></div>
+            <div><AnimatedMetric value={10} suffix="+" accentSuffix play delay={1020} duration={950} /><small>Años creando y aprendiendo</small></div>
           </div>
         </section>
 
