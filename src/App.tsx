@@ -516,6 +516,7 @@ function AlphaEngineShowcase({ project }: { project: Project }) {
 }
 
 function App() {
+  const heroRef = useRef<HTMLElement>(null)
   const navRef = useRef<HTMLElement>(null)
   const menuButtonRef = useRef<HTMLButtonElement>(null)
   const marqueeRef = useRef<HTMLElement>(null)
@@ -550,7 +551,7 @@ function App() {
       const scrollable = document.documentElement.scrollHeight - window.innerHeight
       const progress = scrollable > 0 ? window.scrollY / scrollable : 0
       if (scrollProgressRef.current) scrollProgressRef.current.style.transform = `scaleX(${Math.min(1, Math.max(0, progress))})`
-      document.documentElement.style.setProperty('--scroll-y', `${window.scrollY}px`)
+      heroRef.current?.style.setProperty('--scroll-y', `${window.scrollY}px`)
 
       const marker = window.innerHeight * .32
       const navigationTarget = navigationTargetRef.current
@@ -650,7 +651,15 @@ function App() {
     const revealObserver = new IntersectionObserver((entries) => {
       entries.forEach((entry) => {
         if (!entry.isIntersecting) return
-        entry.target.classList.add('in-view')
+        const target = entry.target as HTMLElement
+        const finishReveal = (event: AnimationEvent) => {
+          if (event.target !== target || event.animationName !== 'reveal-in') return
+          target.classList.remove('scroll-reveal', 'in-view')
+          target.style.removeProperty('--reveal-delay')
+          target.removeEventListener('animationend', finishReveal)
+        }
+        target.addEventListener('animationend', finishReveal)
+        target.classList.add('in-view')
         revealObserver.unobserve(entry.target)
       })
     }, { rootMargin: '0px 0px -8% 0px', threshold: .08 })
@@ -663,6 +672,20 @@ function App() {
     if (!marquee) return
     const observer = new IntersectionObserver(([entry]) => marquee.classList.toggle('marquee-running', entry.isIntersecting), { threshold: .01 })
     observer.observe(marquee)
+    return () => observer.disconnect()
+  }, [])
+
+  useEffect(() => {
+    const showcases = document.querySelectorAll<HTMLElement>('.featured-showcase')
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        (entry.target as HTMLElement).dataset.onscreen = String(entry.isIntersecting)
+      })
+    }, { rootMargin: '120px 0px', threshold: .01 })
+    showcases.forEach((showcase) => {
+      showcase.dataset.onscreen = 'false'
+      observer.observe(showcase)
+    })
     return () => observer.disconnect()
   }, [])
 
@@ -771,7 +794,7 @@ function App() {
       </header>
 
       <main id="main-content" tabIndex={-1}>
-        <section className="hero" id="inicio">
+        <section className="hero" id="inicio" ref={heroRef}>
           <div className="hero-orbit orbit-one" />
           <div className="hero-orbit orbit-two" />
           <p className="kicker hero-kicker"><span>01</span> Software developer · Madrid</p>
