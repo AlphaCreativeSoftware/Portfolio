@@ -317,10 +317,18 @@ function AnimatedMetric({ value, play, suffix = '', accentSuffix = false, prefix
       animatedRef.current = true
       setAnimating(true)
       const startedAt = performance.now()
+      const frameInterval = window.matchMedia('(max-width: 900px)').matches ? 40 : 16
+      let lastRenderAt = startedAt - frameInterval
+      let lastRenderedValue = -1
       const tick = (now: number) => {
         const progress = Math.min(1, (now - startedAt) / duration)
         const eased = 1 - Math.pow(1 - progress, 3)
-        setDisplayValue(Math.round(value * eased))
+        const nextValue = Math.round(value * eased)
+        if (progress === 1 || (now - lastRenderAt >= frameInterval && nextValue !== lastRenderedValue)) {
+          lastRenderAt = now
+          lastRenderedValue = nextValue
+          setDisplayValue(nextValue)
+        }
         if (progress < 1) frame = window.requestAnimationFrame(tick)
         else {
           setAnimating(false)
@@ -342,11 +350,16 @@ function AnimatedMetric({ value, play, suffix = '', accentSuffix = false, prefix
 function CibelesShowcase() {
   const [activePhase, setActivePhase] = useState(0)
   const [expanded, setExpanded] = useState(false)
+  const [detailsMounted, setDetailsMounted] = useState(false)
   const [isVisible, setIsVisible] = useState(false)
   const showcaseRef = useRef<HTMLElement>(null)
   const stageRef = useRef<HTMLDivElement>(null)
   const resultsReveal = useOnceVisible<HTMLDivElement>()
   const [matchLayout, setMatchLayout] = useState<{ width: number; height: number; paths: MatchPath[] }>({ width: 1, height: 1, paths: [] })
+  const toggleDetails = () => {
+    if (!expanded) setDetailsMounted(true)
+    setExpanded((current) => !current)
+  }
 
   useEffect(() => {
     if (!expanded) {
@@ -427,11 +440,12 @@ function CibelesShowcase() {
         <div><AnimatedMetric value={97} suffix="%" play={resultsReveal.visible} /><span>de precisión al auditar relaciones existentes</span></div>
       </div>
 
-      <button className="details-toggle" onClick={() => setExpanded(!expanded)} aria-expanded={expanded} aria-controls="cibeles-details">
+      <button className="details-toggle" onClick={toggleDetails} aria-expanded={expanded} aria-controls="cibeles-details">
         <span><small>Caso interactivo</small>{expanded ? 'Ocultar funcionamiento' : 'Ver cómo funciona'}</span><ChevronRight />
       </button>
 
       <div id="cibeles-details" className={`project-details ${expanded ? 'project-details-open' : ''}`}>
+        {detailsMounted && (
         <div className="project-details-inner" aria-hidden={!expanded} inert={!expanded}>
       <div className="cibeles-demo">
         <div className="reconciliation-panel">
@@ -485,6 +499,7 @@ function CibelesShowcase() {
         <a href="https://www.ejeprime.com/residencial/blackstone-pone-en-marcha-la-venta-de-la-cartera-de-fidere-y-recibira-ofertas-en-noviembre" target="_blank" rel="noreferrer">Contexto público de la operación <ExternalLink /></a>
       </div>
         </div>
+        )}
       </div>
     </article>
   )
@@ -492,6 +507,7 @@ function CibelesShowcase() {
 
 function AlphaEngineShowcase({ project }: { project: Project }) {
   const [expanded, setExpanded] = useState(false)
+  const [detailsMounted, setDetailsMounted] = useState(false)
   const proofReveal = useOnceVisible<HTMLDivElement>()
   const modules = [
     ['Render', 'Graphics2D, transformaciones, alpha y descarte fuera de cámara'],
@@ -501,6 +517,10 @@ function AlphaEngineShowcase({ project }: { project: Project }) {
     ['Recursos', 'Carga centralizada de imágenes, fuentes, animaciones y sonido'],
     ['Sistemas', 'Input, UI interactiva, partículas y persistencia de datos'],
   ]
+  const toggleDetails = () => {
+    if (!expanded) setDetailsMounted(true)
+    setExpanded((current) => !current)
+  }
 
   return (
     <article className="alpha-showcase featured-showcase">
@@ -521,10 +541,11 @@ function AlphaEngineShowcase({ project }: { project: Project }) {
         <div><AnimatedMetric value={21} play={proofReveal.visible} /><span>páginas de documentación</span></div>
         <div><AnimatedMetric value={1} play={proofReveal.visible} count={false} /><span>juego funcional incluido</span></div>
       </div>
-      <button className="details-toggle" onClick={() => setExpanded(!expanded)} aria-expanded={expanded} aria-controls="alpha-engine-details">
+      <button className="details-toggle" onClick={toggleDetails} aria-expanded={expanded} aria-controls="alpha-engine-details">
         <span><small>Caso interactivo</small>{expanded ? 'Ocultar arquitectura' : 'Explorar el motor'}</span><ChevronRight />
       </button>
       <div id="alpha-engine-details" className={`project-details ${expanded ? 'project-details-open' : ''}`}>
+        {detailsMounted && (
         <div className="project-details-inner" aria-hidden={!expanded} inert={!expanded}>
           <div className="alpha-detail">
             <div className="engine-visual">
@@ -552,13 +573,15 @@ function AlphaEngineShowcase({ project }: { project: Project }) {
             </div>
           </div>
         </div>
+        )}
       </div>
     </article>
   )
 }
 
 function App() {
-  const heroRef = useRef<HTMLElement>(null)
+  const orbitOneRef = useRef<HTMLDivElement>(null)
+  const orbitTwoRef = useRef<HTMLDivElement>(null)
   const navRef = useRef<HTMLElement>(null)
   const menuButtonRef = useRef<HTMLButtonElement>(null)
   const solarControlRef = useRef<HTMLDivElement>(null)
@@ -574,12 +597,17 @@ function App() {
   const [menuOpen, setMenuOpen] = useState(false)
   const [solarMenuOpen, setSolarMenuOpen] = useState(false)
   const [fruitExpanded, setFruitExpanded] = useState(false)
+  const [fruitDetailsMounted, setFruitDetailsMounted] = useState(false)
   const [scrolled, setScrolled] = useState(false)
   const [activeSection, setActiveSection] = useState('inicio')
   const [navIndicator, setNavIndicator] = useState({ x: 0, y: 0, width: 0, height: 0, visible: false, moving: false })
   const [theme, setTheme] = useState<Theme>(() => (localStorage.getItem('portfolio-theme') as Theme) || 'system')
   const [solarMode, setSolarMode] = useState<SolarMode>(() => (localStorage.getItem('portfolio-solar-mode') as SolarMode) || 'auto')
   const [localTime, setLocalTime] = useState(() => new Date())
+  const toggleFruitDetails = () => {
+    if (!fruitExpanded) setFruitDetailsMounted(true)
+    setFruitExpanded((current) => !current)
+  }
   const dayPeriod = getDayPeriod(localTime)
   const automaticAtmosphere: Atmosphere = theme === 'system' ? dayPeriod : theme === 'light' ? 'day' : 'night'
   const atmosphere: Atmosphere = solarMode === 'auto' ? automaticAtmosphere : solarMode
@@ -593,6 +621,7 @@ function App() {
 
   useEffect(() => {
     let frame = 0
+    let lastHeroTravel = -1
     const updatePageState = () => {
       frame = 0
       const nextScrolled = window.scrollY > 24
@@ -603,7 +632,12 @@ function App() {
       const scrollable = document.documentElement.scrollHeight - window.innerHeight
       const progress = scrollable > 0 ? window.scrollY / scrollable : 0
       if (scrollProgressRef.current) scrollProgressRef.current.style.transform = `scaleX(${Math.min(1, Math.max(0, progress))})`
-      heroRef.current?.style.setProperty('--scroll-y', `${window.scrollY}px`)
+      const heroTravel = Math.min(window.scrollY, window.innerHeight)
+      if (heroTravel !== lastHeroTravel) {
+        lastHeroTravel = heroTravel
+        if (orbitOneRef.current) orbitOneRef.current.style.transform = `translate3d(0, ${heroTravel * -.15}px, 0)`
+        if (orbitTwoRef.current) orbitTwoRef.current.style.transform = `translate3d(0, ${heroTravel * -.3}px, 0)`
+      }
 
       const marker = window.innerHeight * .32
       const navigationTarget = navigationTargetRef.current
@@ -892,9 +926,9 @@ function App() {
       </header>
 
       <main id="main-content" tabIndex={-1}>
-        <section className="hero" id="inicio" ref={heroRef}>
-          <div className="hero-orbit orbit-one" />
-          <div className="hero-orbit orbit-two" />
+        <section className="hero" id="inicio">
+          <div className="hero-orbit orbit-one" ref={orbitOneRef} />
+          <div className="hero-orbit orbit-two" ref={orbitTwoRef} />
           <p className="kicker hero-kicker"><span>01</span> Software developer · Madrid</p>
           <time className="hero-background-time" dateTime={localTime.toISOString()} aria-label={`Hora local: ${formattedTime}`}>{formattedTime}<small> local</small></time>
           <div className="hero-copy">
@@ -955,12 +989,13 @@ function App() {
                       <a className="store-link" href="https://play.google.com/store/apps/details?id=com.alphacreative.fruitdrop" target="_blank" rel="noreferrer">
                         Ver en Google Play <ExternalLink size={17} />
                       </a>
-                      <button className="details-toggle" onClick={() => setFruitExpanded(!fruitExpanded)} aria-expanded={fruitExpanded} aria-controls="fruit-drop-details">
+                       <button className="details-toggle" onClick={toggleFruitDetails} aria-expanded={fruitExpanded} aria-controls="fruit-drop-details">
                         <span><small>Caso interactivo</small>{fruitExpanded ? 'Ocultar funcionamiento' : 'Explorar integraciones'}</span><ChevronRight />
                       </button>
-                    </div>
-                    <div id="fruit-drop-details" className={`project-details fruit-project-details ${fruitExpanded ? 'project-details-open' : ''}`}>
-                      <div className="project-details-inner" aria-hidden={!fruitExpanded} inert={!fruitExpanded}>
+                     </div>
+                     <div id="fruit-drop-details" className={`project-details fruit-project-details ${fruitExpanded ? 'project-details-open' : ''}`}>
+                       {fruitDetailsMounted && (
+                       <div className="project-details-inner" aria-hidden={!fruitExpanded} inert={!fruitExpanded}>
                         <div className="fruit-detail-grid">
                           <div className="fruit-detail-copy">
                       <div className="fruit-integrations">
@@ -979,8 +1014,8 @@ function App() {
                             ['reward +1', 'packet-1'], ['user · score', 'packet-2'], ['cloud save', 'packet-3'],
                             ['#24 ↑', 'packet-4'], ['ES · session', 'packet-5'], ['purchase ✓', 'packet-6'],
                           ].map(([message, className]) => <span className={`integration-packet ${className}`} key={message}>{message}</span>)}
-                        </div>
-                      </div>
+                       </div>
+                     </div>
                           </div>
                     <div className="fruit-visual" aria-label="Imágenes del videojuego Fruit Drop">
                       <div className="fruit-feature"><img src="/projects/fruit-drop/feature.png" alt="Arte promocional de Fruit Drop con sus personajes" loading="lazy" decoding="async" /></div>
@@ -989,6 +1024,7 @@ function App() {
                     </div>
                         </div>
                       </div>
+                       )}
                     </div>
                   </article>
                 )
