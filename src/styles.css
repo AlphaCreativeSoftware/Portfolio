@@ -155,6 +155,22 @@ section[id] { scroll-margin-top: 72px; }
 .theme-switcher button.active { color: var(--blue); }
 .theme-switcher button:hover:not(.active) { color: var(--text); }
 .theme-switcher svg { width: 13px; height: 13px; }
+.solar-control { position: relative; margin-left: -6px; }
+.solar-trigger { width: 25px; height: 34px; display: grid; place-items: center; padding: 0; border: 0; border-radius: 999px; background: transparent; color: var(--faint); cursor: pointer; transition: color .25s, background .25s; }
+.solar-trigger:hover, .solar-control-open .solar-trigger { color: var(--blue); background: color-mix(in srgb, var(--soft-blue) 58%, transparent); }
+.solar-trigger svg { width: 14px; height: 14px; transition: transform .44s var(--ease-premium); }
+.solar-control-open .solar-trigger svg { transform: rotate(180deg); }
+.solar-menu { position: absolute; z-index: 60; right: 0; top: calc(100% + 10px); width: 158px; display: flex; flex-direction: column; gap: 2px; padding: 8px; border: 1px solid var(--line); border-radius: 16px; background: color-mix(in srgb, var(--surface) 96%, transparent); box-shadow: 0 18px 55px rgba(0,0,0,.15); opacity: 0; visibility: hidden; pointer-events: none; transform: translateY(-7px) scale(.97); transform-origin: top right; transition: opacity .22s, visibility .22s, transform .35s var(--ease-premium); }
+.solar-control-open .solar-menu { opacity: 1; visibility: visible; pointer-events: auto; transform: none; }
+.solar-menu > span { padding: 5px 9px 7px; color: var(--faint); font-size: 6px; font-weight: 600; letter-spacing: .12em; text-transform: uppercase; }
+.solar-menu button { min-height: 32px; display: flex; align-items: center; gap: 9px; padding: 7px 9px; border: 0; border-radius: 10px; background: transparent; color: var(--muted); font-size: 9px; text-align: left; cursor: pointer; transition: color .2s, background .2s; }
+.solar-menu button:hover { color: var(--text); background: var(--page-alt); }
+.solar-menu button.active { color: var(--blue); background: var(--soft-blue); }
+.solar-menu button i { width: 6px; height: 6px; flex: none; border-radius: 50%; background: var(--faint); box-shadow: 0 0 0 3px transparent; }
+.solar-menu button.active i { background: var(--blue); box-shadow: 0 0 0 3px color-mix(in srgb, var(--blue) 11%, transparent); }
+.solar-menu button:nth-of-type(2) i { background: #f5b94c; }
+.solar-menu button:nth-of-type(3) i { background: #ee9850; }
+.solar-menu button:nth-of-type(4) i { background: #769fe6; }
 .availability { display: flex; align-items: center; gap: 7px; font-size: 11px; color: var(--muted); }
 .availability span { width: 6px; height: 6px; border-radius: 50%; background: #34c759; }
 .menu-button { display: none; justify-self: end; border: 0; background: none; color: var(--text); }
@@ -614,7 +630,9 @@ footer > a:last-child { justify-self: end; display: flex; align-items: center; g
   .mobile-section-label { grid-column: 2; display: block; min-width: 0; overflow: hidden; color: var(--faint); font-size: 8px; font-weight: 600; letter-spacing: .1em; text-overflow: ellipsis; text-transform: uppercase; white-space: nowrap; animation: section-label-in .35s var(--ease-premium) both; }
   @keyframes section-label-in { from { opacity: 0; translate: 0 4px; } to { opacity: 1; translate: none; } }
   .availability { display: none; }
-  .header-actions { grid-column: 3; grid-row: 1; margin: 0; }
+  .header-actions { grid-column: 3; grid-row: 1; gap: 4px; margin: 0; }
+  .solar-control { margin-left: -2px; }
+  .solar-menu { right: -36px; }
   .theme-switcher::before { width: 25px; height: 25px; }
   .theme-switcher[data-active-theme='light']::before { transform: translate3d(27px, -50%, 0); }
   .theme-switcher[data-active-theme='dark']::before { transform: translate3d(54px, -50%, 0); }

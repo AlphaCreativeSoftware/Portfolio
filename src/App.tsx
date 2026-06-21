@@ -8,6 +8,7 @@ import {
   Boxes,
   CalendarDays,
   Check,
+  ChevronDown,
   ChevronRight,
   Code2,
   Database,
@@ -37,6 +38,7 @@ type Project = {
 type Theme = 'system' | 'light' | 'dark'
 type DayPeriod = 'morning' | 'afternoon' | 'night'
 type Atmosphere = DayPeriod | 'day'
+type SolarMode = 'auto' | DayPeriod
 
 function getDayPeriod(date: Date): DayPeriod {
   const minutes = date.getHours() * 60 + date.getMinutes()
@@ -75,6 +77,13 @@ const sectionLabels: Record<(typeof sectionIds)[number], string> = {
   habilidades: 'Habilidades',
   'sobre-mi': 'Sobre mí',
   contacto: 'Contacto',
+}
+
+const solarModeLabels: Record<SolarMode, string> = {
+  auto: 'Automático',
+  morning: 'Mañana',
+  afternoon: 'Tarde',
+  night: 'Noche',
 }
 
 const projects: Project[] = [
@@ -544,6 +553,7 @@ function App() {
   const heroRef = useRef<HTMLElement>(null)
   const navRef = useRef<HTMLElement>(null)
   const menuButtonRef = useRef<HTMLButtonElement>(null)
+  const solarControlRef = useRef<HTMLDivElement>(null)
   const marqueeRef = useRef<HTMLElement>(null)
   const scrollProgressRef = useRef<HTMLSpanElement>(null)
   const scrolledRef = useRef(false)
@@ -553,14 +563,17 @@ function App() {
   const navigationTimerRef = useRef<number | null>(null)
   const fruitMetricsReveal = useOnceVisible<HTMLDivElement>()
   const [menuOpen, setMenuOpen] = useState(false)
+  const [solarMenuOpen, setSolarMenuOpen] = useState(false)
   const [fruitExpanded, setFruitExpanded] = useState(false)
   const [scrolled, setScrolled] = useState(false)
   const [activeSection, setActiveSection] = useState('inicio')
   const [navIndicator, setNavIndicator] = useState({ x: 0, y: 0, width: 0, height: 0, visible: false, moving: false })
   const [theme, setTheme] = useState<Theme>(() => (localStorage.getItem('portfolio-theme') as Theme) || 'system')
+  const [solarMode, setSolarMode] = useState<SolarMode>(() => (localStorage.getItem('portfolio-solar-mode') as SolarMode) || 'auto')
   const [localTime, setLocalTime] = useState(() => new Date())
   const dayPeriod = getDayPeriod(localTime)
-  const atmosphere: Atmosphere = theme === 'system' ? dayPeriod : theme === 'light' ? 'day' : 'night'
+  const automaticAtmosphere: Atmosphere = theme === 'system' ? dayPeriod : theme === 'light' ? 'day' : 'night'
+  const atmosphere: Atmosphere = solarMode === 'auto' ? automaticAtmosphere : solarMode
   const greeting = dayPeriod === 'morning' ? 'buenos días' : dayPeriod === 'afternoon' ? 'buenas tardes' : 'buenas noches'
   const formattedTime = localTime.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' })
   const updateActiveSection = (section: string) => {
@@ -725,6 +738,26 @@ function App() {
   }, [])
 
   useEffect(() => {
+    localStorage.setItem('portfolio-solar-mode', solarMode)
+  }, [solarMode])
+
+  useEffect(() => {
+    if (!solarMenuOpen) return
+    const closeOnOutsideClick = (event: PointerEvent) => {
+      if (!solarControlRef.current?.contains(event.target as Node)) setSolarMenuOpen(false)
+    }
+    const closeOnEscape = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') setSolarMenuOpen(false)
+    }
+    document.addEventListener('pointerdown', closeOnOutsideClick)
+    window.addEventListener('keydown', closeOnEscape)
+    return () => {
+      document.removeEventListener('pointerdown', closeOnOutsideClick)
+      window.removeEventListener('keydown', closeOnEscape)
+    }
+  }, [solarMenuOpen])
+
+  useEffect(() => {
     const position = getAtmospherePosition(localTime, atmosphere)
     document.documentElement.dataset.atmosphere = atmosphere
     document.documentElement.style.setProperty('--celestial-right', `${position.right}vw`)
@@ -831,6 +864,15 @@ function App() {
             <button className={theme === 'system' ? 'active' : ''} aria-pressed={theme === 'system'} onClick={() => setTheme('system')} title="Usar tema del dispositivo" aria-label="Tema automático"><Monitor /></button>
             <button className={theme === 'light' ? 'active' : ''} aria-pressed={theme === 'light'} onClick={() => setTheme('light')} title="Usar tema claro" aria-label="Tema claro"><Sun /></button>
             <button className={theme === 'dark' ? 'active' : ''} aria-pressed={theme === 'dark'} onClick={() => setTheme('dark')} title="Usar tema oscuro" aria-label="Tema oscuro"><Moon /></button>
+          </div>
+          <div className={`solar-control ${solarMenuOpen ? 'solar-control-open' : ''}`} ref={solarControlRef}>
+            <button className="solar-trigger" type="button" onClick={() => setSolarMenuOpen((open) => !open)} aria-label={`Ciclo solar: ${solarModeLabels[solarMode]}`} aria-expanded={solarMenuOpen} aria-haspopup="menu" title={`Ciclo solar: ${solarModeLabels[solarMode]}`}><ChevronDown /></button>
+            <div className="solar-menu" role="menu" aria-label="Ciclo solar">
+              <span>Iluminación</span>
+              {(Object.keys(solarModeLabels) as SolarMode[]).map((mode) => (
+                <button key={mode} type="button" role="menuitemradio" aria-checked={solarMode === mode} className={solarMode === mode ? 'active' : ''} onClick={() => { setSolarMode(mode); setSolarMenuOpen(false) }}><i />{solarModeLabels[mode]}</button>
+              ))}
+            </div>
           </div>
           <a className="availability" href="#contacto" onClick={() => navigateTo('contacto')}><span />Disponible</a>
         </div>

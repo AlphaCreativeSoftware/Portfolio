@@ -15,12 +15,14 @@
     <script>
       try {
         const storedTheme = localStorage.getItem('portfolio-theme') || 'system'
+        const storedSolarMode = localStorage.getItem('portfolio-solar-mode') || 'auto'
         const darkTheme = storedTheme === 'dark' || (storedTheme === 'system' && matchMedia('(prefers-color-scheme: dark)').matches)
         const now = new Date()
         const minutes = now.getHours() * 60 + now.getMinutes()
         const period = minutes >= 1230 || minutes < 300 ? 'night' : minutes < 720 ? 'morning' : 'afternoon'
         document.documentElement.dataset.theme = storedTheme
-        document.documentElement.dataset.atmosphere = storedTheme === 'system' ? period : storedTheme === 'light' ? 'day' : 'night'
+        const automaticAtmosphere = storedTheme === 'system' ? period : storedTheme === 'light' ? 'day' : 'night'
+        document.documentElement.dataset.atmosphere = storedSolarMode === 'auto' ? automaticAtmosphere : storedSolarMode
         document.querySelector('meta[name="theme-color"]').content = darkTheme ? '#000000' : '#ffffff'
       } catch (_) {}
     </script>
