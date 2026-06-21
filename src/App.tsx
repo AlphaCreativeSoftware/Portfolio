@@ -317,7 +317,7 @@ function AnimatedMetric({ value, play, suffix = '', accentSuffix = false, prefix
       animatedRef.current = true
       setAnimating(true)
       const startedAt = performance.now()
-      const frameInterval = window.matchMedia('(max-width: 900px)').matches ? 40 : 16
+      const frameInterval = window.matchMedia('(max-width: 900px)').matches ? 33 : 16
       let lastRenderAt = startedAt - frameInterval
       let lastRenderedValue = -1
       const tick = (now: number) => {

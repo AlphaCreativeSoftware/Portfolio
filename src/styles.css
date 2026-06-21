@@ -215,12 +215,12 @@ h1 em, h2 em { color: var(--blue); font-style: normal; font-weight: inherit; }
 .hero-stats strong span { color: var(--blue); }
 .hero-stats small { max-width: 125px; color: var(--faint); font-size: 9px; line-height: 1.45; text-transform: uppercase; letter-spacing: .08em; }
 
-@keyframes hero-title-enter { from { opacity: 0; transform: translateY(108%); filter: blur(10px); } 65% { opacity: 1; filter: blur(1px); } to { opacity: 1; transform: none; filter: blur(0); } }
-@keyframes hero-element-enter { from { opacity: 0; transform: translateY(14px); filter: blur(7px); } to { opacity: 1; transform: none; filter: blur(0); } }
+@keyframes hero-title-enter { from { opacity: 0; transform: translateY(108%); } 65% { opacity: 1; } to { opacity: 1; transform: none; } }
+@keyframes hero-element-enter { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
 @keyframes hero-time-enter { from { opacity: 0; transform: translateY(8px); } to { opacity: var(--time-opacity); transform: none; } }
 @keyframes hero-rule-enter { from { opacity: 0; transform: scaleX(0); } to { opacity: 1; transform: scaleX(1); } }
 @keyframes hero-aura-enter { from { opacity: 0; transform: scale(.82); } to { opacity: .7; transform: scale(1); } }
-@keyframes hero-orbit-enter { from { opacity: 0; clip-path: circle(0% at 50% 50%); } to { opacity: var(--orbit-opacity); clip-path: circle(72% at 50% 50%); } }
+@keyframes hero-orbit-enter { from { opacity: 0; transform: scale(.6); } to { opacity: var(--orbit-opacity); transform: scale(1); } }
 @keyframes hero-accent-settle { from { text-shadow: 0 0 28px color-mix(in srgb, var(--blue) 34%, transparent); } to { text-shadow: 0 0 0 transparent; } }
 
 .marquee { padding: 16px 0; border-block: 1px solid var(--line); color: var(--faint); overflow: hidden; white-space: nowrap; font-size: 9px; letter-spacing: .16em; font-weight: 600; text-transform: uppercase; background: var(--surface-raised); }
@@ -733,13 +733,10 @@ footer > a:last-child { justify-self: end; display: flex; align-items: center; g
   .about-now { grid-template-columns: 90px 1fr; }
   .about-now strong { grid-column: 2; }
   .metric-value.metric-counting { animation: none; }
-  .scroll-reveal { translate: 0 18px; scale: 1; filter: none; }
-  @keyframes reveal-in { from { opacity: 0; translate: 0 18px; scale: 1; filter: none; } to { opacity: 1; translate: none; scale: 1; filter: none; } }
 }
 
 @media (max-width: 600px) {
-  @keyframes hero-title-enter { from { opacity: 0; transform: translateY(108%); filter: blur(5px); } 65% { opacity: 1; filter: blur(.5px); } to { opacity: 1; transform: none; filter: blur(0); } }
-  @keyframes hero-element-enter { from { opacity: 0; transform: translateY(14px); filter: blur(3px); } to { opacity: 1; transform: none; filter: blur(0); } }
+
   .section { padding: 100px 22px; }
   .hero { min-height: 0; padding-inline: 22px; }
   .hero-background-time { --time-opacity: .12; right: 22px; top: 88px; font-size: 16px; }
