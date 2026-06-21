@@ -199,9 +199,10 @@ function useOnceVisible<T extends HTMLElement>(threshold = .32) {
   return { elementRef, visible }
 }
 
-function AnimatedMetric({ value, play, suffix = '', prefix = '', delay = 0, duration = 1050, count = true }: AnimatedMetricProps) {
+function AnimatedMetric({ value, play, suffix = '', prefix = '', delay = 0, duration = 1250, count = true }: AnimatedMetricProps) {
   const animatedRef = useRef(false)
   const [displayValue, setDisplayValue] = useState(count ? 0 : value)
+  const [animating, setAnimating] = useState(false)
   const [complete, setComplete] = useState(false)
 
   useEffect(() => {
@@ -214,8 +215,12 @@ function AnimatedMetric({ value, play, suffix = '', prefix = '', delay = 0, dura
       setComplete(true)
       return
     }
+    setAnimating(true)
     if (!count) {
-      timer = window.setTimeout(() => setComplete(true), delay + duration)
+      timer = window.setTimeout(() => {
+        setAnimating(false)
+        setComplete(true)
+      }, delay + duration)
       return () => window.clearTimeout(timer)
     }
     timer = window.setTimeout(() => {
@@ -225,7 +230,10 @@ function AnimatedMetric({ value, play, suffix = '', prefix = '', delay = 0, dura
         const eased = 1 - Math.pow(1 - progress, 3)
         setDisplayValue(Math.round(value * eased))
         if (progress < 1) frame = window.requestAnimationFrame(tick)
-        else setComplete(true)
+        else {
+          setAnimating(false)
+          setComplete(true)
+        }
       }
       frame = window.requestAnimationFrame(tick)
     }, delay)
@@ -235,7 +243,7 @@ function AnimatedMetric({ value, play, suffix = '', prefix = '', delay = 0, dura
     }
   }, [count, delay, duration, play, value])
 
-  return <strong className={`metric-value ${complete ? 'metric-complete' : ''}`} aria-label={`${prefix}${value}${suffix}`}>{prefix}{displayValue}{suffix}</strong>
+  return <strong className={`metric-value ${animating ? 'metric-counting' : ''} ${complete ? 'metric-complete' : ''}`} style={{ '--metric-duration': `${duration}ms` } as CSSProperties} aria-label={`${prefix}${value}${suffix}`}>{prefix}{displayValue}{suffix}</strong>
 }
 
 function CibelesShowcase() {
