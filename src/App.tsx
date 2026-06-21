@@ -158,12 +158,93 @@ const adaptationRows = [
   { id: 'ADE-194', meta: 'CHURN · Reparación', amount: '4.220 €', phase: 3 },
 ]
 
+function AlphaCreativeMark() {
+  return (
+    <span className="alpha-brand" aria-label="Proyecto de Alpha Creative" title="Alpha Creative">
+      <span className="alpha-brand-logo" aria-hidden="true">
+        <img className="alpha-logo-light" src="/brands/alpha-creative/logo-black.png" alt="" />
+        <img className="alpha-logo-dark" src="/brands/alpha-creative/logo-white.png" alt="" />
+      </span>
+      <span className="alpha-brand-label">Alpha Creative</span>
+    </span>
+  )
+}
+
+type AnimatedMetricProps = {
+  value: number
+  play: boolean
+  suffix?: string
+  prefix?: string
+  delay?: number
+  duration?: number
+  count?: boolean
+}
+
+function useOnceVisible<T extends HTMLElement>(threshold = .32) {
+  const elementRef = useRef<T>(null)
+  const [visible, setVisible] = useState(false)
+
+  useEffect(() => {
+    const element = elementRef.current
+    if (!element || visible) return
+    const observer = new IntersectionObserver(([entry]) => {
+      if (!entry.isIntersecting) return
+      setVisible(true)
+      observer.disconnect()
+    }, { threshold })
+    observer.observe(element)
+    return () => observer.disconnect()
+  }, [threshold, visible])
+
+  return { elementRef, visible }
+}
+
+function AnimatedMetric({ value, play, suffix = '', prefix = '', delay = 0, duration = 1050, count = true }: AnimatedMetricProps) {
+  const animatedRef = useRef(false)
+  const [displayValue, setDisplayValue] = useState(count ? 0 : value)
+  const [complete, setComplete] = useState(false)
+
+  useEffect(() => {
+    if (!play || animatedRef.current) return
+    let frame = 0
+    let timer = 0
+    animatedRef.current = true
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      setDisplayValue(value)
+      setComplete(true)
+      return
+    }
+    if (!count) {
+      timer = window.setTimeout(() => setComplete(true), delay + duration)
+      return () => window.clearTimeout(timer)
+    }
+    timer = window.setTimeout(() => {
+      const startedAt = performance.now()
+      const tick = (now: number) => {
+        const progress = Math.min(1, (now - startedAt) / duration)
+        const eased = 1 - Math.pow(1 - progress, 3)
+        setDisplayValue(Math.round(value * eased))
+        if (progress < 1) frame = window.requestAnimationFrame(tick)
+        else setComplete(true)
+      }
+      frame = window.requestAnimationFrame(tick)
+    }, delay)
+    return () => {
+      window.clearTimeout(timer)
+      if (frame) window.cancelAnimationFrame(frame)
+    }
+  }, [count, delay, duration, play, value])
+
+  return <strong className={`metric-value ${complete ? 'metric-complete' : ''}`} aria-label={`${prefix}${value}${suffix}`}>{prefix}{displayValue}{suffix}</strong>
+}
+
 function CibelesShowcase() {
   const [activePhase, setActivePhase] = useState(0)
   const [expanded, setExpanded] = useState(false)
   const [isVisible, setIsVisible] = useState(false)
   const showcaseRef = useRef<HTMLElement>(null)
   const stageRef = useRef<HTMLDivElement>(null)
+  const resultsReveal = useOnceVisible<HTMLDivElement>()
   const [matchLayout, setMatchLayout] = useState<{ width: number; height: number; paths: MatchPath[] }>({ width: 1, height: 1, paths: [] })
 
   useEffect(() => {
@@ -225,8 +306,8 @@ function CibelesShowcase() {
   }, [expanded])
 
   return (
-    <article className="cibeles-showcase" ref={showcaseRef} data-visible={isVisible}>
-      <div className="cibeles-project-meta"><span>01</span><span className="professional-pill"><i /> Proyecto profesional · Testa Homes</span></div>
+    <article className="cibeles-showcase featured-showcase" ref={showcaseRef} data-visible={isVisible}>
+      <div className="cibeles-project-meta"><span>01</span><span className="professional-pill"><i /><span><small>Proyecto profesional</small>Testa Homes</span></span></div>
       <div className="cibeles-heading">
         <div>
           <p className="project-eyebrow">Python · Análisis de datos de negocio</p>
@@ -239,10 +320,10 @@ function CibelesShowcase() {
         </div>
       </div>
 
-      <div className="cibeles-results">
-        <div><strong>96%</strong><span>de facturas asociadas</span></div>
-        <div><strong>99%</strong><span>de adecuaciones con al menos una factura</span></div>
-        <div><strong>97%</strong><span>de precisión al auditar relaciones existentes</span></div>
+      <div className="cibeles-results" ref={resultsReveal.elementRef}>
+        <div><AnimatedMetric value={96} suffix="%" play={resultsReveal.visible} /><span>de facturas asociadas</span></div>
+        <div><AnimatedMetric value={99} suffix="%" play={resultsReveal.visible} /><span>de adecuaciones con al menos una factura</span></div>
+        <div><AnimatedMetric value={97} suffix="%" play={resultsReveal.visible} /><span>de precisión al auditar relaciones existentes</span></div>
       </div>
 
       <button className="details-toggle" onClick={() => setExpanded(!expanded)} aria-expanded={expanded} aria-controls="cibeles-details">
@@ -310,6 +391,7 @@ function CibelesShowcase() {
 
 function AlphaEngineShowcase({ project }: { project: Project }) {
   const [expanded, setExpanded] = useState(false)
+  const proofReveal = useOnceVisible<HTMLDivElement>()
   const modules = [
     ['Render', 'Graphics2D, transformaciones, alpha y descarte fuera de cámara'],
     ['Escenas', 'GameState, jerarquía de objetos y transiciones con carga asíncrona'],
@@ -320,8 +402,8 @@ function AlphaEngineShowcase({ project }: { project: Project }) {
   ]
 
   return (
-    <article className="alpha-showcase">
-      <div className="alpha-project-meta"><span>02</span><span className="engine-pill"><i /> Motor propio · Java</span></div>
+    <article className="alpha-showcase featured-showcase">
+      <div className="alpha-project-meta"><span>02</span><div className="project-meta-end"><AlphaCreativeMark /><span className="engine-pill"><i /> Motor propio · Java</span></div></div>
       <div className="alpha-summary">
         <div>
           <p className="project-eyebrow">Arquitectura · Gráficos 2D · Sistemas de juego</p>
@@ -333,10 +415,10 @@ function AlphaEngineShowcase({ project }: { project: Project }) {
           <div className="project-tags"><span>Java 17</span><span>AWT · Graphics2D</span><span>Swing · JFrame</span><span>Arquitectura propia</span></div>
         </div>
       </div>
-      <div className="alpha-proof">
-        <div><strong>42</strong><span>clases Java</span></div>
-        <div><strong>21</strong><span>páginas de documentación</span></div>
-        <div><strong>1</strong><span>juego funcional incluido</span></div>
+      <div className="alpha-proof" ref={proofReveal.elementRef}>
+        <div><AnimatedMetric value={42} play={proofReveal.visible} /><span>clases Java</span></div>
+        <div><AnimatedMetric value={21} play={proofReveal.visible} /><span>páginas de documentación</span></div>
+        <div><AnimatedMetric value={1} play={proofReveal.visible} count={false} /><span>juego funcional incluido</span></div>
       </div>
       <button className="details-toggle" onClick={() => setExpanded(!expanded)} aria-expanded={expanded} aria-controls="alpha-engine-details">
         <span><small>Caso interactivo</small>{expanded ? 'Ocultar arquitectura' : 'Explorar el motor'}</span><ChevronRight />
@@ -384,6 +466,7 @@ function App() {
   const indicatorTimerRef = useRef<number | null>(null)
   const navigationTargetRef = useRef<string | null>(null)
   const navigationTimerRef = useRef<number | null>(null)
+  const fruitMetricsReveal = useOnceVisible<HTMLDivElement>()
   const [menuOpen, setMenuOpen] = useState(false)
   const [fruitExpanded, setFruitExpanded] = useState(false)
   const [scrolled, setScrolled] = useState(false)
@@ -666,9 +749,9 @@ function App() {
               if (project.index === '02') return <AlphaEngineShowcase project={project} key={project.title} />
               if (project.index === '03') {
                 return (
-                  <article className={`fruit-showcase ${fruitExpanded ? 'fruit-showcase-open' : ''}`} key={project.title}>
+                  <article className={`fruit-showcase featured-showcase ${fruitExpanded ? 'fruit-showcase-open' : ''}`} key={project.title}>
                     <div className="fruit-content">
-                      <div className="project-top"><span>{project.index}</span><span className="published-pill"><span /> Disponible en Google Play</span></div>
+                      <div className="project-top"><span>{project.index}</span><div className="project-meta-end"><AlphaCreativeMark /><span className="published-pill"><span /> Disponible en Google Play</span></div></div>
                       <div className="fruit-title-row">
                         <img src="/projects/fruit-drop/icon.png" alt="Icono de Fruit Drop" loading="lazy" decoding="async" />
                         <div>
@@ -679,9 +762,9 @@ function App() {
                       </div>
                       <div className="fruit-summary-art"><img src="/projects/fruit-drop/feature.png" alt="Personajes y logotipo de Fruit Drop" loading="lazy" decoding="async" /></div>
                       <p className="project-description">{project.description}</p>
-                      <div className="fruit-metrics">
-                        <div><strong>3 meses</strong><span>De desarrollo hasta publicación</span></div>
-                        <div><strong>100%</strong><span>Diseñado y desarrollado por mí</span></div>
+                      <div className="fruit-metrics" ref={fruitMetricsReveal.elementRef}>
+                        <div><AnimatedMetric value={3} suffix=" meses" play={fruitMetricsReveal.visible} count={false} /><span>De desarrollo hasta publicación</span></div>
+                        <div><AnimatedMetric value={100} suffix="%" play={fruitMetricsReveal.visible} /><span>Diseñado y desarrollado por mí</span></div>
                       </div>
                       <div className="project-tags"><span>Unity · C#</span><span>Producto end-to-end</span><span>Monetización</span><span>Servicios cloud</span></div>
                       <a className="store-link" href="https://play.google.com/store/apps/details?id=com.alphacreative.fruitdrop" target="_blank" rel="noreferrer">
@@ -727,7 +810,7 @@ function App() {
               }
               return (
                 <article className={`project-card ${project.className}`} key={project.title}>
-                  <div className="project-top"><span>{project.index}</span><Icon size={28} /></div>
+                  <div className="project-top"><span>{project.index}</span><div className="project-meta-end"><AlphaCreativeMark /><Icon size={28} /></div></div>
                   <p className="project-eyebrow">{project.eyebrow}</p>
                   <h3>{project.title}</h3>
                   {project.tagline && <p className="project-tagline">{project.tagline}</p>}
@@ -754,6 +837,11 @@ function App() {
               <div className="timeline-date">Feb. 2026 — Ahora</div>
               <div><p className="timeline-company">Prosegur AVOS Tech · BPO Ibercaja</p><h3>Responsable de desarrollo y mantenimiento</h3><p>Desarrollo de nuevas aplicaciones y evolución de soluciones existentes con ASP.NET, React, TypeScript y Azure. Estimación y organización del trabajo técnico, junto con la gestión de aplicaciones y componentes críticos de la red operativa del BPO. Responsabilidad también sobre sistemas heredados en Delphi, C y Windows Forms.</p></div>
               <span className="timeline-status">Actual</span>
+            </article>
+            <article className="timeline-item independent">
+              <div className="timeline-date">2020 — Actualidad</div>
+              <div><p className="timeline-company">Alpha Creative · Marca propia</p><h3>Fundador y creador de producto</h3><p>Creación y desarrollo de una marca independiente bajo la que diseño, publico y comercializo software, productos digitales y proyectos editoriales. Gestión end-to-end de producto, identidad, contenido, distribución y presencia online.</p></div>
+              <span className="timeline-status timeline-status-independent">En activo</span>
             </article>
             <article className="timeline-item">
               <div className="timeline-date">Nov. 2025 — Feb. 2026</div>
