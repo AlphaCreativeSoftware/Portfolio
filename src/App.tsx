@@ -35,6 +35,31 @@ type Project = {
 }
 
 type Theme = 'system' | 'light' | 'dark'
+type DayPeriod = 'morning' | 'afternoon' | 'night'
+type Atmosphere = DayPeriod | 'day'
+
+function getDayPeriod(date: Date): DayPeriod {
+  const minutes = date.getHours() * 60 + date.getMinutes()
+  if (minutes >= 20 * 60 + 30 || minutes < 5 * 60) return 'night'
+  if (minutes < 12 * 60) return 'morning'
+  return 'afternoon'
+}
+
+function getAtmospherePosition(date: Date, atmosphere: Atmosphere) {
+  const minutes = date.getHours() * 60 + date.getMinutes()
+  if (atmosphere === 'day') return { right: 7, top: 18 }
+  if (atmosphere === 'night' && getDayPeriod(date) !== 'night') return { right: 8, top: 20 }
+
+  const start = atmosphere === 'night' ? 20 * 60 + 30 : 5 * 60
+  const duration = atmosphere === 'night' ? 8.5 * 60 : 15.5 * 60
+  const elapsed = atmosphere === 'night' && minutes < 5 * 60 ? minutes + 24 * 60 - start : minutes - start
+  const progress = Math.min(1, Math.max(0, elapsed / duration))
+  const elevation = Math.sin(progress * Math.PI)
+  return {
+    right: 4 + (1 - progress) * 9,
+    top: 16 + (1 - elevation) * 16,
+  }
+}
 
 type MatchPath = {
   d: string
@@ -533,6 +558,11 @@ function App() {
   const [activeSection, setActiveSection] = useState('inicio')
   const [navIndicator, setNavIndicator] = useState({ x: 0, y: 0, width: 0, height: 0, visible: false, moving: false })
   const [theme, setTheme] = useState<Theme>(() => (localStorage.getItem('portfolio-theme') as Theme) || 'system')
+  const [localTime, setLocalTime] = useState(() => new Date())
+  const dayPeriod = getDayPeriod(localTime)
+  const atmosphere: Atmosphere = theme === 'system' ? dayPeriod : theme === 'light' ? 'day' : 'night'
+  const greeting = dayPeriod === 'morning' ? 'buenos días' : dayPeriod === 'afternoon' ? 'buenas tardes' : 'buenas noches'
+  const formattedTime = localTime.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' })
   const updateActiveSection = (section: string) => {
     if (activeSectionRef.current === section) return
     activeSectionRef.current = section
@@ -690,6 +720,18 @@ function App() {
   }, [])
 
   useEffect(() => {
+    const timer = window.setInterval(() => setLocalTime(new Date()), 30_000)
+    return () => window.clearInterval(timer)
+  }, [])
+
+  useEffect(() => {
+    const position = getAtmospherePosition(localTime, atmosphere)
+    document.documentElement.dataset.atmosphere = atmosphere
+    document.documentElement.style.setProperty('--celestial-right', `${position.right}vw`)
+    document.documentElement.style.setProperty('--celestial-top', `${position.top}%`)
+  }, [atmosphere, localTime])
+
+  useEffect(() => {
     document.documentElement.dataset.theme = theme
     localStorage.setItem('portfolio-theme', theme)
     const systemTheme = window.matchMedia('(prefers-color-scheme: dark)')
@@ -757,6 +799,11 @@ function App() {
 
   return (
     <div className="site-shell">
+      <div className="ambient-scene" aria-hidden="true">
+        <span className="ambient-wash ambient-wash-primary" />
+        <span className="ambient-wash ambient-wash-secondary" />
+        <span className="ambient-celestial" />
+      </div>
       <a className="skip-link" href="#main-content">Saltar al contenido</a>
       <header className={`topbar ${scrolled ? 'topbar-scrolled' : ''} ${menuOpen ? 'topbar-menu-open' : ''}`}>
         <span className="scroll-progress" ref={scrollProgressRef} />
@@ -798,13 +845,14 @@ function App() {
           <div className="hero-orbit orbit-one" />
           <div className="hero-orbit orbit-two" />
           <p className="kicker hero-kicker"><span>01</span> Software developer · Madrid</p>
+          <time className="hero-background-time" dateTime={localTime.toISOString()} aria-label={`Hora local: ${formattedTime}`}>{formattedTime}<small> local</small></time>
           <div className="hero-copy">
             <h1 aria-label="Construyo software que convierte lo complejo en útil.">
               <span className="hero-title-line"><span>Construyo software</span></span>
               <span className="hero-title-line"><span>que convierte lo</span></span>
               <span className="hero-title-line"><span><em>complejo</em> en útil.</span></span>
             </h1>
-            <p>Hola, soy <strong>Mikael Rodríguez</strong>. Diseño productos, automatizaciones y soluciones de datos e IA con una obsesión sencilla: que funcionen y generen impacto real.</p>
+            <p>Hola, {greeting}. Soy <strong>Mikael Rodríguez</strong>. Diseño productos, automatizaciones y soluciones de datos e IA con una obsesión sencilla: que funcionen y generen impacto real.</p>
           </div>
           <div className="hero-actions">
             <a className="button button-primary" href="#proyectos" onClick={() => navigateTo('proyectos')}>Explorar proyectos <ArrowDownRight size={18} /></a>
