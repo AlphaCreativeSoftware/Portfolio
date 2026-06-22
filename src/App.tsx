@@ -826,12 +826,19 @@ function App() {
       setMenuOpen(false)
       window.requestAnimationFrame(() => menuButtonRef.current?.focus())
     }
+    const closeOnOutsideClick = (event: PointerEvent) => {
+      const target = event.target as Node
+      if (navRef.current?.contains(target) || menuButtonRef.current?.contains(target)) return
+      setMenuOpen(false)
+    }
     const desktopQuery = window.matchMedia('(min-width: 901px)')
     const closeOnDesktop = (event: MediaQueryListEvent) => { if (event.matches) setMenuOpen(false) }
+    document.addEventListener('pointerdown', closeOnOutsideClick)
     window.addEventListener('keydown', closeOnEscape)
     desktopQuery.addEventListener('change', closeOnDesktop)
     return () => {
       document.body.style.overflow = ''
+      document.removeEventListener('pointerdown', closeOnOutsideClick)
       window.removeEventListener('keydown', closeOnEscape)
       desktopQuery.removeEventListener('change', closeOnDesktop)
     }

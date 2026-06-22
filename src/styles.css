@@ -302,7 +302,12 @@ h1 em, h2 em { color: var(--blue); font-style: normal; font-weight: inherit; }
 .metric-value { display: inline-block; font-variant-numeric: tabular-nums; text-shadow: 0 0 0 transparent; }
 .metric-value.metric-counting { animation: metric-progress-glow var(--metric-duration, 1250ms) ease-out both; }
 .metric-value.metric-complete { text-shadow: 0 0 7px color-mix(in srgb, var(--metric-accent, var(--blue)) 13%, transparent); }
-@keyframes metric-progress-glow { 0% { text-shadow: 0 0 0 transparent; } 62% { text-shadow: 0 0 14px color-mix(in srgb, var(--metric-accent, var(--blue)) 26%, transparent); } 100% { text-shadow: 0 0 8px color-mix(in srgb, var(--metric-accent, var(--blue)) 14%, transparent); } }
+@keyframes metric-progress-glow {
+  0% { text-shadow: 0 0 0 transparent; }
+  35% { text-shadow: 0 0 6px color-mix(in srgb, var(--metric-accent, var(--blue)) 14%, transparent); }
+  78% { text-shadow: 0 0 15px color-mix(in srgb, var(--metric-accent, var(--blue)) 28%, transparent); }
+  100% { text-shadow: 0 0 7px color-mix(in srgb, var(--metric-accent, var(--blue)) 13%, transparent); }
+}
 
 .cibeles-showcase { grid-column: 1 / -1; padding: 48px; border-radius: 32px; background: var(--surface); box-shadow: var(--shadow); overflow: hidden; }
 .cibeles-project-meta { display: flex; align-items: center; justify-content: space-between; margin-bottom: 42px; color: var(--faint); font-size: 9px; }
@@ -723,7 +728,6 @@ footer > a:last-child { justify-self: end; display: flex; align-items: center; g
   .method-label { grid-column: 1 / -1; min-height: 120px; border-right: 0; }
   .about-now { grid-template-columns: 90px 1fr; }
   .about-now strong { grid-column: 2; }
-  .metric-value.metric-counting { animation: none; }
 }
 
 @media (max-width: 600px) {
