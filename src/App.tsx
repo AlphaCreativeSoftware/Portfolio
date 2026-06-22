@@ -38,7 +38,7 @@ type Project = {
 
 type Theme = 'system' | 'light' | 'dark'
 type DayPeriod = 'morning' | 'afternoon' | 'night'
-type Atmosphere = DayPeriod | 'day'
+type Atmosphere = DayPeriod
 type SolarMode = 'auto' | DayPeriod
 
 function getDayPeriod(date: Date): DayPeriod {
@@ -50,7 +50,6 @@ function getDayPeriod(date: Date): DayPeriod {
 
 function getAtmospherePosition(date: Date, atmosphere: Atmosphere) {
   const minutes = date.getHours() * 60 + date.getMinutes()
-  if (atmosphere === 'day') return { right: 7, top: 18 }
   if (atmosphere === 'night' && getDayPeriod(date) !== 'night') return { right: 8, top: 20 }
 
   const start = atmosphere === 'night' ? 20 * 60 + 30 : 5 * 60
@@ -609,8 +608,7 @@ function App() {
     setFruitExpanded((current) => !current)
   }
   const dayPeriod = getDayPeriod(localTime)
-  const automaticAtmosphere: Atmosphere = theme === 'system' ? dayPeriod : theme === 'light' ? 'day' : 'night'
-  const atmosphere: Atmosphere = solarMode === 'auto' ? automaticAtmosphere : solarMode
+  const atmosphere: Atmosphere = solarMode === 'auto' ? dayPeriod : solarMode
   const greeting = dayPeriod === 'morning' ? 'buenos días' : dayPeriod === 'afternoon' ? 'buenas tardes' : 'buenas noches'
   const formattedTime = localTime.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' })
   const updateActiveSection = (section: string) => {

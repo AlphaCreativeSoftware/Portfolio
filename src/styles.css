@@ -59,15 +59,6 @@
   --celestial-opacity: .3;
 }
 
-:root[data-atmosphere='day'] {
-  --ambient-primary: #aed8ff;
-  --ambient-secondary: #fff0b8;
-  --ambient-strength: .23;
-  --celestial-core: #fffdf3;
-  --celestial-edge: #ffd272;
-  --celestial-opacity: .42;
-}
-
 :root[data-theme='dark'] {
   color-scheme: dark;
   --page: #000000;
