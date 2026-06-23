@@ -429,7 +429,7 @@ function CibelesShowcase() {
         </div>
         <div className="cibeles-summary">
           <p>Diseñé una herramienta para optimizar y conciliar la trazabilidad entre facturas de obra y adecuaciones inmobiliarias en una de las mayores carteras residenciales en alquiler de España, dentro de una operativa valorada en más de 1.000 M€. La solución aplicaba una lógica progresiva de transformación, validación y conciliación.</p>
-          <div className="project-tags"><span>Python</span><span>Pandas & NumPy</span><span>Excel & Power BI</span><span>Conciliación financiera</span><span>Millones de registros</span><span>Reporting automático</span></div>
+          <div className="project-tags"><span>Python</span><span>Pandas & NumPy</span><span>Excel & Power BI</span><span>Prinex</span><span>Conciliación financiera</span><span>Millones de registros</span><span>Reporting automático</span></div>
         </div>
       </div>
 
