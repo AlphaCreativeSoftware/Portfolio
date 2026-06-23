@@ -420,16 +420,16 @@ function CibelesShowcase() {
 
   return (
     <article className="cibeles-showcase featured-showcase" ref={showcaseRef} data-visible={isVisible}>
-      <div className="cibeles-project-meta"><span>01</span><span className="professional-pill"><i /><span><small>Proyecto profesional</small>Testa Homes</span></span></div>
+      <div className="cibeles-project-meta"><span>01</span><span className="professional-pill"><i /><span>Proyecto profesional</span></span></div>
       <div className="cibeles-heading">
         <div>
           <p className="project-eyebrow">Python · Análisis de datos de negocio</p>
-          <h3>Proyecto Cibeles</h3>
+          <h3>Cibeles Analytics</h3>
           <p className="project-tagline">De datos inconexos a decisiones demostrables.</p>
         </div>
         <div className="cibeles-summary">
-          <p>Diseñé una herramienta para reconstruir la trazabilidad entre facturas de obra y adecuaciones inmobiliarias, aplicando una lógica progresiva de transformación, validación y conciliación.</p>
-          <div className="project-tags"><span>Python</span><span>Conciliación financiera</span><span>Millones de registros</span><span>Reporting automático</span></div>
+          <p>Diseñé una herramienta para optimizar y conciliar la trazabilidad entre facturas de obra y adecuaciones inmobiliarias en una de las mayores carteras residenciales en alquiler de España, dentro de una operativa valorada en más de 1.000 M€. La solución aplicaba una lógica progresiva de transformación, validación y conciliación.</p>
+          <div className="project-tags"><span>Python</span><span>Pandas & NumPy</span><span>Excel & Power BI</span><span>Conciliación financiera</span><span>Millones de registros</span><span>Reporting automático</span></div>
         </div>
       </div>
 
@@ -523,7 +523,7 @@ function AlphaEngineShowcase({ project }: { project: Project }) {
 
   return (
     <article className="alpha-showcase featured-showcase">
-      <div className="alpha-project-meta"><span>02</span><div className="project-meta-end"><AlphaCreativeMark /><span className="engine-pill"><i /> Motor propio · Java</span></div></div>
+      <div className="alpha-project-meta"><span>02</span><div className="project-meta-end"><AlphaCreativeMark /><span className="engine-pill"><i /> Proyecto educativo</span></div></div>
       <div className="alpha-summary">
         <div>
           <p className="project-eyebrow">Arquitectura · Gráficos 2D · Sistemas de juego</p>
@@ -1071,7 +1071,7 @@ function App() {
             </article>
             <article className="timeline-item">
               <div className="timeline-date">Nov. 2025 — Feb. 2026</div>
-              <div><p className="timeline-company">Testa Homes · Proyecto Cibeles</p><h3>Software de conciliación y análisis</h3><p>Primer proyecto profesional: tres meses creando en Python una solución para transformar, validar y relacionar información financiera, generando análisis e informes automatizados.</p></div>
+              <div><p className="timeline-company">Proyecto profesional · Sector Real Estate</p><h3>Software de conciliación y análisis</h3><p>Primer proyecto profesional: tres meses creando en Python una solución para transformar, validar y relacionar información financiera, generando análisis e informes automatizados.</p></div>
             </article>
             <article className="timeline-item">
               <div className="timeline-date">2024 — 2025</div>

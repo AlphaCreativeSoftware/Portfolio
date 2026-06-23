@@ -400,7 +400,7 @@ h1 em, h2 em { color: var(--blue); font-style: normal; font-weight: inherit; }
 
 .alpha-showcase { grid-column: 1 / -1; padding: 48px; border-radius: 32px; background: var(--surface); box-shadow: var(--shadow); overflow: hidden; }
 .alpha-project-meta { display: flex; align-items: center; justify-content: space-between; margin-bottom: 42px; color: var(--faint); font-size: 9px; }
-.engine-pill { display: inline-flex; align-items: center; gap: 7px; padding: 7px 10px; border-radius: 999px; color: var(--text-2); background: var(--page-alt); font-size: 8px; font-weight: 600; letter-spacing: .04em; }
+.engine-pill { display: inline-flex; align-items: center; gap: 7px; padding: 7px 10px; border: 1px solid color-mix(in srgb, var(--blue) 12%, var(--line)); border-radius: 999px; color: var(--text-2); background: var(--page-alt); font-size: 8px; font-weight: 600; letter-spacing: .04em; }
 .engine-pill i { width: 6px; height: 6px; border-radius: 50%; background: var(--blue); box-shadow: 0 0 0 3px color-mix(in srgb, var(--blue) 11%, transparent); }
 .alpha-summary { display: grid; grid-template-columns: 1.05fr .95fr; gap: 7vw; align-items: end; }
 .alpha-summary .project-eyebrow { margin: 0 0 15px; }
