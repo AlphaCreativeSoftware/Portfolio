@@ -523,13 +523,21 @@ function AlphaEngineShowcase({ project }: { project: Project }) {
   useEffect(() => {
     const video = videoRef.current
     if (!video || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
-    const observer = new IntersectionObserver(([entry]) => {
-      if (entry.isIntersecting) void video.play().catch(() => undefined)
+    const mobileDevice = window.matchMedia('(hover: none) and (pointer: coarse)').matches
+    let inView = false
+    const syncPlayback = () => {
+      if (inView && document.visibilityState === 'visible') void video.play().catch(() => undefined)
       else video.pause()
-    }, { rootMargin: '120px 0px', threshold: .15 })
+    }
+    const observer = new IntersectionObserver(([entry]) => {
+      inView = entry.isIntersecting
+      syncPlayback()
+    }, { rootMargin: mobileDevice ? '0px' : '120px 0px', threshold: mobileDevice ? .55 : .15 })
     observer.observe(video)
+    document.addEventListener('visibilitychange', syncPlayback)
     return () => {
       observer.disconnect()
+      document.removeEventListener('visibilitychange', syncPlayback)
       video.pause()
     }
   }, [])
@@ -548,7 +556,7 @@ function AlphaEngineShowcase({ project }: { project: Project }) {
         <div className="alpha-media-stage">
           <div className="media-chrome"><span><i /><i /><i /></span><small>AlphaEngine2D · runtime</small><b><i /> Running</b></div>
           <div className="media-canvas">
-            <video ref={videoRef} muted loop playsInline preload="metadata" poster="/projects/alpha-engine/splash.png" aria-label="Demostración en vídeo de AlphaEngine2D" disablePictureInPicture>
+            <video ref={videoRef} muted loop playsInline preload="none" poster="/projects/alpha-engine/splash.png" aria-label="Demostración en vídeo de AlphaEngine2D" disablePictureInPicture>
               <source src="/projects/alpha-engine/video_1.mp4" type="video/mp4" />
             </video>
             <div className="media-scanline" />
@@ -644,6 +652,8 @@ function App() {
   useEffect(() => {
     let frame = 0
     let lastHeroTravel = -1
+    const mobileDevice = window.matchMedia('(hover: none) and (pointer: coarse)').matches
+    const sections = sectionIds.map((id) => document.getElementById(id)).filter((section): section is HTMLElement => Boolean(section))
     const updatePageState = () => {
       frame = 0
       const nextScrolled = window.scrollY > 24
@@ -655,7 +665,7 @@ function App() {
       const progress = scrollable > 0 ? window.scrollY / scrollable : 0
       if (scrollProgressRef.current) scrollProgressRef.current.style.transform = `scaleX(${Math.min(1, Math.max(0, progress))})`
       const heroTravel = Math.min(window.scrollY, window.innerHeight)
-      if (heroTravel !== lastHeroTravel) {
+      if (!mobileDevice && heroTravel !== lastHeroTravel) {
         lastHeroTravel = heroTravel
         if (orbitOneRef.current) orbitOneRef.current.style.transform = `translate3d(0, ${heroTravel * -.15}px, 0)`
         if (orbitTwoRef.current) orbitTwoRef.current.style.transform = `translate3d(0, ${heroTravel * -.3}px, 0)`
@@ -674,9 +684,8 @@ function App() {
       }
 
       let currentSection = 'inicio'
-      for (const id of sectionIds) {
-        const section = document.getElementById(id)
-        if (section && section.getBoundingClientRect().top <= marker) currentSection = id
+      for (const section of sections) {
+        if (section.getBoundingClientRect().top <= marker) currentSection = section.id
         else break
       }
       if (window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 2) currentSection = 'contacto'
@@ -688,7 +697,7 @@ function App() {
     updatePageState()
     const pageResizeObserver = new ResizeObserver(onScroll)
     pageResizeObserver.observe(document.documentElement)
-    window.addEventListener('scroll', onScroll)
+    window.addEventListener('scroll', onScroll, { passive: true })
     window.addEventListener('resize', onScroll)
     return () => {
       if (frame) window.cancelAnimationFrame(frame)
@@ -761,7 +770,7 @@ function App() {
         if (!entry.isIntersecting) return
         const target = entry.target as HTMLElement
         const finishReveal = (event: AnimationEvent) => {
-          if (event.target !== target || event.animationName !== 'reveal-in') return
+          if (event.target !== target || !['reveal-in', 'mobile-heavy-reveal'].includes(event.animationName)) return
           target.classList.remove('scroll-reveal', 'in-view')
           target.style.removeProperty('--reveal-delay')
           target.removeEventListener('animationend', finishReveal)
@@ -1026,7 +1035,7 @@ function App() {
                         <div className="fruit-product-stage" aria-label="Presentación visual de Fruit Drop">
                           <img className="fruit-stage-art" src="/projects/fruit-drop/feature.png" alt="Personajes y logotipo de Fruit Drop" loading="lazy" decoding="async" />
                           <img className="fruit-stage-icon" src="/projects/fruit-drop/icon.png" alt="" aria-hidden="true" loading="lazy" decoding="async" />
-                          <div className="fruit-stage-phone"><span /><img src="/projects/fruit-drop/rankings.png" alt="Ranking global de Fruit Drop" loading="lazy" decoding="async" /></div>
+                          <div className="fruit-stage-phone"><span /><img src="/projects/fruit-drop/rankings-card.jpg" alt="Ranking global de Fruit Drop" loading="lazy" decoding="async" fetchPriority="low" /></div>
                           <span className="fruit-stage-label">Live on Google Play</span>
                         </div>
                       </div>

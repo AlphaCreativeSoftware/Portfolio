@@ -934,10 +934,14 @@ footer > a:last-child { justify-self: end; display: flex; align-items: center; g
 @keyframes mobile-heavy-reveal { from { opacity: 0; translate: 0 26px; } to { opacity: 1; translate: none; } }
 
 @media (max-width: 900px) {
-  .project-card.scroll-reveal,
-  .featured-showcase.scroll-reveal { opacity: 0; translate: 0 26px; scale: 1; filter: none; }
-  .project-card.scroll-reveal.in-view,
-  .featured-showcase.scroll-reveal.in-view { animation: mobile-heavy-reveal .72s var(--ease-premium) var(--reveal-delay, 0ms) both; }
+  .scroll-reveal { opacity: 0; translate: 0 26px; scale: 1; filter: none; }
+  .scroll-reveal.in-view { animation: mobile-heavy-reveal .72s var(--ease-premium) var(--reveal-delay, 0ms) both; }
+  .topbar, .topbar-scrolled { background: color-mix(in srgb, var(--page) 97%, transparent); backdrop-filter: none; }
+  .nav { background: color-mix(in srgb, var(--surface) 98%, transparent); backdrop-filter: saturate(130%) blur(12px); }
+  .project-card::before { display: none; }
+  .integration-node, .media-badge, .fruit-stage-label { backdrop-filter: none; }
+  .integration-node { background: var(--surface); }
+  .fruit-stage-phone { animation: none; will-change: auto; }
   .cibeles-hero, .alpha-hero, .fruit-hero, .ai-hero { grid-template-columns: 1fr; }
   .cibeles-hero, .alpha-hero, .ai-hero { gap: 34px; }
   .alpha-media-stage { width: 100%; }
