@@ -421,15 +421,26 @@ function CibelesShowcase() {
   return (
     <article className="cibeles-showcase featured-showcase" ref={showcaseRef} data-visible={isVisible}>
       <div className="cibeles-project-meta"><span>01</span><span className="professional-pill"><i /><span>Proyecto profesional</span></span></div>
-      <div className="cibeles-heading">
-        <div>
+      <div className="cibeles-hero">
+        <div className="cibeles-heading">
           <p className="project-eyebrow">Python · Análisis de datos de negocio</p>
           <h3>Cibeles Analytics</h3>
           <p className="project-tagline">De datos inconexos a decisiones demostrables.</p>
-        </div>
-        <div className="cibeles-summary">
           <p>Diseñé una herramienta para optimizar y conciliar la trazabilidad entre facturas de obra y adecuaciones inmobiliarias en una de las mayores carteras residenciales en alquiler de España, dentro de una operativa valorada en más de 1.000 M€. La solución aplicaba una lógica progresiva de transformación, validación y conciliación.</p>
           <div className="project-tags"><span>Python</span><span>Pandas & NumPy</span><span>Excel & Power BI</span><span>Prinex</span><span>Conciliación financiera</span><span>Millones de registros</span><span>Reporting automático</span></div>
+        </div>
+        <div className="cibeles-story" aria-label="Flujo conceptual del motor de conciliación">
+          <div className="story-toolbar"><span><i /> Motor activo</span><small>Conciliación analítica</small></div>
+          <svg className="story-connections" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
+            <path d="M18 25 C42 25 38 50 50 50" /><path d="M18 75 C42 75 38 50 50 50" />
+            <path d="M50 50 C62 50 60 25 82 25" /><path d="M50 50 C62 50 60 75 82 75" />
+          </svg>
+          <div className="story-node source source-a"><Database /><span><small>Fuente A</small><strong>Facturas</strong></span></div>
+          <div className="story-node source source-b"><Boxes /><span><small>Fuente B</small><strong>Adecuaciones</strong></span></div>
+          <div className="story-engine"><span>96%</span><small>trazabilidad</small></div>
+          <div className="story-node output output-a"><Check /><span><small>Salida</small><strong>Dato validado</strong></span></div>
+          <div className="story-node output output-b"><FileText /><span><small>Salida</small><strong>Reporting</strong></span></div>
+          <div className="story-caption"><span>Millones de registros</span><span>97% precisión auditada</span></div>
         </div>
       </div>
 
@@ -507,6 +518,7 @@ function CibelesShowcase() {
 function AlphaEngineShowcase({ project }: { project: Project }) {
   const [expanded, setExpanded] = useState(false)
   const [detailsMounted, setDetailsMounted] = useState(false)
+  const videoRef = useRef<HTMLVideoElement>(null)
   const proofReveal = useOnceVisible<HTMLDivElement>()
   const modules = [
     ['Render', 'Graphics2D, transformaciones, alpha y descarte fuera de cámara'],
@@ -521,18 +533,43 @@ function AlphaEngineShowcase({ project }: { project: Project }) {
     setExpanded((current) => !current)
   }
 
+  useEffect(() => {
+    const video = videoRef.current
+    if (!video || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
+    const observer = new IntersectionObserver(([entry]) => {
+      if (entry.isIntersecting) void video.play().catch(() => undefined)
+      else video.pause()
+    }, { rootMargin: '120px 0px', threshold: .15 })
+    observer.observe(video)
+    return () => {
+      observer.disconnect()
+      video.pause()
+    }
+  }, [])
+
   return (
     <article className="alpha-showcase featured-showcase">
       <div className="alpha-project-meta"><span>02</span><div className="project-meta-end"><AlphaCreativeMark /><span className="engine-pill"><i /> Proyecto educativo</span></div></div>
-      <div className="alpha-summary">
-        <div>
+      <div className="alpha-hero">
+        <div className="alpha-summary">
           <p className="project-eyebrow">Arquitectura · Gráficos 2D · Sistemas de juego</p>
           <h3>AlphaEngine2D</h3>
           <p className="project-tagline">Un motor construido desde los fundamentos.</p>
-        </div>
-        <div className="alpha-summary-copy">
           <p>{project.description}</p>
           <div className="project-tags"><span>Java 17</span><span>AWT · Graphics2D</span><span>Swing · JFrame</span><span>Arquitectura propia</span></div>
+        </div>
+        <div className="alpha-media-stage">
+          <div className="media-chrome"><span><i /><i /><i /></span><small>AlphaEngine2D · runtime</small><b><i /> Running</b></div>
+          <div className="media-canvas">
+            <video ref={videoRef} muted loop playsInline preload="metadata" poster="/projects/alpha-engine/splash.png" aria-label="Demostración en vídeo de AlphaEngine2D" disablePictureInPicture>
+              <source src="/projects/alpha-engine/video_1.mp4" type="video/mp4" />
+            </video>
+            <div className="media-scanline" />
+            <span className="media-badge">Java · Graphics2D</span>
+          </div>
+          <div className="media-pipeline" aria-hidden="true">
+            {['Input', 'Update', 'Physics', 'Render'].map((step, index) => <span key={step}><i style={{ '--step': index } as CSSProperties} />{step}</span>)}
+          </div>
         </div>
       </div>
       <div className="alpha-proof" ref={proofReveal.elementRef}>
@@ -976,27 +1013,36 @@ function App() {
                   <article className={`fruit-showcase featured-showcase ${fruitExpanded ? 'fruit-showcase-open' : ''}`} key={project.title}>
                     <div className="fruit-content">
                       <div className="project-top"><span>{project.index}</span><div className="project-meta-end"><AlphaCreativeMark /><span className="published-pill"><span /> Disponible en Google Play</span></div></div>
-                      <div className="fruit-title-row">
-                        <img src="/projects/fruit-drop/icon.png" alt="Icono de Fruit Drop" loading="lazy" decoding="async" />
-                        <div>
+                      <div className="fruit-hero">
+                        <div className="fruit-copy">
+                          <div className="fruit-title-row">
+                            <img src="/projects/fruit-drop/icon.png" alt="Icono de Fruit Drop" loading="lazy" decoding="async" />
+                            <div>
                           <p className="project-eyebrow">{project.eyebrow}</p>
                           <h3>{project.title}</h3>
                           {project.tagline && <p className="project-tagline">{project.tagline}</p>}
+                            </div>
+                          </div>
+                          <p className="project-description">{project.description}</p>
+                          <div className="fruit-metrics" ref={fruitMetricsReveal.elementRef}>
+                            <div><AnimatedMetric value={3} suffix=" meses" play={fruitMetricsReveal.visible} count={false} /><span>De desarrollo hasta publicación</span></div>
+                            <div><AnimatedMetric value={100} suffix="%" play={fruitMetricsReveal.visible} /><span>Diseñado y desarrollado por mí</span></div>
+                          </div>
+                          <div className="project-tags"><span>Unity · C#</span><span>Producto end-to-end</span><span>Monetización</span><span>Servicios cloud</span></div>
+                          <a className="store-link" href="https://play.google.com/store/apps/details?id=com.alphacreative.fruitdrop" target="_blank" rel="noreferrer">
+                            Ver en Google Play <ExternalLink size={17} />
+                          </a>
+                          <button className="details-toggle" onClick={toggleFruitDetails} aria-expanded={fruitExpanded} aria-controls="fruit-drop-details">
+                            <span><small>Caso interactivo</small>{fruitExpanded ? 'Ocultar funcionamiento' : 'Explorar integraciones'}</span><ChevronRight />
+                          </button>
+                        </div>
+                        <div className="fruit-product-stage" aria-label="Presentación visual de Fruit Drop">
+                          <img className="fruit-stage-art" src="/projects/fruit-drop/feature.png" alt="Personajes y logotipo de Fruit Drop" loading="lazy" decoding="async" />
+                          <img className="fruit-stage-icon" src="/projects/fruit-drop/icon.png" alt="" aria-hidden="true" loading="lazy" decoding="async" />
+                          <div className="fruit-stage-phone"><span /><img src="/projects/fruit-drop/rankings.png" alt="Ranking global de Fruit Drop" loading="lazy" decoding="async" /></div>
+                          <span className="fruit-stage-label">Live on Google Play</span>
                         </div>
                       </div>
-                      <div className="fruit-summary-art"><img src="/projects/fruit-drop/feature.png" alt="Personajes y logotipo de Fruit Drop" loading="lazy" decoding="async" /></div>
-                      <p className="project-description">{project.description}</p>
-                      <div className="fruit-metrics" ref={fruitMetricsReveal.elementRef}>
-                        <div><AnimatedMetric value={3} suffix=" meses" play={fruitMetricsReveal.visible} count={false} /><span>De desarrollo hasta publicación</span></div>
-                        <div><AnimatedMetric value={100} suffix="%" play={fruitMetricsReveal.visible} /><span>Diseñado y desarrollado por mí</span></div>
-                      </div>
-                      <div className="project-tags"><span>Unity · C#</span><span>Producto end-to-end</span><span>Monetización</span><span>Servicios cloud</span></div>
-                      <a className="store-link" href="https://play.google.com/store/apps/details?id=com.alphacreative.fruitdrop" target="_blank" rel="noreferrer">
-                        Ver en Google Play <ExternalLink size={17} />
-                      </a>
-                       <button className="details-toggle" onClick={toggleFruitDetails} aria-expanded={fruitExpanded} aria-controls="fruit-drop-details">
-                        <span><small>Caso interactivo</small>{fruitExpanded ? 'Ocultar funcionamiento' : 'Explorar integraciones'}</span><ChevronRight />
-                      </button>
                      </div>
                      <div id="fruit-drop-details" className={`project-details fruit-project-details ${fruitExpanded ? 'project-details-open' : ''}`}>
                        {fruitDetailsMounted && (
@@ -1030,6 +1076,32 @@ function App() {
                         </div>
                       </div>
                        )}
+                    </div>
+                  </article>
+                )
+              }
+              if (project.index === '04') {
+                return (
+                  <article className="project-card project-blue ai-showcase featured-showcase" key={project.title}>
+                    <div className="project-top"><span>{project.index}</span><div className="project-meta-end"><AlphaCreativeMark /><Icon size={28} /></div></div>
+                    <div className="ai-hero">
+                      <div className="ai-copy">
+                        <p className="project-eyebrow">{project.eyebrow}</p>
+                        <h3>{project.title}</h3>
+                        {project.tagline && <p className="project-tagline">{project.tagline}</p>}
+                        <p className="project-description">{project.description}</p>
+                        <div className="project-result"><Check size={16} /> {project.result}</div>
+                        <div className="tag-list">{project.tags.map((tag) => <span key={tag}>{tag}</span>)}</div>
+                      </div>
+                      <div className="ai-system" aria-label="Arquitectura híbrida de IA privada">
+                        <div className="ai-system-grid" />
+                        <svg viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true"><path d="M20 24 C42 24 35 50 50 50" /><path d="M20 76 C42 76 35 50 50 50" /><path d="M50 50 C64 50 62 28 82 28" /></svg>
+                        <div className="ai-hub"><Bot /><span><small>Private core</small><strong>Local AI</strong></span><i /></div>
+                        <div className="ai-satellite satellite-model"><span>01</span><b>Modelos locales</b></div>
+                        <div className="ai-satellite satellite-data"><span>02</span><b>Datos privados</b></div>
+                        <div className="ai-satellite satellite-cloud"><span>03</span><b>Cloud opcional</b></div>
+                        <div className="ai-system-footer"><span><i /> Hardware propio</span><span>Control end-to-end</span></div>
+                      </div>
                     </div>
                   </article>
                 )
