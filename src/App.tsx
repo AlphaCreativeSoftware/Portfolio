@@ -426,21 +426,8 @@ function CibelesShowcase() {
           <p className="project-eyebrow">Python · Análisis de datos de negocio</p>
           <h3>Cibeles Analytics</h3>
           <p className="project-tagline">De datos inconexos a decisiones demostrables.</p>
-          <p>Diseñé una herramienta para optimizar y conciliar la trazabilidad entre facturas de obra y adecuaciones inmobiliarias en una de las mayores carteras residenciales en alquiler de España, dentro de una operativa valorada en más de 1.000 M€. La solución aplicaba una lógica progresiva de transformación, validación y conciliación.</p>
+          <p>Diseñé una herramienta para optimizar y conciliar la trazabilidad entre facturas de obra y adecuaciones inmobiliarias en una de las mayores carteras residenciales en alquiler de España, dentro de una operativa valorada en más de 1.000 M€.</p>
           <div className="project-tags"><span>Python</span><span>Pandas & NumPy</span><span>Excel & Power BI</span><span>Prinex</span><span>Conciliación financiera</span><span>Millones de registros</span><span>Reporting automático</span></div>
-        </div>
-        <div className="cibeles-story" aria-label="Flujo conceptual del motor de conciliación">
-          <div className="story-toolbar"><span><i /> Motor activo</span><small>Conciliación analítica</small></div>
-          <svg className="story-connections" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
-            <path d="M18 25 C42 25 38 50 50 50" /><path d="M18 75 C42 75 38 50 50 50" />
-            <path d="M50 50 C62 50 60 25 82 25" /><path d="M50 50 C62 50 60 75 82 75" />
-          </svg>
-          <div className="story-node source source-a"><Database /><span><small>Fuente A</small><strong>Facturas</strong></span></div>
-          <div className="story-node source source-b"><Boxes /><span><small>Fuente B</small><strong>Adecuaciones</strong></span></div>
-          <div className="story-engine"><span>96%</span><small>trazabilidad</small></div>
-          <div className="story-node output output-a"><Check /><span><small>Salida</small><strong>Dato validado</strong></span></div>
-          <div className="story-node output output-b"><FileText /><span><small>Salida</small><strong>Reporting</strong></span></div>
-          <div className="story-caption"><span>Millones de registros</span><span>97% precisión auditada</span></div>
         </div>
       </div>
 
@@ -1068,11 +1055,6 @@ function App() {
                        </div>
                      </div>
                           </div>
-                    <div className="fruit-visual" aria-label="Imágenes del videojuego Fruit Drop">
-                      <div className="fruit-feature"><img src="/projects/fruit-drop/feature.png" alt="Arte promocional de Fruit Drop con sus personajes" loading="lazy" decoding="async" /></div>
-                      <div className="phone-frame"><div className="phone-speaker" /><img src="/projects/fruit-drop/rankings.png" alt="Ranking global dentro de Fruit Drop" loading="lazy" decoding="async" /></div>
-                      <img className="floating-fruit-icon" src="/projects/fruit-drop/icon.png" alt="" aria-hidden="true" loading="lazy" decoding="async" />
-                    </div>
                         </div>
                       </div>
                        )}
@@ -1093,14 +1075,21 @@ function App() {
                         <div className="project-result"><Check size={16} /> {project.result}</div>
                         <div className="tag-list">{project.tags.map((tag) => <span key={tag}>{tag}</span>)}</div>
                       </div>
-                      <div className="ai-system" aria-label="Arquitectura híbrida de IA privada">
-                        <div className="ai-system-grid" />
-                        <svg viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true"><path d="M20 24 C42 24 35 50 50 50" /><path d="M20 76 C42 76 35 50 50 50" /><path d="M50 50 C64 50 62 28 82 28" /></svg>
-                        <div className="ai-hub"><Bot /><span><small>Private core</small><strong>Local AI</strong></span><i /></div>
-                        <div className="ai-satellite satellite-model"><span>01</span><b>Modelos locales</b></div>
-                        <div className="ai-satellite satellite-data"><span>02</span><b>Datos privados</b></div>
-                        <div className="ai-satellite satellite-cloud"><span>03</span><b>Cloud opcional</b></div>
-                        <div className="ai-system-footer"><span><i /> Hardware propio</span><span>Control end-to-end</span></div>
+                      <div className="ai-chat" aria-label="Demostración de conversación con el agente de IA">
+                        <div className="ai-chat-header">
+                          <span className="ai-chat-avatar"><Bot /></span>
+                          <span><strong>Agente de Mikael</strong><small><i /> IA local disponible</small></span>
+                          <b>Privado</b>
+                        </div>
+                        <div className="ai-chat-body">
+                          <div className="ai-chat-message ai-chat-user">¿Qué puedes hacer por mí?</div>
+                          <div className="ai-chat-typing" aria-hidden="true"><i /><i /><i /></div>
+                          <div className="ai-chat-message ai-chat-agent">
+                            <span className="ai-chat-agent-icon"><Bot /></span>
+                            <p>Hola, soy el agente de IA de Mikael Rodríguez. Me encargo de tareas relacionadas con desarrollo y automatización: puedo responder y enviar correos con el tono que prefieras, contestar mensajes de WhatsApp y auditar aplicaciones en busca de errores y nuevas soluciones.</p>
+                          </div>
+                        </div>
+                        <div className="ai-chat-input"><span>Escribe una tarea…</span><ArrowRight /></div>
                       </div>
                     </div>
                   </article>
