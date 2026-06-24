@@ -554,16 +554,15 @@ function AlphaEngineShowcase({ project }: { project: Project }) {
           <div className="project-tags"><span>Java 17</span><span>AWT · Graphics2D</span><span>Swing · JFrame</span><span>Arquitectura propia</span></div>
         </div>
         <div className="alpha-media-stage">
-          <div className="media-chrome"><span><i /><i /><i /></span><small>AlphaEngine2D · runtime</small><b><i /> Running</b></div>
+          <div className="media-chrome"><span><i /><i /><i /></span><small>AlphaEngine2D · Vista previa</small><b><i /> En ejecución</b></div>
           <div className="media-canvas">
             <video ref={videoRef} muted loop playsInline preload="none" poster="/projects/alpha-engine/splash.png" aria-label="Demostración en vídeo de AlphaEngine2D" disablePictureInPicture>
               <source src="/projects/alpha-engine/video_1.mp4" type="video/mp4" />
             </video>
-            <div className="media-scanline" />
             <span className="media-badge">Java · Graphics2D</span>
           </div>
           <div className="media-pipeline" aria-hidden="true">
-            {['Input', 'Update', 'Physics', 'Render'].map((step, index) => <span key={step}><i style={{ '--step': index } as CSSProperties} />{step}</span>)}
+            {['Entrada', 'Actualización', 'Física', 'Renderizado'].map((step, index) => <span key={step}><i style={{ '--step': index } as CSSProperties} />{step}</span>)}
           </div>
         </div>
       </div>
