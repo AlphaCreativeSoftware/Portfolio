@@ -188,14 +188,14 @@ section[id] { scroll-margin-top: 72px; }
 h1, h2 { font-family: 'Manrope', sans-serif; letter-spacing: -.065em; line-height: .96; font-weight: 600; margin: 0; }
 h1 { font-size: clamp(60px, 7vw, 112px); max-width: 1120px; }
 h1 em, h2 em { font-style: normal; font-weight: inherit; }
-h1 em { color: var(--blue); }
+h1 em { display: inline-block; margin: 0 -.02em 0 0; padding: 0 .07em .14em 0; color: var(--blue); background: linear-gradient(105deg, var(--blue) 0%, #0a84ff 34%, #32ade6 58%, #7c7cff 82%, var(--blue) 100%); background-size: 220% 100%; background-position: 0% 50%; background-clip: text; -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
 h2 em { color: var(--blue); background: var(--accent-gradient); background-clip: text; -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-.hero-title-line { display: block; margin-bottom: -.035em; padding-bottom: .035em; overflow: hidden; }
+.hero-title-line { display: block; margin-bottom: -.18em; padding: 0 .08em .27em 0; overflow: hidden; }
 .hero-title-line > span { display: block; transform-origin: left bottom; animation: hero-title-enter .92s var(--ease-premium) backwards; }
 .hero-title-line:nth-child(1) > span { animation-delay: .12s; }
 .hero-title-line:nth-child(2) > span { animation-delay: .23s; }
 .hero-title-line:nth-child(3) > span { animation-delay: .34s; }
-.hero-title-line em { animation: hero-accent-settle 1.25s .54s ease-out backwards; }
+.hero-title-line em { animation: hero-accent-gradient 2.15s .42s var(--ease-premium) both, hero-accent-settle 1.25s .54s ease-out backwards; }
 .hero-copy > p { max-width: 650px; margin: 36px 0 0; color: var(--muted); line-height: 1.65; font-size: 17px; letter-spacing: -.015em; animation: hero-element-enter .75s .56s var(--ease-premium) backwards; }
 .hero-copy strong { color: var(--text); font-weight: 600; }
 .hero-actions { align-self: end; display: flex; flex-direction: column; align-items: flex-start; gap: 20px; padding-bottom: 12px; animation: hero-element-enter .75s .7s var(--ease-premium) backwards; }
@@ -220,7 +220,8 @@ h2 em { color: var(--blue); background: var(--accent-gradient); background-clip:
 @keyframes hero-rule-enter { from { opacity: 0; transform: scaleX(0); } to { opacity: 1; transform: scaleX(1); } }
 @keyframes hero-aura-enter { from { opacity: 0; transform: scale(.82); } to { opacity: .7; transform: scale(1); } }
 @keyframes hero-orbit-enter { from { opacity: 0; transform: scale(.6); } to { opacity: var(--orbit-opacity); transform: scale(1); } }
-@keyframes hero-accent-settle { from { text-shadow: 0 0 28px color-mix(in srgb, var(--blue) 34%, transparent); } to { text-shadow: 0 0 0 transparent; } }
+@keyframes hero-accent-gradient { from { background-position: 0% 50%; } to { background-position: 100% 50%; } }
+@keyframes hero-accent-settle { from { text-shadow: 0 0 14px color-mix(in srgb, var(--blue) 18%, transparent); } to { text-shadow: 0 0 0 transparent; } }
 
 .marquee { padding: 16px 0; border-block: 1px solid var(--line); color: var(--faint); overflow: hidden; white-space: nowrap; font-size: 9px; letter-spacing: .16em; font-weight: 600; text-transform: uppercase; background: var(--surface-raised); }
 .marquee-track { display: flex; width: max-content; animation: slide 38s linear infinite; animation-play-state: paused; will-change: transform; }
