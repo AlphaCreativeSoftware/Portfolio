@@ -557,6 +557,7 @@ function AlphaEngineShowcase({ project }: { project: Project }) {
           <div className="media-chrome"><span><i /><i /><i /></span><small>AlphaEngine2D · Vista previa</small><b><i /> En ejecución</b></div>
           <div className="media-canvas">
             <video ref={videoRef} muted loop playsInline preload="none" poster="/projects/alpha-engine/splash.png" aria-label="Demostración en vídeo de AlphaEngine2D" disablePictureInPicture>
+              <source src="/projects/alpha-engine/video_1.webm" type="video/webm" />
               <source src="/projects/alpha-engine/video_1.mp4" type="video/mp4" />
             </video>
             <span className="media-badge">Java · Graphics2D</span>
