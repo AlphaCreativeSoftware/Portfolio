@@ -628,6 +628,7 @@ function App() {
   const navigationTimerRef = useRef<number | null>(null)
   const fruitMetricsReveal = useOnceVisible<HTMLDivElement>()
   const workMethodReveal = useOnceVisible<HTMLDivElement>(.3)
+  const experienceHeadingReveal = useOnceVisible<HTMLHeadingElement>(.5)
   const [menuOpen, setMenuOpen] = useState(false)
   const [solarMenuOpen, setSolarMenuOpen] = useState(false)
   const [fruitExpanded, setFruitExpanded] = useState(false)
@@ -672,6 +673,7 @@ function App() {
         lastHeroTravel = heroTravel
         if (orbitOneRef.current) orbitOneRef.current.style.transform = `translate3d(0, ${heroTravel * -.15}px, 0)`
         if (orbitTwoRef.current) orbitTwoRef.current.style.transform = `translate3d(0, ${heroTravel * -.3}px, 0)`
+        document.documentElement.style.setProperty('--hero-word-shift', `${(heroTravel / window.innerHeight) * 70}%`)
       }
 
       const marker = window.innerHeight * .32
@@ -1134,12 +1136,12 @@ function App() {
 
         <section className="section experience-section" id="experiencia">
           <div className="section-heading compact">
-            <div><p className="kicker"><span>03</span> Trayectoria</p><h2>Aprender rápido.<br /><em>Entregar mejor.</em></h2></div>
+            <div><p className="kicker"><span>03</span> Trayectoria</p><h2 ref={experienceHeadingReveal.elementRef} className={experienceHeadingReveal.visible ? 'gradient-play' : ''}>Aprender rápido.<br /><em>Entregar mejor.</em></h2></div>
           </div>
           <div className="timeline">
             <article className="timeline-item current">
               <div className="timeline-date">Feb. 2026 — Ahora</div>
-              <div><p className="timeline-company">Prosegur AVOS Tech · Sector banca</p><h3>Responsable de desarrollo y mantenimiento</h3><p>Desarrollo de nuevas aplicaciones y evolución de soluciones existentes con ASP.NET, React, TypeScript y Azure. Estimación y organización del trabajo técnico, junto con la gestión de aplicaciones y componentes críticos de la red operativa del BPO. Responsabilidad también sobre sistemas heredados en Delphi, C y Windows Forms.</p></div>
+              <div><p className="timeline-company">Prosegur AVOS Tech · Sector banca</p><h3>Responsable de software</h3><p>Responsable líder de aplicaciones y soluciones con ASP.NET, React, TypeScript y Azure. Estimación y organización del trabajo técnico, junto con la gestión de aplicaciones y componentes críticos de la red operativa del BPO. Responsabilidad también sobre sistemas heredados en Delphi, C y Windows Forms.</p></div>
               <span className="timeline-status">Actual</span>
             </article>
             <article className="timeline-item independent">
