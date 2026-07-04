@@ -234,7 +234,10 @@ function AlphaCreativeMark() {
         <img className="alpha-logo-light" src="/brands/alpha-creative/logo-black.png" alt="" />
         <img className="alpha-logo-dark" src="/brands/alpha-creative/logo-white.png" alt="" />
       </span>
-      <span className="alpha-brand-label">Alpha Creative</span>
+      <span className="alpha-brand-label">
+        <span className="alpha-brand-label-full">Alpha Creative</span>
+        <span className="alpha-brand-label-short">A.Creative</span>
+      </span>
     </span>
   )
 }
@@ -844,6 +847,7 @@ function App() {
     const systemTheme = window.matchMedia('(prefers-color-scheme: dark)')
     const syncBrowserTheme = () => {
       const darkTheme = theme === 'dark' || (theme === 'system' && systemTheme.matches)
+      document.documentElement.dataset.appearance = darkTheme ? 'dark' : 'light'
       document.querySelector<HTMLMetaElement>('meta[name="theme-color"]')?.setAttribute('content', darkTheme ? '#000000' : '#ffffff')
     }
     syncBrowserTheme()
@@ -1073,16 +1077,15 @@ function App() {
               }
               if (project.index === '04') {
                 return (
-                  <article className="project-card project-blue ai-showcase featured-showcase" key={project.title}>
-                    <div className="project-top"><span>{project.index}</span><div className="project-meta-end"><AlphaCreativeMark /><Icon size={28} /></div></div>
+                  <article className="ai-showcase featured-showcase" key={project.title}>
+                    <div className="ai-project-meta"><span>{project.index}</span><div className="project-meta-end"><AlphaCreativeMark /><span className="ai-pill"><i /> Proyecto personal</span></div></div>
                     <div className="ai-hero">
-                      <div className="ai-copy">
+                      <div className="ai-summary">
                         <p className="project-eyebrow">{project.eyebrow}</p>
                         <h3>{project.title}</h3>
                         {project.tagline && <p className="project-tagline">{project.tagline}</p>}
-                        <p className="project-description">{project.description}</p>
-                        <div className="project-result"><Check size={16} /> {project.result}</div>
-                        <div className="tag-list">{project.tags.map((tag) => <span key={tag}>{tag}</span>)}</div>
+                        <p>{project.description}</p>
+                        <div className="project-tags">{project.tags.map((tag) => <span key={tag}>{tag}</span>)}</div>
                       </div>
                       <div className="ai-chat" aria-label="Demostración de conversación con el agente de IA">
                         <div className="ai-chat-header">
@@ -1100,6 +1103,11 @@ function App() {
                         </div>
                         <div className="ai-chat-input"><span>Escribe una tarea…</span><ArrowRight /></div>
                       </div>
+                    </div>
+                    <div className="ai-capabilities">
+                      <div><strong>Correo</strong><span>Redacta y responde con tu tono</span></div>
+                      <div><strong>Mensajería</strong><span>Contesta tus mensajes de WhatsApp</span></div>
+                      <div><strong>Auditoría</strong><span>Detecta errores y propone mejoras</span></div>
                     </div>
                   </article>
                 )

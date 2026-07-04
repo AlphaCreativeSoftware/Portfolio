@@ -33,6 +33,7 @@
         const minutes = now.getHours() * 60 + now.getMinutes()
         const period = minutes >= 1230 || minutes < 300 ? 'night' : minutes < 720 ? 'morning' : 'afternoon'
         document.documentElement.dataset.theme = storedTheme
+        document.documentElement.dataset.appearance = darkTheme ? 'dark' : 'light'
         const atmosphere = storedSolarMode === 'auto' ? period : storedSolarMode
         document.documentElement.dataset.atmosphere = atmosphere
         let right = 7
