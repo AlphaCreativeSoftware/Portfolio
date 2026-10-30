@@ -1,0 +1,8 @@
+.marquee { padding: 16px 0; border-block: 1px solid var(--line); color: var(--faint); overflow: hidden; white-space: nowrap; font-size: 9px; letter-spacing: .16em; font-weight: 600; text-transform: uppercase; background: var(--surface-raised); }
+.marquee-track { display: flex; width: max-content; animation: slide 38s linear infinite; animation-play-state: paused; will-change: transform; }
+.marquee-running .marquee-track { animation-play-state: running; }
+.marquee-group { display: flex; flex: none; justify-content: space-around; min-width: 100vw; }
+.marquee-group span { display: flex; align-items: center; gap: 20px; padding: 0 clamp(18px, 2.2vw, 38px); }
+.marquee-group i { color: var(--blue); font-style: normal; }
+@keyframes slide { to { transform: translateX(-50%); } }
+

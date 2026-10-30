@@ -1,0 +1,37 @@
+.cibeles-showcase,
+.alpha-showcase,
+.fruit-showcase,
+.ai-showcase { box-shadow: inset 0 1px 0 color-mix(in srgb, #fff 24%, transparent), var(--shadow); }
+
+/* Let the fixed time-of-day light pass subtly through the main surfaces. */
+.project-card,
+.cibeles-showcase,
+.alpha-showcase,
+.fruit-showcase,
+.ai-showcase,
+.skills-matrix,
+.strengths-panel,
+.about-profile,
+.work-method,
+.about-now,
+.contact-card:not(.contact-card-primary) { background-color: color-mix(in srgb, var(--surface) 94%, transparent); }
+
+/* Liquid Glass: refract the ambient light through the project cards and contact cards,
+   where the depth reads. Kept off the large flat panels (skills/about) — invisible effect,
+   highest scroll cost. Desktop only. The lower surface opacity here (vs. the 94% fallback
+   above) is what makes the refraction visible; text stays crisp at 88%. */
+@media (min-width: 901px) {
+  .project-card,
+  .cibeles-showcase,
+  .alpha-showcase,
+  .fruit-showcase,
+  .ai-showcase,
+  .contact-card:not(.contact-card-primary) {
+    background-color: color-mix(in srgb, var(--surface) 80%, transparent);
+    backdrop-filter: var(--glass-blur);
+    -webkit-backdrop-filter: var(--glass-blur);
+  }
+}
+
+.button:active, .details-toggle:active, .store-link:active, .contact-card:active { transform: scale(.985); }
+

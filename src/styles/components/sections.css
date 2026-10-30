@@ -1,0 +1,12 @@
+.section { position: relative; padding: 140px max(8vw, 34px); overflow: hidden; }
+.section > * { position: relative; z-index: 1; }
+.section-heading { display: grid; grid-template-columns: 1.3fr .7fr; align-items: end; gap: 0 clamp(32px, 5vw, 80px); max-width: 1320px; margin: 0 auto 82px; }
+.section-heading h2 { margin-top: 22px; font-size: clamp(48px, 6vw, 84px); text-wrap: balance; }
+.section-heading > p { color: var(--muted); line-height: 1.7; max-width: 430px; font-size: 15px; }
+.section-heading.compact { grid-template-columns: 1fr; }
+
+.projects-section { padding-bottom: 90px; background: color-mix(in srgb, var(--page-alt) 55%, transparent); }
+.projects-section::before, .skills-section::before, .capabilities-section::before { content: ''; position: absolute; z-index: 0; width: 620px; height: 620px; border-radius: 50%; background: radial-gradient(circle, color-mix(in srgb, var(--blue) 7%, transparent), transparent 70%); pointer-events: none; }
+.projects-section::before { right: 4%; top: 4%; width: 760px; height: 760px; background: radial-gradient(circle, color-mix(in srgb, var(--blue) 38%, transparent) 0%, color-mix(in srgb, var(--ambient-primary) 26%, transparent) 42%, transparent 72%); transition: background 1.2s ease; }
+.skills-section::before { left: -340px; top: 20%; }
+.capabilities-section::before { right: -330px; top: 28%; }

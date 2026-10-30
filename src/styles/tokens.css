@@ -1,0 +1,92 @@
+:root {
+  color-scheme: light;
+  --page: #ffffff;
+  --page-alt: #f5f5f7;
+  --surface: #ffffff;
+  --surface-raised: rgba(255, 255, 255, .78);
+  --text: #1d1d1f;
+  --text-2: #424245;
+  --muted: #6e6e73;
+  --faint: #767679;
+  --line: rgba(0, 0, 0, .09);
+  --blue: #0071e3;
+  --blue-hover: #0077ed;
+  --accent-gradient: linear-gradient(108deg, #0071e3 0%, #00a0c7 52%, #625bd7 100%);
+  --primary-gradient: linear-gradient(135deg, #087bea 0%, #0071e3 58%, #1565d8 100%);
+  --soft-blue: #e8f2ff;
+  --fruit-bg-a: #e8fbff;
+  --fruit-bg-b: #cdf7f3;
+  --fruit-overlay: rgba(17, 40, 43, .15);
+  --shadow: 0 1px 2px rgba(0, 0, 0, .03), 0 8px 24px rgba(0, 0, 0, .04), 0 20px 56px rgba(0, 0, 0, .05);
+  --shadow-hover: 0 2px 6px rgba(0, 0, 0, .05), 0 14px 38px rgba(0, 0, 0, .07), 0 30px 80px rgba(0, 0, 0, .09);
+  --ease-premium: cubic-bezier(.22, 1, .36, 1);
+  --glass-blur: saturate(200%) blur(24px);
+  --glass-highlight: inset 0 1px 0 color-mix(in srgb, #fff 60%, transparent);
+  --measure: 64ch;
+  --ambient-primary: #b9dcff;
+  --ambient-secondary: #fff0bc;
+  --ambient-strength: .22;
+  --celestial-core: #fffdf2;
+  --celestial-edge: #ffd67a;
+  --celestial-opacity: .42;
+  --celestial-right: 7vw;
+  --celestial-top: 18%;
+  font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  scroll-behavior: smooth;
+}
+
+:root[data-atmosphere='morning'] {
+  --ambient-primary: #ffd391;
+  --ambient-secondary: #9ed4ff;
+  --ambient-strength: .28;
+  --celestial-core: #fffdf2;
+  --celestial-edge: #ffc85f;
+  --celestial-opacity: .46;
+}
+
+:root[data-atmosphere='afternoon'] {
+  --ambient-primary: #ffc071;
+  --ambient-secondary: #b4d8ff;
+  --ambient-strength: .26;
+  --celestial-core: #fff8df;
+  --celestial-edge: #ffae45;
+  --celestial-opacity: .43;
+}
+
+:root[data-atmosphere='night'] {
+  --ambient-primary: #3d7bd9;
+  --ambient-secondary: #7259b8;
+  --ambient-strength: .21;
+  --celestial-core: #eef6ff;
+  --celestial-edge: #8bbcff;
+  --celestial-opacity: .3;
+}
+
+/* Dark palette — single source of truth. Applied via data-appearance, which the
+   theme script resolves from data-theme + the OS preference, so 'system' theme
+   works without duplicating this block in a prefers-color-scheme media query. */
+:root[data-appearance='dark'] {
+  color-scheme: dark;
+  --page: #000000;
+  --page-alt: #101010;
+  --surface: #161617;
+  --surface-raised: rgba(22, 22, 23, .8);
+  --text: #f5f5f7;
+  --text-2: #d2d2d7;
+  --muted: #a1a1a6;
+  --faint: #86868b;
+  --line: rgba(255, 255, 255, .12);
+  --blue: #2997ff;
+  --blue-hover: #4aa7ff;
+  --accent-gradient: linear-gradient(108deg, #2997ff 0%, #64d2ff 52%, #b49cff 100%);
+  --primary-gradient: linear-gradient(135deg, #369fff 0%, #167be5 58%, #315fd5 100%);
+  --soft-blue: #10283e;
+  --fruit-bg-a: #07191c;
+  --fruit-bg-b: #101317;
+  --fruit-overlay: rgba(0, 0, 0, .5);
+  --shadow: 0 1px 2px rgba(0, 0, 0, .3), 0 10px 30px rgba(0, 0, 0, .32), 0 24px 70px rgba(0, 0, 0, .4);
+  --shadow-hover: 0 2px 6px rgba(0, 0, 0, .4), 0 16px 44px rgba(0, 0, 0, .46), 0 32px 90px rgba(0, 0, 0, .55);
+}
+

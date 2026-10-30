@@ -2,6 +2,22 @@
 
 Portfolio profesional construido con React, TypeScript y Vite.
 
+## Estructura y evolución
+
+El portfolio está separado en páginas, funcionalidades, componentes compartidos y
+estilos por responsabilidad. El sistema solar y los controles de apariencia son
+independientes de la página de portfolio, para poder reutilizarlos en una futura portada.
+
+Consulta [la guía de arquitectura](docs/architecture.md) para localizar cada módulo,
+añadir proyectos y preparar nuevas páginas sin volver a concentrarlo todo en `App.tsx`.
+
+```bash
+npm test
+npm run check
+```
+
+`check` ejecuta las pruebas y el build de producción. No requiere dependencias de test adicionales.
+
 ## Desarrollo local
 
 ```bash
@@ -39,7 +55,7 @@ Un dominio personalizado es opcional y normalmente tiene coste anual; el alojami
 
 ## Antes de publicar
 
-- Sustituir los enlaces sociales por los perfiles definitivos de LinkedIn y GitHub.
-- Incorporar capturas o vídeos reales de los proyectos.
+- Verificar que los enlaces y datos de contacto siguen vigentes.
+- Revisar el peso de los assets y el comportamiento del vídeo en dispositivos reales.
 - Confirmar qué información profesional puede mostrarse públicamente.
-- Añadir un email profesional o mecanismo de contacto.
+- Confirmar rutas, metadatos y configuración del hosting si se añaden más páginas.
