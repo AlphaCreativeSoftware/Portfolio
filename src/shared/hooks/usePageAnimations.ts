@@ -33,7 +33,7 @@ export function usePageAnimations(pageRef: RefObject<HTMLElement | null>) {
   }, [pageRef])
 
   useEffect(() => {
-    const showcases = pageRef.current?.querySelectorAll<HTMLElement>('.featured-showcase') ?? []
+    const showcases = pageRef.current?.querySelectorAll<HTMLElement>('.featured-showcase, [data-viewport-animation]') ?? []
     const observer = new IntersectionObserver((entries) => {
       entries.forEach((entry) => {
         (entry.target as HTMLElement).dataset.onscreen = String(entry.isIntersecting)

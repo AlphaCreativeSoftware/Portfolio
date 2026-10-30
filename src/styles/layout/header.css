@@ -45,3 +45,8 @@
 .menu-button { display: none; justify-self: end; border: 0; background: none; color: var(--text); }
 .nav-backdrop { display: none; }
 
+@media (min-width: 901px) and (max-width: 1150px) {
+  .topbar .availability { display: none; }
+  .nav { gap: 18px; }
+}
+

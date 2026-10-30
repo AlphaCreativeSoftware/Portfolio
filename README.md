@@ -1,12 +1,15 @@
-# Portfolio de Mikael Rodríguez
+# El espacio de Mikael Rodríguez
 
-Portfolio profesional construido con React, TypeScript y Vite.
+Web personal construida con React, TypeScript, Vite y React Router.
+
+- `/`: portada personal y acceso a mis espacios.
+- `/portfolio`: proyectos, experiencia, habilidades y forma de trabajar.
 
 ## Estructura y evolución
 
 El portfolio está separado en páginas, funcionalidades, componentes compartidos y
 estilos por responsabilidad. El sistema solar y los controles de apariencia son
-independientes de la página de portfolio, para poder reutilizarlos en una futura portada.
+independientes de las páginas, y se comparten entre la portada y el portfolio.
 
 Consulta [la guía de arquitectura](docs/architecture.md) para localizar cada módulo,
 añadir proyectos y preparar nuevas páginas sin volver a concentrarlo todo en `App.tsx`.
@@ -17,6 +20,9 @@ npm run check
 ```
 
 `check` ejecuta las pruebas y el build de producción. No requiere dependencias de test adicionales.
+
+La dirección de diseño, las rutas y el espacio previsto para un futuro retrato
+animado se explican en [la guía de la portada](docs/homepage.md).
 
 ## Desarrollo local
 

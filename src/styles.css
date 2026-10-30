@@ -1,3 +1,4 @@
+@import './styles/fonts.css';
 @import './styles/tokens.css';
 @import './styles/base.css';
 @import './styles/layout/header.css';
@@ -18,3 +19,8 @@
 @import './styles/layout/footer.css';
 @import './styles/motion.css';
 @import './styles/responsive.css';
+@import './styles/home/foundation.css';
+@import './styles/home/hero.css';
+@import './styles/home/spaces.css';
+@import './styles/home/editorial.css';
+@import './styles/home/responsive.css';

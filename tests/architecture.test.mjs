@@ -51,3 +51,14 @@ test('style entry point contains only ordered imports and all target files exist
   assert.equal(new Set(imports.map((match) => match[1])).size, imports.length)
   for (const match of imports) assert.ok((await readFile(path.resolve(root, match[1]), 'utf8')).trim())
 })
+
+test('the existing typefaces are local WOFF2 assets with their licenses', async () => {
+  for (const name of ['dm-sans-latin', 'dm-sans-latin-ext', 'manrope-latin', 'manrope-latin-ext']) {
+    const font = await readFile(new URL('../public/fonts/' + name + '.woff2', import.meta.url))
+    assert.equal(font.subarray(0, 4).toString(), 'wOF2')
+  }
+  for (const name of ['DM-Sans-OFL.txt', 'Manrope-OFL.txt']) assert.match(await readFile(new URL('../public/fonts/' + name, import.meta.url), 'utf8'), /SIL OPEN FONT LICENSE/)
+  const html = await readFile(new URL('../index.html', import.meta.url), 'utf8')
+  assert.ok(!html.includes('fonts.googleapis.com'))
+  assert.match(html, /preload.*\/fonts\/manrope-latin\.woff2/)
+})

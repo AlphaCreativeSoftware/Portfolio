@@ -1,13 +1,14 @@
 import type { CSSProperties } from 'react'
 import type { SectionNavigation } from '../../shared/hooks/useSectionNavigation'
 import { AppearanceControls } from '../../features/appearance/AppearanceControls'
+import { Link } from 'react-router-dom'
 
 export function SiteHeader({ navigation }: { navigation: SectionNavigation }) {
   const { items, scrolled, menuOpen, scrollProgressRef, navigateTo, activeSection, currentSectionLabel, navRef, navIndicator, menuButtonRef, setMenuOpen, closeMenu } = navigation
   return (
     <header className={`topbar ${scrolled ? 'topbar-scrolled' : ''} ${menuOpen ? 'topbar-menu-open' : ''}`}>
       <span className="scroll-progress" ref={scrollProgressRef} />
-      <a className="brand" href="#inicio" aria-label="Ir al inicio" onClick={() => navigateTo('inicio')}>MR<span>.</span></a>
+      <Link className="brand" to="/" aria-label="Ir a la página principal">MR<span>.</span></Link>
       <span className="mobile-section-label" key={activeSection}>{currentSectionLabel}</span>
       <nav id="site-navigation" ref={navRef} className={menuOpen ? 'nav nav-open' : 'nav'} aria-label="Navegación principal">
         <span
@@ -20,7 +21,9 @@ export function SiteHeader({ navigation }: { navigation: SectionNavigation }) {
           } as CSSProperties}
           aria-hidden="true"
         ><i /></span>
-        {items.map(({ id, label, number }) => (
+        {items.map(({ id, label, number, to }) => to ? (
+          <Link key={id} to={to} onClick={closeMenu} className="nav-page-link"><span>{number}</span>{label}</Link>
+        ) : (
           <a key={id} className={activeSection === id ? 'active' : ''} aria-current={activeSection === id ? 'page' : undefined} href={'#' + id} onClick={() => navigateTo(id)}><span>{number}</span>{label}</a>
         ))}
       </nav>

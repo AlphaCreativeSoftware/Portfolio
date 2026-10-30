@@ -1,0 +1,21 @@
+.home-perspective { display: grid; grid-template-columns: 1fr 1fr; gap: clamp(60px, 8vw, 120px); padding-block: 114px 120px; border-top: 1px solid var(--line); }
+.home-perspective h2 { margin-top: 28px; font-size: clamp(42px, 4.6vw, 65px); line-height: 1.13; letter-spacing: -.055em; }
+.home-perspective-copy { padding-top: 40px; }
+.home-perspective-copy > p { max-width: 44ch; margin: 0; color: var(--muted); font-size: 16px; line-height: 1.8; }
+.home-perspective-copy > .home-perspective-lead { color: var(--text-2); font-size: 21px; line-height: 1.6; letter-spacing: -.02em; }
+.home-perspective-copy > p + p { margin-top: 22px; }
+.home-perspective-copy > .home-quiet-link { margin-top: 21px; color: var(--blue); }
+.home-now { margin-top: 38px; padding: 24px 0 0 22px; border-top: 1px solid var(--line); border-left: 1px solid var(--line); }
+.home-now > span { display: flex; align-items: center; gap: 8px; color: var(--muted); font-size: 9px; font-weight: 500; letter-spacing: .12em; text-transform: uppercase; }
+.home-now i { width: 5px; height: 5px; background: #34c759; border-radius: 50%; }
+.home-now p { max-width: 34ch; margin: 12px 0 8px; color: var(--text-2); font-size: 14px; line-height: 1.7; }
+.home-now a { display: inline-flex; align-items: center; gap: 7px; min-height: 34px; color: var(--blue); font-size: 11px; }
+.home-contact { position: relative; display: grid; grid-template-columns: 1fr 1fr; align-items: center; gap: clamp(60px, 8vw, 120px); padding-block: 108px 118px; border-top: 1px solid var(--line); }
+.home-contact h2 { margin-top: 26px; font-size: clamp(50px, 5.8vw, 80px); line-height: 1.08; letter-spacing: -.06em; }
+.home-contact-copy > p { margin: 0; color: var(--muted); font-size: 16px; line-height: 1.8; }
+.home-email-link { display: flex; align-items: center; gap: 12px; margin-top: 20px; padding-block: 20px; border-bottom: 1px solid var(--home-border); color: var(--text-2); transition: color .25s, border-color .25s; }
+.home-email-link > svg { flex: none; }
+.home-email-link > svg:last-child { margin-left: auto; color: var(--blue); }
+.home-email-link span { min-width: 0; overflow-wrap: anywhere; font-size: 15px; line-height: 1.6; }
+.home-email-link:hover { color: var(--blue); border-color: var(--blue); }
+.home-contact-copy > .home-quiet-link { margin-top: 14px; }

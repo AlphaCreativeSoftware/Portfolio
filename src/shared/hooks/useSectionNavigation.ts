@@ -1,6 +1,6 @@
 import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 
-export type NavigationItem = { id: string; label: string; number: string }
+export type NavigationItem = { id: string; label: string; number: string; to?: string }
 export type NavigationConfig = {
   sectionIds: readonly string[]
   sectionLabels: Readonly<Record<string, string>>

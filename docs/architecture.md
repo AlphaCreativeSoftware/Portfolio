@@ -1,23 +1,28 @@
 # Arquitectura
 
-Esta refactorización separa responsabilidades **sin rediseñar la interfaz**.
-La URL inicial y los enlaces `#proyectos`, `#experiencia`, etc. siguen funcionando.
-No hay un router ni una portada nueva todavía: la separación permite introducirlos
-cuando exista una segunda página real, sin mezclarla con el portfolio.
+La aplicación tiene dos páginas reales: portada (`/`) y portfolio (`/portfolio`).
+React Router gestiona las rutas, el historial y la restauración del scroll. El
+portfolio se carga de forma diferida. Ambas páginas comparten el ambiente solar,
+el tema y los patrones visuales, pero sus contenidos y secciones son independientes.
 
 ## Mapa de responsabilidades
 
 ```text
 src/
-  App.tsx                       Composición de proveedores y página actual
+  App.tsx                       Proveedores, outlet y restauración de scroll
+  app/                         Tabla de rutas, accesibilidad y compatibilidad de URLs
   pages/
+    HomePage.tsx                Composición de la portada
     PortfolioPage.tsx           Orden de secciones y configuración de navegación
+    NotFoundPage.tsx            Recuperación de URLs inexistentes
+    RouteErrorPage.tsx          Recuperación de errores de carga
   components/layout/
     SiteLayout.tsx              Contenedor, ambiente, cabecera y pie comunes
     SiteHeader.tsx              Presentación del menú y controles
     SiteFooter.tsx
   features/
     appearance/                Tema, reloj y ciclo solar independientes del portfolio
+    home/                      Portada: escena orbital, espacios y narrativa personal
     portfolio/
       data/                    Catálogos, trayectoria y datos de las demostraciones
       sections/                Hero, proyectos, experiencia, habilidades, sobre mí y contacto
@@ -25,10 +30,12 @@ src/
       hooks/                   Movimiento del hero
       types.ts                 Contratos del dominio
   shared/
+    config/                    Identidad, dominio y enlaces compartidos
     hooks/                     Visibilidad, navegación, animaciones, vídeo y disclosure
     ui/                        Métricas, cabeceras, controles e iconos compartidos
   styles.css                   Única entrada de estilos; solo imports ordenados
   styles/
+    fonts.css                  Fuentes locales con licencias OFL
     tokens.css                 Variables visuales, temas y paleta solar
     base.css                   Reset, accesibilidad y ambiente global
     layout/                    Cabecera y pie
@@ -37,6 +44,7 @@ src/
     sections/                  Secciones del portfolio
     motion.css                 Reveal compartido
     responsive.css             Adaptaciones responsive y reduced-motion
+    home/                      Estilos de portada, acotados a sus clases
 tests/                         Pruebas de contratos, contenido y arquitectura
 ```
 
@@ -73,15 +81,19 @@ se monta en la primera apertura y queda `inert` al cerrarse, conservando su esta
 Para vídeos reutilizar `useViewportVideo`: pausa fuera de pantalla, al ocultarse la
 pestaña y respeta reduced-motion.
 
-### Crear la futura portada
+### Añadir otra zona
 
-1. Crear `pages/HomePage.tsx` y sus funcionalidades, sin introducirlas en `PortfolioPage`.
-2. Reutilizar `AppearanceProvider`, `AmbientScene`, los tokens y los elementos de `shared/ui`.
-3. Introducir rutas reales (`/` y `/portfolio`) cuando ambas páginas estén definidas;
-   entonces adaptar el menú y los enlaces entre páginas. No simular rutas con condiciones de hash.
-4. Añadir carga diferida por página, metadatos/canonical por ruta y fallback SPA en el hosting.
+1. Crear una página en `pages/` y sus funcionalidades en `features/`, sin mezclarlas con el portfolio.
+2. Registrar la ruta en `app/routes.tsx`, con `lazy` si su contenido es pesado.
+3. Reutilizar el layout y declarar su navegación; los elementos con `to` cambian
+   de página, los elementos sin `to` navegan a secciones locales.
+4. Usar `usePageMetadata` para título, descripción y canonical. Estos metadatos se
+   actualizan en el cliente; no se está haciendo SSR ni prerenderizado SEO por ruta.
+5. Añadir su acceso a la portada cuando tenga contenido real y comprobar el fallback del hosting.
 
-Esta entrega no inventa una portada, un sistema de navegación multipágina ni nuevas dependencias.
+Los antiguos enlaces `/#proyectos`, `/#experiencia`, `/#habilidades` y `/#sobre-mi`
+se convierten en `/portfolio#…` al arrancar. Las anclas `#inicio` y `#contacto`
+pertenecen ahora a la portada. No se usa el hash para simular páginas.
 
 ## Estilos: preservar la cascada
 
@@ -106,12 +118,14 @@ npm run build     # TypeScript estricto y bundle de producción
 npm run check     # Ambas comprobaciones
 ```
 
-Las pruebas de renderizado no sustituyen a las pruebas del navegador. En esta
-migración se comparó además la versión anterior de Git con la refactorizada en
-Chrome headless: escritorio/móvil, claro/oscuro y flujos interactivos.
+Las pruebas de renderizado no sustituyen a las pruebas del navegador. En la
+refactorización original se comparó la versión anterior de Git con la modularizada.
+La portada se revisó además en Chrome headless a 320, 390, 768, 1024 y 1440 px,
+en claro/oscuro y con recorridos entre páginas.
 Los artefactos locales de comparación se guardan en `.artifacts/`, ignorado por Git.
-Las capturas se estabilizaron con reloj fijo, reduced-motion y recursos externos
-bloqueados; admiten una tolerancia de 2/255 por canal para el compositor de Chrome.
+Las condiciones y resultados de la comparación original están en
+`refactor-validation.md`. Las fuentes actuales son locales, por lo que las nuevas
+capturas ya no necesitan sustituirlas por fuentes de respaldo.
 
 Para otra refactorización sin cambios de interfaz, el guard opcional permite
 comparar el HTML inicial y la concatenación exacta de CSS:
@@ -121,4 +135,6 @@ node scripts/check-refactor.mjs --capture   # Antes de modificar
 node scripts/check-refactor.mjs             # Después de modificar
 ```
 
-El baseline es local y no reemplaza una revisión de animaciones e interacciones.
+El baseline es local, cubre ambas páginas en tres variantes de apariencia y no
+reemplaza una revisión de animaciones e interacciones. Tras un rediseño intencional,
+hay que capturar uno nuevo antes de usarlo en una futura extracción sin cambios visuales.

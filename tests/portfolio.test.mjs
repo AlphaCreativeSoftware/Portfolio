@@ -4,20 +4,23 @@ import { fileURLToPath } from 'node:url'
 import { after, before, test } from 'node:test'
 import { createElement } from 'react'
 import { renderToStaticMarkup } from 'react-dom/server'
-import { createServer } from 'vite'
+import { MemoryRouter } from 'react-router-dom'
+import { createTestServer } from './helpers/vite-server.mjs'
 
 let server
 let model
 let navigation
 let projects
-let App
+let PortfolioPage
+let AppearanceProvider
 
 before(async () => {
-  server = await createServer({ cacheDir: '.artifacts/vite-test-cache', server: { middlewareMode: true }, appType: 'custom', optimizeDeps: { noDiscovery: true, include: [] } })
+  server = await createTestServer('.artifacts/vite-test-cache')
   model = await server.ssrLoadModule('/src/features/appearance/model.ts')
   navigation = await server.ssrLoadModule('/src/features/portfolio/data/navigation.ts')
   projects = (await server.ssrLoadModule('/src/features/portfolio/data/projects.ts')).projects
-  App = (await server.ssrLoadModule('/src/App.tsx')).default
+  PortfolioPage = (await server.ssrLoadModule('/src/pages/PortfolioPage.tsx')).PortfolioPage
+  AppearanceProvider = (await server.ssrLoadModule('/src/features/appearance/AppearanceProvider.tsx')).AppearanceProvider
 })
 
 after(async () => {
@@ -60,7 +63,7 @@ test('navigation and project catalogs have stable, unique identities', () => {
 for (const [theme, solar] of [['system', 'auto'], ['light', 'morning'], ['dark', 'night']]) {
   test(`portfolio shell: landmarks, anchors, assets and lazy details (${theme}/${solar})`, () => {
     globalThis.localStorage = { getItem: (key) => key === 'portfolio-theme' ? theme : solar }
-    const html = renderToStaticMarkup(createElement(App))
+    const html = renderToStaticMarkup(createElement(MemoryRouter, { initialEntries: ['/portfolio'] }, createElement(AppearanceProvider, null, createElement(PortfolioPage))))
     assert.equal((html.match(/<main\b/g) ?? []).length, 1)
     assert.equal((html.match(/<h1\b/g) ?? []).length, 1)
     assert.equal((html.match(/<header\b/g) ?? []).length, 1)
