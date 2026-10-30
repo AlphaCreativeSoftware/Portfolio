@@ -64,6 +64,14 @@ for (const [theme, solar] of [['system', 'auto'], ['light', 'morning'], ['dark',
   test(`portfolio shell: landmarks, anchors, assets and lazy details (${theme}/${solar})`, () => {
     globalThis.localStorage = { getItem: (key) => key === 'portfolio-theme' ? theme : solar }
     const html = renderToStaticMarkup(createElement(MemoryRouter, { initialEntries: ['/portfolio'] }, createElement(AppearanceProvider, null, createElement(PortfolioPage))))
+    const header = html.match(/<header\b[\s\S]*?<\/header>/)[0]
+    assert.ok(!header.includes('Disponible'))
+    assert.match(header, /aria-label="Áreas de la web"/)
+    assert.match(header, /aria-label="Secciones del portfolio"/)
+    assert.match(header, /aria-current="page" class="site-destination site-destination-active" href="\/portfolio"/)
+    assert.match(header, /href="\/"[^>]*>Web principal/)
+    assert.match(header, /class="mobile-area-label">Portfolio<\/strong>/)
+    assert.ok(!header.includes('mobile-section-context'), 'Portfolio start must show only the area name')
     assert.equal((html.match(/<main\b/g) ?? []).length, 1)
     assert.equal((html.match(/<h1\b/g) ?? []).length, 1)
     assert.equal((html.match(/<header\b/g) ?? []).length, 1)

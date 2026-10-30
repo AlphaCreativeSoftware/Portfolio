@@ -11,7 +11,7 @@ export function SiteLayout({ children, navigation, page = 'portfolio' }: SiteLay
     <div className={page === 'home' ? 'site-shell home-shell' : 'site-shell'}>
       <AmbientScene />
       <a className="skip-link" href="#main-content">Saltar al contenido</a>
-      <SiteHeader navigation={navigation} />
+      <SiteHeader navigation={navigation} page={page} />
       {children}
       <SiteFooter navigateTo={navigation.navigateTo} />
     </div>

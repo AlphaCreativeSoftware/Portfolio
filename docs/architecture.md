@@ -19,6 +19,7 @@ src/
   components/layout/
     SiteLayout.tsx              Contenedor, ambiente, cabecera y pie comunes
     SiteHeader.tsx              Presentación del menú y controles
+    SiteDestinations.tsx        Navegación global entre áreas, separada de las anclas
     SiteFooter.tsx
   features/
     appearance/                Tema, reloj y ciclo solar independientes del portfolio
@@ -85,8 +86,9 @@ pestaña y respeta reduced-motion.
 
 1. Crear una página en `pages/` y sus funcionalidades en `features/`, sin mezclarlas con el portfolio.
 2. Registrar la ruta en `app/routes.tsx`, con `lazy` si su contenido es pesado.
-3. Reutilizar el layout y declarar su navegación; los elementos con `to` cambian
-   de página, los elementos sin `to` navegan a secciones locales.
+3. Reutilizar el layout y declarar sus secciones en `useSectionNavigation`.
+   Registrar los accesos entre páginas en `SiteDestinations`, sin mezclarlos en
+   la lista de anclas locales.
 4. Usar `usePageMetadata` para título, descripción y canonical. Estos metadatos se
    actualizan en el cliente; no se está haciendo SSR ni prerenderizado SEO por ruta.
 5. Añadir su acceso a la portada cuando tenga contenido real y comprobar el fallback del hosting.

@@ -3,16 +3,57 @@
 ## Dirección
 
 La portada presenta a Mikael, no una lista de servicios ni una repetición del
-portfolio. La secuencia es: identidad → espacios → historia personal → conversación.
+portfolio. La secuencia es: presentación → áreas de la web → contacto.
 
 El nombre marca la jerarquía principal. La escena orbital utiliza los colores del
-ambiente existente, con círculos elípticos, un reloj de Madrid y un destino de glass.
-El portfolio es la entrada principal; Alpha Creative y conocimiento abierto enlazan
+ambiente existente, con círculos elípticos y un reloj de Madrid. No contiene tarjetas,
+capturas ni iconos de proyectos. Portfolio y Alpha Creative enlazan
 a productos y perfiles que ya existen. No hay destinos vacíos ni estadísticas inventadas.
 
 Los espaciados comparten una medida de contenido de 1.240 px y gutters fluidos.
-Las tarjetas secundarias son más discretas que la entrada al portfolio. La mirada
-personal y el contacto recuperan el espacio en blanco en lugar de repetir tarjetas.
+Las dos áreas tienen una jerarquía equilibrada, con dos columnas en escritorio y
+tableta y tarjetas apiladas en móvil. Alpha Creative reúne Google Play, Amazon,
+GitHub y YouTube en dos grupos: productos/publicaciones y código/contenido. No hay
+una tarjeta de Publicaciones separada. El portfolio se presenta como un
+resumen con acceso a proyectos, experiencia y competencias; no se duplican los
+casos ni las imágenes de cada proyecto en la portada. La biografía y el empleo actual
+permanecen exclusivamente en el portfolio.
+
+## Navegación compartida
+
+La cabecera utiliza el mismo estilo de ancho completo en ambas páginas. Se eliminó
+el estado «Disponible» y la variante flotante exclusiva de la portada.
+
+- `SiteDestinations`: selector global «Web principal / Portfolio», con `aria-current="page"`.
+- Navegación local: enlaces a secciones de la página actual, con `aria-current="location"`.
+- Escritorio: selector global junto a la marca y enlaces locales en el centro.
+- Móvil: etiqueta de área compacta y discreta («Principal» / «Portfolio») y sección
+  activa en caja normal, separadas por un trazo fino. El nombre accesible conserva
+  «Web principal». En el hero solo aparece el área, sin separador.
+  Al abrir el menú, el selector global aparece primero y las secciones locales
+  debajo de «En esta página».
+
+Al abrir el menú se restablece su scroll. La apertura mediante teclado enfoca el
+primer enlace; Escape devuelve el foco al botón del menú.
+
+El selector global tiene una sola cápsula de selección, con el mismo tratamiento
+de superficie que el selector de tema. `DestinationMotionProvider` conserva el
+el destino y el origen de la transición por clave de navegación entre montajes,
+sin guardar estado en el navegador. La cabecera saliente no consume el origen de
+la entrante; StrictMode tampoco lo altera. En escritorio, la cápsula recorre los enlaces en 440 ms, también
+al usar el historial. Las posiciones y anchuras se miden a partir de los enlaces:
+añadir un destino no requiere nuevos offsets CSS. ResizeObserver y la carga de
+fuentes reajustan la geometría sin animaciones de reposicionamiento. No hay bucles
+de animación, dependencias nuevas ni retrasos artificiales en la navegación.
+Con reduced-motion el cambio es inmediato. El menú móvil se abre directamente
+sobre el destino actual y nunca reproduce una selección antigua al reabrirse.
+
+Regresión opcional de navegador: `node scripts/check-navigation-motion.mjs`
+(con Playwright disponible, o `PLAYWRIGHT_MODULE_PATH` apuntando al módulo externo).
+`BASE_URL` permite probar el servidor dev o el preview del build. La prueba exige
+que la cápsula visible recorra más de 40 px y termine sus 440 ms en la cabecera
+conectada, no solo que arranque. Incluye ida/vuelta, historial, reduced-motion y
+ausencia de animación en móvil.
 
 ## Rutas y carga
 
@@ -25,9 +66,8 @@ La portada no descarga el vídeo, las capturas del motor ni el módulo de la pá
 de portfolio. El tema y la iluminación no se reinician al cambiar de página.
 La única dependencia de ejecución añadida es React Router 7.18.
 
-El marcado y los estilos específicos del portfolio no se han rediseñado. Su cabecera
-incorpora una salida a Inicio y se ha ajustado el menú a anchuras intermedias para
-evitar que se solape con los controles de apariencia.
+Los proyectos del portfolio conservan su presentación y sus interacciones. El
+cambio de página ya no depende de un enlace ambiguo «Inicio» ni del logotipo.
 
 ## Glass y movimiento
 
@@ -36,6 +76,12 @@ En móvil se usan fondos más opacos, sin blur en tarjetas ni en la cabecera. El
 satélite decorativo se pausa fuera del viewport y con reduced-motion. Las entradas
 del hero no alteran la geometría final de las órbitas. Los gradientes de iluminación
 se apagan antes de alcanzar los bordes de sus cajas, para no crear rectángulos visibles.
+
+En pantallas de hasta 600 px, la escena solar se integra como fondo decorativo
+junto a la identidad, sin reservar una fila entre la introducción y las áreas.
+Se ocultan las anotaciones de la escena y el disco ambiental duplicado; la luz
+global y los controles del ciclo solar permanecen activos. En escritorio se
+conserva la composición lateral.
 
 Las fuentes son las mismas —Manrope y DM Sans—, ahora servidas localmente en WOFF2
 con sus licencias OFL en `public/fonts/`. Solo se precargan los dos subconjuntos latinos;

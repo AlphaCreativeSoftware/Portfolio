@@ -1,5 +1,3 @@
-import { ArrowUpRight, ArrowDownRight, Database, Boxes } from 'lucide-react'
-import { Link } from 'react-router-dom'
 import { useAppearance } from '../../appearance/context'
 import { getAtmospherePosition } from '../../appearance/model'
 import type { CSSProperties } from 'react'
@@ -34,17 +32,7 @@ export function HomeOrbit() {
         <time dateTime={localTime.toISOString()}>{formattedTime}</time>
       </div>
       <p className="home-orbit-period"><span />{period}</p>
-      <Link className="home-orbit-destination" to="/portfolio" aria-label="Entrar al portfolio de Mikael Rodríguez">
-        <div className="home-orbit-destination-top"><span>Una idea, llevada hasta el final.</span><ArrowUpRight size={20} /></div>
-        <strong>El trabajo habla.</strong>
-        <div className="home-orbit-work" aria-hidden="true">
-          <span className="home-work-symbol"><Database /></span>
-          <span className="home-work-symbol"><Boxes /></span>
-          <span className="home-work-symbol home-work-symbol-fruit"><img src="/projects/fruit-drop/icon.png" alt="" width="32" height="32" decoding="async" /></span>
-          <span>Explorar el portfolio</span>
-          <ArrowDownRight size={16} />
-        </div>
-      </Link>
+      <span className="home-orbit-signature" aria-hidden="true">Mikael Rodríguez · Software & producto</span>
     </div>
   )
 }

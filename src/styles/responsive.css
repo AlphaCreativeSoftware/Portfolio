@@ -5,11 +5,20 @@
   .topbar { --topbar-h: 64px; height: var(--topbar-h); grid-template-columns: auto minmax(0, 1fr) auto auto; gap: 9px; padding: 0 18px; background: color-mix(in srgb, var(--page) 94%, transparent); backdrop-filter: saturate(155%) blur(14px); border-bottom: 1px solid var(--line); }
   .topbar-scrolled { --topbar-h: 58px; height: var(--topbar-h); }
   .topbar-menu-open { background: color-mix(in srgb, var(--surface) 98%, transparent); box-shadow: 0 12px 34px rgba(0,0,0,.06); }
-  .brand, .mobile-section-label, .header-actions, .menu-button { position: relative; z-index: 5; }
-  .brand { grid-column: 1; }
-  .mobile-section-label { grid-column: 2; display: block; min-width: 0; overflow: hidden; color: var(--faint); font-size: 8px; font-weight: 600; letter-spacing: .1em; text-overflow: ellipsis; text-transform: uppercase; white-space: nowrap; animation: section-label-in .35s var(--ease-premium) both; }
+  .header-identity, .mobile-section-label, .header-actions, .menu-button { position: relative; z-index: 5; }
+  .header-identity { grid-column: 1; }
+  .desktop-site-destinations { display: none; }
+  .mobile-site-destinations { display: block; }
+  .mobile-site-destinations .site-destinations { width: 100%; border-radius: 13px; }
+  .mobile-site-destinations .site-destination { flex: 1; min-height: 40px; border-radius: 10px; font-size: 12px; }
+  .mobile-site-destinations .site-destination-indicator { border-radius: 10px; }
+  .site-menu-section-label { margin-top: 12px; padding-top: 14px; border-top: 1px solid var(--line); }
+  .mobile-section-label { grid-column: 2; display: flex; align-items: center; gap: 6px; min-width: 0; overflow: hidden; color: var(--muted); font-size: 9px; line-height: 1.4; white-space: nowrap; }
+  .mobile-area-label { flex: none; color: var(--muted); font-size: 8px; font-weight: 550; letter-spacing: .075em; text-transform: uppercase; }
+  .mobile-section-context { display: flex; align-items: center; gap: 6px; min-width: 0; }
+  .mobile-context-divider { flex: none; width: 1px; height: 9px; background: var(--line); transform: rotate(18deg); }
+  .mobile-current-section { min-width: 0; overflow: hidden; text-overflow: ellipsis; color: var(--muted); font-weight: 400; letter-spacing: -.01em; animation: section-label-in .25s var(--ease-premium) both; }
   @keyframes section-label-in { from { opacity: 0; translate: 0 4px; } to { opacity: 1; translate: none; } }
-  .availability { display: none; }
   .header-actions { grid-column: 3; grid-row: 1; gap: 4px; margin: 0; }
   .solar-control { margin-left: -2px; }
   .solar-menu { right: -36px; }
@@ -27,8 +36,9 @@
   .menu-button-open .hamburger i:nth-child(1) { top: 6px; transform: rotate(45deg); }
   .menu-button-open .hamburger i:nth-child(2) { opacity: 0; transform: scaleX(0); }
   .menu-button-open .hamburger i:nth-child(3) { top: 6px; transform: rotate(-45deg); }
-  .nav { position: fixed; z-index: 4; inset: calc(var(--topbar-h, 64px) + 10px) 12px auto; display: flex; flex-direction: column; gap: 0; padding: 10px; border: 1px solid var(--line); border-radius: 22px; background: color-mix(in srgb, var(--surface) 97%, transparent); box-shadow: 0 24px 70px rgba(0,0,0,.16); backdrop-filter: saturate(180%) blur(28px); opacity: 0; visibility: hidden; pointer-events: none; transform: translateY(-14px) scale(.98); transform-origin: top; transition: opacity .28s, transform .4s var(--ease-premium), visibility .28s; }
-  .nav-open { opacity: 1; visibility: visible; pointer-events: auto; transform: none; }
+  .site-menu { position: fixed; z-index: 4; inset: calc(var(--topbar-h, 64px) + 10px) 12px auto; max-height: calc(100dvh - var(--topbar-h, 64px) - 24px); overflow-y: auto; overscroll-behavior: contain; padding: 10px; border: 1px solid var(--line); border-radius: 22px; background: color-mix(in srgb, var(--surface) 97%, transparent); box-shadow: 0 24px 70px rgba(0,0,0,.16); backdrop-filter: saturate(180%) blur(28px); opacity: 0; visibility: hidden; pointer-events: none; transform: translateY(-14px) scale(.98); transform-origin: top; transition: opacity .28s, transform .4s var(--ease-premium), visibility .28s; }
+  .site-menu-open { opacity: 1; visibility: visible; pointer-events: auto; transform: none; }
+  .nav { position: relative; display: flex; flex-direction: column; gap: 0; }
   .nav a { display: grid; grid-template-columns: 34px 1fr; align-items: center; padding: 16px 12px; border-bottom: 1px solid var(--line); border-radius: 14px; color: var(--text); font: 600 21px 'Manrope'; letter-spacing: -.04em; opacity: 0; transform: translateY(-7px); transition: opacity .3s, transform .3s, color .2s, background .3s, border-color .3s; }
   .nav a:last-child { border-bottom: 0; }
   .nav a span { display: block; color: var(--blue); font: 600 8px 'DM Sans'; letter-spacing: .08em; }
@@ -204,7 +214,7 @@
   .scroll-reveal { opacity: 0; translate: 0 26px; scale: 1; filter: none; }
   .scroll-reveal.in-view { animation: mobile-heavy-reveal .72s var(--ease-premium) var(--reveal-delay, 0ms) both; }
   .topbar, .topbar-scrolled { background: color-mix(in srgb, var(--page) 97%, transparent); backdrop-filter: none; }
-  .nav { background: color-mix(in srgb, var(--surface) 98%, transparent); backdrop-filter: saturate(130%) blur(12px); }
+  .site-menu { background: color-mix(in srgb, var(--surface) 98%, transparent); backdrop-filter: saturate(130%) blur(12px); }
   .project-card::before { display: none; }
   .integration-node, .media-badge, .fruit-stage-label { backdrop-filter: none; }
   .integration-node { background: var(--surface); }
@@ -280,6 +290,12 @@
   .contact-card:hover { border-color: var(--line); box-shadow: 0 10px 35px rgba(0,0,0,.04); }
   .contact-card-primary:hover { border-color: var(--blue); box-shadow: 0 10px 35px rgba(0,0,0,.04); }
   .more-work a:hover svg, .text-link:hover svg, .contact-card:hover > svg { transform: none; }
+}
+
+@media (max-width: 360px) {
+  .topbar { padding-inline: 8px; gap: 4px; }
+  .mobile-section-label, .mobile-section-context { gap: 4px; }
+  .mobile-area-label { font-size: 7.5px; }
 }
 
 @media (prefers-reduced-motion: reduce) {

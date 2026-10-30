@@ -10,10 +10,10 @@ export function NotFoundPage() {
       <AmbientScene />
       <main className="route-message" id="main-content" tabIndex={-1}>
         <Link className="brand" to="/">MR<span>.</span></Link>
-        <p className="home-eyebrow">404 / Fuera de órbita</p>
-        <h1>Por aquí todavía<br />no hay nada.</h1>
-        <p>Puede que el enlace haya cambiado. La página principal es un buen lugar para seguir.</p>
-        <div><Link className="button button-primary" to="/"><ArrowLeft size={16} />Volver al inicio</Link><Link className="text-link" to="/portfolio">Ver portfolio<ArrowUpRight size={16} /></Link></div>
+        <p className="home-eyebrow">Error 404</p>
+        <h1>Página<br />no encontrada.</h1>
+        <p>El enlace no está disponible. Puedes volver a la web principal o acceder al portfolio.</p>
+        <div><Link className="button button-primary" to="/"><ArrowLeft size={16} />Web principal</Link><Link className="text-link" to="/portfolio">Ver portfolio<ArrowUpRight size={16} /></Link></div>
       </main>
     </div>
   )

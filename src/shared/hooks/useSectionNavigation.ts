@@ -1,6 +1,6 @@
 import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 
-export type NavigationItem = { id: string; label: string; number: string; to?: string }
+export type NavigationItem = { id: string; label: string; number: string }
 export type NavigationConfig = {
   sectionIds: readonly string[]
   sectionLabels: Readonly<Record<string, string>>
@@ -13,6 +13,7 @@ export function useSectionNavigation({ sectionIds, sectionLabels, items }: Navig
   const firstSection = sectionIds[0] ?? ''
   const lastSection = sectionIds[sectionIds.length - 1] ?? firstSection
   const navRef = useRef<HTMLElement>(null)
+  const menuPanelRef = useRef<HTMLDivElement>(null)
 
   const menuButtonRef = useRef<HTMLButtonElement>(null)
 
@@ -143,6 +144,18 @@ export function useSectionNavigation({ sectionIds, sectionLabels, items }: Navig
   useEffect(() => {
     document.body.style.overflow = menuOpen ? 'hidden' : ''
     if (!menuOpen) return () => { document.body.style.overflow = '' }
+    if (menuPanelRef.current) menuPanelRef.current.scrollTop = 0
+    const openedWithKeyboard = menuButtonRef.current?.matches(':focus-visible')
+    const panel = menuPanelRef.current
+    // Visibility can still be hidden during the entrance transition. Focus only
+    // once the actual panel is visible, including when motion is disabled.
+    const focusMenu = (event?: TransitionEvent) => {
+      if (!panel || (event && event.target !== panel) || getComputedStyle(panel).visibility !== 'visible') return
+      panel.querySelector<HTMLAnchorElement>('a')?.focus()
+      panel.removeEventListener('transitionend', focusMenu)
+    }
+    if (openedWithKeyboard) panel?.addEventListener('transitionend', focusMenu)
+    const focusFrame = openedWithKeyboard ? window.requestAnimationFrame(() => focusMenu()) : null
     const closeOnEscape = (event: KeyboardEvent) => {
       if (event.key !== 'Escape') return
       setMenuOpen(false)
@@ -150,7 +163,7 @@ export function useSectionNavigation({ sectionIds, sectionLabels, items }: Navig
     }
     const closeOnOutsideClick = (event: PointerEvent) => {
       const target = event.target as Node
-      if (navRef.current?.contains(target) || menuButtonRef.current?.contains(target)) return
+      if (menuPanelRef.current?.contains(target) || menuButtonRef.current?.contains(target)) return
       setMenuOpen(false)
     }
     const desktopQuery = window.matchMedia('(min-width: 901px)')
@@ -160,6 +173,8 @@ export function useSectionNavigation({ sectionIds, sectionLabels, items }: Navig
     desktopQuery.addEventListener('change', closeOnDesktop)
     return () => {
       document.body.style.overflow = ''
+      if (focusFrame) window.cancelAnimationFrame(focusFrame)
+      panel?.removeEventListener('transitionend', focusMenu)
       document.removeEventListener('pointerdown', closeOnOutsideClick)
       window.removeEventListener('keydown', closeOnEscape)
       desktopQuery.removeEventListener('change', closeOnDesktop)
@@ -202,5 +217,5 @@ export function useSectionNavigation({ sectionIds, sectionLabels, items }: Navig
     }, 1400)
   }
 
-  return { items, navRef, menuButtonRef, scrollProgressRef, menuOpen, setMenuOpen, scrolled, activeSection, navIndicator, closeMenu, currentSectionLabel, navigateTo }
+  return { items, navRef, menuPanelRef, menuButtonRef, scrollProgressRef, menuOpen, setMenuOpen, scrolled, activeSection, isAtStart: activeSection === firstSection, navIndicator, closeMenu, currentSectionLabel, navigateTo }
 }

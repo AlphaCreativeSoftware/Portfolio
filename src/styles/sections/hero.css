@@ -1,5 +1,18 @@
 .hero { position: relative; min-height: 820px; height: 100svh; max-height: 960px; padding: 135px max(8vw, 34px) 0; display: grid; grid-template-columns: 1.45fr .55fr; grid-template-rows: auto 1fr auto; isolation: isolate; }
-.hero::before { content: ''; position: absolute; width: 780px; height: 520px; left: 20%; top: 17%; z-index: -2; background: radial-gradient(ellipse 58% 72% at 38% 40%, color-mix(in srgb, var(--ambient-primary) 20%, transparent), transparent 70%), radial-gradient(ellipse, color-mix(in srgb, var(--blue) 15%, transparent), transparent 68%); opacity: .7; transition: background 1.2s ease; animation: hero-aura-enter 1.8s .15s var(--ease-premium) backwards; }
+.hero::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -2;
+  /* Each ellipse fades out before the top/bottom of its painting area. */
+  background:
+    radial-gradient(ellipse 44% 38% at 62% 44%, color-mix(in srgb, var(--ambient-primary) 20%, transparent), transparent 100%),
+    radial-gradient(ellipse 40% 34% at 35% 58%, color-mix(in srgb, var(--blue) 15%, transparent), transparent 100%);
+  opacity: .7;
+  transition: background 1.2s ease;
+  animation: hero-aura-enter 1.8s .15s var(--ease-premium) backwards;
+  pointer-events: none;
+}
 .hero-orbit { --orbit-opacity: 1; position: absolute; z-index: -1; border-radius: 50%; border: 1px solid color-mix(in srgb, var(--blue) 14%, transparent); box-shadow: inset 0 0 90px color-mix(in srgb, var(--blue) 5%, transparent); opacity: var(--orbit-opacity); animation: hero-orbit-enter 1.55s .25s var(--ease-premium) backwards; will-change: transform; }
 .orbit-one { width: 420px; height: 420px; right: -130px; top: 160px; }
 .orbit-two { --orbit-opacity: .55; width: 620px; height: 620px; right: -240px; top: 60px; animation-delay: .4s; }
@@ -47,7 +60,7 @@ h2 em { color: var(--blue); background: var(--accent-gradient); background-clip:
 @keyframes hero-element-enter { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
 @keyframes hero-time-enter { from { opacity: 0; transform: translateY(8px); } to { opacity: var(--time-opacity); transform: none; } }
 @keyframes hero-rule-enter { from { opacity: 0; transform: scaleX(0); } to { opacity: 1; transform: scaleX(1); } }
-@keyframes hero-aura-enter { from { opacity: 0; transform: scale(.82); } to { opacity: .7; transform: scale(1); } }
+@keyframes hero-aura-enter { from { opacity: 0; } to { opacity: .7; } }
 @keyframes hero-orbit-enter { from { opacity: 0; transform: scale(.6); } to { opacity: var(--orbit-opacity); transform: scale(1); } }
 @keyframes hero-accent-gradient { from { background-position: -25% 50%; } to { background-position: 100% 50%; } }
 @keyframes hero-accent-settle { from { text-shadow: 0 0 26px color-mix(in srgb, var(--blue) 34%, transparent); } to { text-shadow: 0 0 0 transparent; } }

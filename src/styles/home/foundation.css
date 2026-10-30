@@ -21,39 +21,6 @@
   text-transform: uppercase;
 }
 
-.home-shell .topbar {
-  inset: 18px 0 auto;
-  width: min(1340px, calc(100% - 48px));
-  height: 64px;
-  margin-inline: auto;
-  padding-inline: 26px;
-  border: 1px solid var(--home-border);
-  border-radius: 999px;
-  background: transparent;
-  backdrop-filter: none;
-  box-shadow: 0 5px 25px rgb(0 0 0 / .035);
-}
-
-/* Blur the backing, not the fixed header: descendants keep the viewport as
-   their containing block, so the mobile menu and backdrop cover it correctly. */
-.home-shell .topbar::before {
-  content: '';
-  position: absolute;
-  z-index: -1;
-  inset: 0;
-  border-radius: inherit;
-  background: color-mix(in srgb, var(--page) 76%, transparent);
-  backdrop-filter: saturate(155%) blur(18px);
-  -webkit-backdrop-filter: saturate(155%) blur(18px);
-}
-
-.home-shell .topbar-scrolled { box-shadow: 0 8px 35px rgb(0 0 0 / .07); }
-.home-shell .scroll-progress { inset: auto 26px -1px; width: calc(100% - 52px); opacity: .65; }
-.home-shell .nav { gap: 24px; font-size: 12px; }
-.home-shell .nav-indicator { bottom: -12px; height: 1px; }
-.home-shell .nav-indicator i { box-shadow: none; }
-.home-shell .header-actions { gap: 8px; }
-.home-shell .availability { margin-left: 8px; font-size: 10px; }
 .home-shell > footer { min-height: 96px; padding-inline: var(--home-gutter); font-size: 11px; }
 .home-shell > footer .brand { font-size: 20px; }
 

@@ -12,6 +12,7 @@ let routes
 let config
 let spaces
 let legacyDestination
+let site
 
 before(async () => {
   server = await createTestServer('.artifacts/vite-home-test-cache')
@@ -21,6 +22,7 @@ before(async () => {
   config = (await server.ssrLoadModule('/src/features/home/data/navigation.ts')).homeNavigation
   spaces = (await server.ssrLoadModule('/src/features/home/data/spaces.ts')).independentSpaces
   legacyDestination = (await server.ssrLoadModule('/src/app/routePaths.ts')).getLegacyPortfolioDestination
+  site = (await server.ssrLoadModule('/src/shared/config/site.ts')).site
 })
 
 after(async () => { await server?.close(); delete globalThis.localStorage })
@@ -35,9 +37,28 @@ for (const theme of ['light', 'dark']) {
     assert.match(html, /Mikael/)
     assert.match(html, /Rodríguez/)
     assert.match(html, /href="\/portfolio"/)
-    assert.match(html, /href="\/portfolio#experiencia"/)
+    assert.ok(!html.includes('sector bancario'), 'Current employment belongs in the portfolio')
+    assert.ok(!html.includes('/projects/'), 'Homepage must not include individual project artwork')
+    assert.ok(!html.includes('El trabajo habla.'), 'Removed promotional copy must not return')
+    assert.ok(!html.includes('home-now'), 'Current role card must not return')
+    const header = html.match(/<header\b[\s\S]*?<\/header>/)[0]
+    assert.ok(!header.includes('Disponible'))
+    assert.match(header, /aria-label="Áreas de la web"/)
+    assert.match(header, /aria-label="Secciones de la web principal"/)
+    assert.match(header, /Web principal/)
+    assert.match(header, /class="mobile-area-label">Principal<\/strong>/)
+    assert.ok(!header.includes('mobile-section-context'), 'At the start there is no local section or separator')
+    const sectionLinks = header.match(/<nav class="nav"[\s\S]*?<\/nav>/)[0]
+    assert.ok(!sectionLinks.includes('href="/portfolio"'), 'Page destinations must not be mixed into section links')
     assert.ok(!html.includes('<video'), 'Homepage must not preload the engine video')
     assert.ok(!html.includes('<canvas'), 'No frame sequence should be loaded without portrait assets')
+    assert.equal((html.match(/class="home-space-card\b/g) ?? []).length, 2)
+    assert.ok(!html.includes('home-space-open-work'), 'Publications must not duplicate Alpha Creative')
+    const alpha = html.match(/<article class="home-space-card home-space-alpha-creative"[\s\S]*?<\/article>/)[0]
+    assert.equal((alpha.match(/<a\b/g) ?? []).length, 4)
+    for (const href of [site.social.apps, site.social.books, site.social.github, site.social.youtube]) assert.ok(alpha.includes(`href="${href.replaceAll('&', '&amp;')}"`))
+    assert.ok(alpha.includes('Productos y publicaciones'))
+    assert.ok(alpha.includes('Código y contenido'))
     const ids = [...html.matchAll(/\sid="([^"]+)"/g)].map((match) => match[1])
     assert.equal(new Set(ids).size, ids.length)
     for (const id of config.sectionIds) assert.ok(ids.includes(id))
@@ -48,12 +69,15 @@ for (const theme of ['light', 'dark']) {
 
 test('all home destinations have real, explicit links', () => {
   for (const space of spaces) {
-    assert.ok(space.links.length > 0)
-    for (const link of space.links) assert.match(link.href, /^https:\/\//)
+    assert.ok(space.linkGroups.length > 0)
+    assert.equal(new Set(space.linkGroups.map((group) => group.id)).size, space.linkGroups.length)
+    const links = space.linkGroups.flatMap((group) => group.links)
+    assert.equal(links.length, 4)
+    assert.equal(new Set(links.map((link) => link.href)).size, links.length)
+    for (const link of links) assert.match(link.href, /^https:\/\//)
   }
   for (const item of config.items) {
-    if (item.to) assert.ok(matchRoutes(routes, item.to))
-    else assert.ok(config.sectionIds.includes(item.id))
+    assert.ok(config.sectionIds.includes(item.id))
   }
 })
 

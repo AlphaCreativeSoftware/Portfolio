@@ -1,13 +1,10 @@
 import type { NavigationConfig } from '../../../shared/hooks/useSectionNavigation'
 
 export const homeNavigation: NavigationConfig = {
-  sectionIds: ['inicio', 'espacios', 'mirada', 'contacto'],
-  sectionLabels: { inicio: 'Inicio', espacios: 'Mis espacios', mirada: 'Sobre mí', contacto: 'Contacto' },
+  sectionIds: ['inicio', 'espacios', 'contacto'],
+  sectionLabels: { inicio: 'Web principal', espacios: 'Áreas', contacto: 'Contacto' },
   items: [
-    { id: 'inicio', label: 'Inicio', number: '01' },
-    { id: 'portfolio-page', label: 'Portfolio', number: '02', to: '/portfolio' },
-    { id: 'espacios', label: 'Mis espacios', number: '03' },
-    { id: 'mirada', label: 'Sobre mí', number: '04' },
-    { id: 'contacto', label: 'Contacto', number: '05' },
+    { id: 'espacios', label: 'Áreas', number: '01' },
+    { id: 'contacto', label: 'Contacto', number: '02' },
   ],
 }

@@ -3,6 +3,15 @@
 .scroll-progress { position: absolute; left: 0; bottom: -1px; width: 100%; height: 1px; background: linear-gradient(90deg, var(--blue), color-mix(in srgb, var(--blue) 45%, #8bc8ff)); box-shadow: 0 0 10px color-mix(in srgb, var(--blue) 35%, transparent); transform: scaleX(0); transform-origin: left; will-change: transform; }
 .brand { font: 700 18px 'Manrope', sans-serif; letter-spacing: -.07em; width: max-content; }
 .brand span { color: var(--blue); }
+.header-identity { display: flex; align-items: center; gap: 18px; min-width: 0; }
+.site-menu { min-width: 0; }
+.site-destinations { position: relative; isolation: isolate; display: flex; align-items: center; gap: 2px; width: fit-content; padding: 3px; border: 1px solid var(--line); border-radius: 999px; background: color-mix(in srgb, var(--page-alt) 65%, transparent); }
+.site-destination-indicator { position: absolute; z-index: -1; inset: 3px auto 3px 0; border: 1px solid var(--line); border-radius: inherit; background: color-mix(in srgb, var(--surface) 96%, var(--blue)); box-shadow: 0 2px 7px rgb(0 0 0 / .08), inset 0 1px 0 color-mix(in srgb, white 40%, transparent); opacity: 0; pointer-events: none; transition: background .3s, border-color .3s, box-shadow .3s; }
+.site-destination { display: flex; align-items: center; justify-content: center; min-height: 29px; padding: 0 11px; border-radius: 999px; color: var(--muted); font-size: 11px; font-weight: 500; white-space: nowrap; transition: color .25s; }
+.site-destination:hover { color: var(--text); }
+.site-destination-active { color: var(--text); }
+.mobile-site-destinations { display: none; }
+.site-menu-label { display: block; padding: 8px 12px; color: var(--faint); font-size: 8px; font-weight: 600; line-height: 1.5; letter-spacing: .12em; text-transform: uppercase; }
 .mobile-section-label { display: none; }
 .nav { position: relative; display: flex; gap: 24px; font-size: 12px; color: var(--muted); }
 .nav a span { display: none; }
@@ -40,13 +49,10 @@
 .solar-menu button:nth-of-type(2) i { background: #f5b94c; }
 .solar-menu button:nth-of-type(3) i { background: #ee9850; }
 .solar-menu button:nth-of-type(4) i { background: #769fe6; }
-.availability { display: flex; align-items: center; gap: 7px; font-size: 11px; color: var(--muted); }
-.availability span { width: 6px; height: 6px; border-radius: 50%; background: #34c759; }
 .menu-button { display: none; justify-self: end; border: 0; background: none; color: var(--text); }
 .nav-backdrop { display: none; }
 
 @media (min-width: 901px) and (max-width: 1150px) {
-  .topbar .availability { display: none; }
   .nav { gap: 18px; }
 }
 
