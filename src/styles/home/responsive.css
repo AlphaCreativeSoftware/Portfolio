@@ -14,7 +14,7 @@
   .home-title { font-size: 9vw; margin-left: -2px; }
   .home-statement { margin-top: 27px; font-size: 22px; }
   .home-hero-intro { font-size: 14px; }
-  .home-hero-action.button { margin-top: 25px; }
+  .home-hero-action { margin-top: 25px; }
   .home-orbit-stage { min-height: 520px; }
   .home-orbit-coordinate { right: -2%; font-size: 9px; }
   .home-orbit-coordinate time { margin-left: 6px; }
@@ -44,7 +44,6 @@
   .home-title { margin-top: 26px; font-size: clamp(61px, 17vw, 96px); line-height: 1.04; letter-spacing: -.07em; }
   .home-statement { font-size: 23px; margin-top: 25px; }
   .home-hero-intro { max-width: 43ch; margin-top: 16px; font-size: 14px; line-height: 1.8; }
-  .home-hero-action.button { margin-top: 26px; padding-inline: 22px; font-size: 12px; }
   /* Keep the solar scene with the opening identity, not in a separate row. */
   .home-orbit-stage { position: absolute; z-index: 0; top: -30px; right: calc(var(--home-gutter) * -2 - 20px); width: min(100vw, 420px); height: 320px; min-height: 0; margin: 0; pointer-events: none; }
   .home-orbit-art::before, .home-orbit-ring, .home-orbit-track { opacity: .62; }
