@@ -14,7 +14,7 @@ export function HomeHero({ navigateTo }: { navigateTo: (id: string) => void }) {
           <p className="home-hero-intro">Construyo software para que el trabajo complejo deje de ser manual. He desarrollado herramientas de conciliación sobre millones de registros y, con Alpha Creative, llevo mis propios productos de la idea a su publicación.</p>
           <a className="home-hero-action" href="#espacios" onClick={() => navigateTo('espacios')}>
             Explorar las áreas
-            <span className="home-hero-action-icon" aria-hidden="true"><ArrowDown size={15} /></span>
+            <ArrowDown size={16} strokeWidth={1.8} aria-hidden="true" />
           </a>
         </div>
         <HomeOrbit />

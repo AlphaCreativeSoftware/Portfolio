@@ -41,40 +41,57 @@
 .home-statement { margin: 34px 0 0; color: var(--text); font: 500 clamp(22px, 2vw, 28px)/1.45 'Manrope', sans-serif; letter-spacing: -.035em; animation: home-enter .85s .35s var(--ease-premium) both; }
 .home-hero-intro { max-width: 43ch; margin: 20px 0 0; color: var(--muted); font-size: 16px; line-height: 1.8; letter-spacing: -.01em; animation: home-enter .85s .43s var(--ease-premium) both; }
 .home-hero-action {
+  --action-glass: color-mix(in srgb, #e5edf7 51%, transparent);
+  --action-edge: color-mix(in srgb, #57708e 23%, transparent);
+  --action-light: rgb(255 255 255 / .86);
+  position: relative;
   display: inline-flex;
   align-items: center;
-  gap: 16px;
+  gap: 14px;
   min-height: 50px;
   margin-top: 32px;
-  padding: 7px 7px 7px 17px;
-  border: 1px solid color-mix(in srgb, var(--text) 17%, transparent);
+  padding: 10px 17px;
+  border: 1px solid var(--action-edge);
   border-radius: 999px;
-  background: linear-gradient(145deg, color-mix(in srgb, var(--surface) 92%, var(--text)), color-mix(in srgb, var(--surface) 72%, transparent));
-  box-shadow: inset 0 1px 0 color-mix(in srgb, var(--text) 7%, transparent), 0 4px 14px rgb(0 0 0 / .08);
+  background: var(--action-glass);
+  box-shadow: 0 4px 12px rgb(12 24 42 / .07);
   color: var(--text);
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 600;
   animation: home-enter .85s .52s var(--ease-premium) both;
-  transition: border-color .25s, box-shadow .25s;
+  transition: background-color .25s;
 }
-.home-hero-action-icon {
-  display: grid;
-  place-items: center;
+:root[data-appearance='dark'] .home-hero-action {
+  --action-glass: color-mix(in srgb, #a4b9d5 14%, transparent);
+  --action-edge: rgb(180 205 238 / .18);
+  --action-light: rgb(224 239 255 / .32);
+}
+.home-hero-action > svg {
   flex: none;
-  width: 34px;
-  aspect-ratio: 1;
-  border: 1px solid var(--line);
-  border-radius: 50%;
-  background: color-mix(in srgb, var(--soft-blue) 72%, var(--surface));
-  color: var(--blue);
+  color: color-mix(in srgb, var(--blue) 72%, var(--text));
+  transition: translate .25s var(--ease-premium);
 }
-.home-hero-action-icon svg { transition: translate .25s var(--ease-premium); }
-@media (hover: hover) and (pointer: fine) {
-  .home-hero-action:hover {
-    border-color: color-mix(in srgb, var(--blue) 30%, var(--line));
-    box-shadow: inset 0 1px 0 color-mix(in srgb, var(--text) 9%, transparent), 0 6px 18px rgb(0 0 0 / .10);
+/* Reflections stay in a one-pixel rim, not across the face of the glass. */
+@supports (mask-composite: exclude) {
+  .home-hero-action { border-color: transparent; background-clip: padding-box; }
+  .home-hero-action::before {
+    content: '';
+    position: absolute;
+    inset: -1px;
+    padding: 1px;
+    border-radius: inherit;
+    background: linear-gradient(135deg, var(--action-light) 0%, var(--action-edge) 45%, var(--action-edge) 74%, var(--action-light));
+    mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+    mask-composite: exclude;
+    pointer-events: none;
   }
-  .home-hero-action:hover svg { translate: 0 2px; }
+}
+@media (min-width: 901px) and (hover: hover) and (pointer: fine) {
+  .home-hero-action { backdrop-filter: blur(8px) saturate(120%); }
+}
+@media (hover: hover) and (pointer: fine) {
+  .home-hero-action:hover { background-color: color-mix(in srgb, var(--text) 7%, var(--action-glass)); }
+  .home-hero-action:hover > svg { translate: 0 2px; }
 }
 
 .home-orbit-stage { position: relative; min-width: 0; align-self: stretch; min-height: 570px; isolation: isolate; animation: home-orbit-enter 1.5s .2s var(--ease-premium) both; }
@@ -151,8 +168,13 @@
 
 @media (prefers-reduced-motion: reduce) {
   .home-title > span { animation: none; }
+  .home-hero-action { animation: none; }
+  .home-hero-action:hover > svg { translate: none; }
 }
 @media (forced-colors: active) {
   .home-title > span { background: none; color: CanvasText; }
   .home-title-dot { color: CanvasText; }
+  .home-hero-action { border-color: LinkText; color: LinkText; }
+  .home-hero-action > svg { color: inherit; }
+  .home-hero-action::before { content: none; }
 }

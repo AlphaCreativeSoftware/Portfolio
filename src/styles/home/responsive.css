@@ -39,7 +39,7 @@
   .home-shell .ambient-celestial { display: none; }
   .home-hero { padding-top: 106px; }
   .home-hero-grid { position: relative; isolation: isolate; grid-template-columns: 1fr; }
-  .home-hero-copy { padding-block: 12px 0; }
+  .home-hero-copy { padding-block: 12px 24px; }
   .home-hero-eyebrow { font-size: 9px; }
   .home-title { margin-top: 26px; font-size: clamp(61px, 17vw, 96px); line-height: 1.04; letter-spacing: -.07em; }
   .home-statement { font-size: 23px; margin-top: 25px; }
