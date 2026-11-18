@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react'
-import { Radio, RefreshCw, Search } from 'lucide-react'
+import { Radio, RefreshCw, Search, X } from 'lucide-react'
 import { AtlasMap } from './AtlasMap'
-import { corridors, matchesSearch, operators, staleAfter, summarize } from './model'
+import { corridors, matchesSearch, operators, speedStaleAfter, staleAfter, summarize } from './model'
 import type { AtlasTrain, Corridor, Operator, ServiceFamily } from './model'
 import { adifArrivals, atlasStations } from './stations'
 import { useAtlasSnapshot } from './useAtlasSnapshot'
@@ -36,22 +36,34 @@ function StationLinks({ corridor }: { corridor: Corridor | 'all' }) {
   </ul>
 }
 
-function TrainDetail({ train, stale, now }: { train: AtlasTrain; stale: boolean; now: number }) {
+function ageLabel(timestamp: number, now: number) {
+  const elapsed = Math.max(0, Math.floor((now - timestamp) / 1000))
+  if (elapsed < 5) return 'hace unos segundos'
+  return elapsed < 60 ? `hace ${elapsed} s` : `hace ${Math.floor(elapsed / 60)} min`
+}
+
+function TrainDetail({ train, stale, now, onClose }: { train: AtlasTrain; stale: boolean; now: number; onClose: () => void }) {
   const expected = expectedArrival(train, now, stale)
   const times = train.stationTimes
+  const position = stale ? null : train.position
+  const speed = position && train.speed && now - train.speed.timestamp <= speedStaleAfter ? train.speed : null
   return (
     <section className="atlas-detail" aria-label="Ficha del tren">
-      <p className="atlas-kicker" data-operator={train.operator}>{operators[train.operator]} · {train.number}</p>
+      <div className="atlas-detail-top">
+        <p className="atlas-kicker" data-operator={train.operator}>{operators[train.operator]} · {train.number}</p>
+        <button className="atlas-detail-close" type="button" aria-label="Cerrar ficha del tren" onClick={onClose}><X size={15} aria-hidden="true" /></button>
+      </div>
       <h3>{train.service}</h3>
       <p>{train.origin} → {train.destination}</p>
       <dl>
+        {speed && <div className="atlas-speed"><dt>{speed.kind === 'estimated' ? 'Velocidad estimada por GPS' : 'Velocidad publicada por Renfe'}</dt><dd>{speed.kind === 'estimated' && '≈ '}{speed.kmh} <small>km/h</small></dd></div>}
         <div><dt>Estado</dt><dd>{delayLabel(train)}{train.delaySource && <small> · {train.delaySource}</small>}</dd></div>
         <div><dt>Posición</dt><dd>{stale ? 'Lectura desactualizada' : positionLabel(train)}</dd></div>
         {train.nextStop && <div><dt>Próxima parada</dt><dd>{train.nextStop}{train.arrival && !times?.arrival && <small> · {train.arrival}</small>}</dd></div>}
         {times?.departure && <div><dt>Salida programada</dt><dd>{times.departure}</dd></div>}
         {times?.arrival && <div><dt>Llegada programada</dt><dd>{times.arrival}</dd></div>}
         {expected && <div><dt>Llegada prevista</dt><dd>{expected.time} <small>· {expected.source} vía Trenalia</small></dd></div>}
-        {train.position && <div><dt>{train.position.timestampKind === 'vehicle' ? 'Hora GPS' : 'Hora del feed'}</dt><dd>{clock.format(train.position.timestamp)}</dd></div>}
+        {position && <div><dt>{position.timestampKind === 'vehicle' ? 'Hora GPS' : 'Hora de la fuente'}</dt><dd>{clock.format(position.timestamp)} <small>· {ageLabel(position.timestamp, now)}</small></dd></div>}
       </dl>
     </section>
   )
@@ -97,9 +109,9 @@ export default function AtlasAv() {
       {failed && snapshot && <p role="status" className="atlas-notice">No se pudo actualizar. Se conserva la última lectura disponible.</p>}
       {snapshot && !stale && !snapshot.gpsAvailable && <p className="atlas-notice">El GPS de Renfe no está disponible o su lectura no es reciente. Los servicios siguen en la lista.</p>}
       <div className="atlas-workspace">
-        <AtlasMap trains={stale ? noTrains : results} corridor={corridor} selected={selectedKey} onSelect={setSelectedKey} now={now} />
+        <AtlasMap trains={stale ? noTrains : results} corridor={corridor} selected={selected?.key ?? null} onSelect={setSelectedKey} now={now} />
         <div className="atlas-side">
-          {selected && <TrainDetail train={selected} stale={stale} now={now} />}
+          {selected && <TrainDetail train={selected} stale={stale} now={now} onClose={() => setSelectedKey(null)} />}
           <div className="atlas-list-header"><h2>Servicios</h2><span>{snapshot ? results.length : '—'}</span></div>
           {results.length ? <ul className="atlas-train-list" aria-label="Trenes de la selección">
             {results.map((train) => {
@@ -125,8 +137,9 @@ export default function AtlasAv() {
         <div className="atlas-operators" aria-label="Colores de operadores">{Object.entries(operators).map(([key, name]) => <span key={key}><i className="atlas-operator-dot" data-operator={key} />{name}</span>)}</div>
         {snapshot && <small className="atlas-credit">Datos de <a href="https://trenalia.org/api" target="_blank" rel="noreferrer">Trenalia</a>, a partir de Renfe y Adif</small>}
         <details><summary>Fuentes y cobertura</summary>
-          <p>Atlas AV se actualiza cada 30 segundos con la página visible. Un horario programado no confirma que el tren esté en marcha. La llegada prevista solo aparece si la fuente atribuye la actualización a Adif. Una posición estimada no es GPS; los servicios programados no tienen marcador.</p>
-          <p>Fuentes: <a href="https://trenalia.org/api" target="_blank" rel="noreferrer">Trenalia</a> (trayectos, paneles de estación y respaldo GPS procesado), <a href="https://data.renfe.com/es/dataset/posicion-vehiculos-av-ld-md" target="_blank" rel="noreferrer">Renfe Operadora</a> (GPS directo, CC BY 4.0) y <a href="https://www.naturalearthdata.com/" target="_blank" rel="noreferrer">Natural Earth</a> (contorno).</p>
+          <p>Atlas AV se actualiza cada 30 segundos con la página visible. Un horario programado no confirma que el tren esté en marcha. Solo se muestra una llegada prevista cuando el origen del dato de Adif está verificado. Una posición estimada no es GPS; los servicios programados no tienen marcador.</p>
+          <p>La velocidad estimada se calcula a partir de tres lecturas GPS recientes del mismo viaje, solo cuando Renfe publica la hora de cada lectura. Las vías del mapa son cartografía y no se usan para desplazar el marcador GPS.</p>
+          <p>Fuentes: <a href="https://trenalia.org/api" target="_blank" rel="noreferrer">Trenalia</a> (trayectos, paneles de estación y respaldo GPS procesado), <a href="https://data.renfe.com/es/dataset/posicion-vehiculos-av-ld-md" target="_blank" rel="noreferrer">Renfe Operadora</a> (GPS directo, CC BY 4.0), <a href="https://www.ign.es/web/ign/portal/estilos-de-los-servicios-de-teselas-vectoriales" target="_blank" rel="noreferrer">IGN/CNIG</a> (cartografía), <a href="https://mapterhorn.com/attribution/" target="_blank" rel="noreferrer">Mapterhorn</a> (relieve) y <a href="https://www.naturalearthdata.com/" target="_blank" rel="noreferrer">Natural Earth</a> (vista 2D alternativa).</p>
           {snapshot && <p>{snapshot.attribution}</p>}
           <p>Información orientativa. Para viajar, confirma los datos con tu operador o en los paneles oficiales de Adif:</p>
           <StationLinks corridor={corridor} />

@@ -1,6 +1,6 @@
 import { simple } from './model.ts'
 import type { AtlasSnapshot, AtlasTrain, Operator, ServiceFamily, TrainPosition } from './model.ts'
-import { asNumber, asRecord, asText, company, isCancelled, isFreshAt, point, readJson, serviceNumber, serviceRoute, trainNumber } from './sourceFields.ts'
+import { asNumber, asRecord, asText, company, hasIndependentAdif, isCancelled, isFreshAt, point, readJson, serviceNumber, serviceRoute, trainNumber } from './sourceFields.ts'
 import { loadStationBoards, supplementWithStationBoards } from './stationBoards.ts'
 
 const sourceLookup = 'https://trenalia.org/api/v1/trains?group=ave,avlo,avant,alvia,euromed,intercity,regional,md,ouigo,iryo&limit=1000'
@@ -39,8 +39,14 @@ function indexGps(document: unknown, now: number, source: 'Renfe' | 'Trenalia') 
       if (!id || !coordinates || (observedTime !== null && !isFreshAt(observedTime, now))) continue
       const key = trainNumber(id)
       const previous = positions.get(key)
-      if (previous && (Math.abs(previous.lat - coordinates.lat) > .005 || Math.abs(previous.lon - coordinates.lon) > .005)) ambiguous.add(key)
-      positions.set(key, { ...coordinates, kind: 'gps', source, timestamp: observedTime ?? timestamp, timestampKind: observedTime && source === 'Renfe' ? 'vehicle' : 'feed' })
+      const individualFix = source === 'Renfe' && observedTime !== null
+      const tripId = individualFix ? asText(asRecord(vehicle.trip).tripId) ?? undefined : undefined
+      const speed = individualFix ? asNumber(position.speed) : null
+      const reportedKmh = speed !== null && speed >= 0 && speed * 3.6 <= 360 ? Math.round(speed * 3.6) : undefined
+      if (previous && (previous.tripId !== tripId || Math.abs(previous.lat - coordinates.lat) > .005 || Math.abs(previous.lon - coordinates.lon) > .005)) ambiguous.add(key)
+      if (!previous || (observedTime ?? timestamp) >= previous.timestamp) {
+        positions.set(key, { ...coordinates, kind: 'gps', source, timestamp: observedTime ?? timestamp, timestampKind: individualFix ? 'vehicle' : 'feed', tripId, reportedKmh })
+      }
     }
   }
   for (const key of ambiguous) positions.delete(key)
@@ -54,6 +60,7 @@ export function normalizeSnapshot(trenalia: unknown, renfe: unknown, now = Date.
   const primaryGps = indexGps(renfe, now, 'Renfe')
   const gps = primaryGps.available ? primaryGps : indexGps(gpsBackup, now, 'Trenalia')
   const trains = new Map<string, AtlasTrain>()
+  const independentAdif = hasIndependentAdif(payload)
   for (const item of payload.trains) {
     const row = asRecord(item)
     const operator = company(row)
@@ -68,8 +75,9 @@ export function normalizeSnapshot(trenalia: unknown, renfe: unknown, now = Date.
 
     const cancelled = isCancelled(row)
     const scheduled = row.scheduled === true
+    if (operator !== 'renfe' && !independentAdif && (!scheduled || cancelled)) continue
     const reportedBy = simple(asText(row.delaySource) ?? '')
-    const delaySource = reportedBy === 'renfe' ? 'Renfe' : reportedBy === 'adif' ? 'Adif' : null
+    const delaySource = reportedBy === 'renfe' && operator === 'renfe' ? 'Renfe' : reportedBy === 'adif' && independentAdif ? 'Adif' : null
     const reportedDelay = delaySource && !cancelled && !scheduled ? asNumber(row.delay) : null
     const next = asRecord(row.next)
     const estimate = row.estimated === true && reportedDelay !== null ? point(row.lat, row.lon) : null
@@ -83,7 +91,8 @@ export function normalizeSnapshot(trenalia: unknown, renfe: unknown, now = Date.
       corridor, origin, destination, position,
       status: cancelled ? 'cancelled' : scheduled ? 'scheduled' : position || reportedDelay !== null ? 'tracked' : 'unknown',
       delay: reportedDelay, delaySource: reportedDelay === null ? null : delaySource,
-      nextStop: cancelled ? null : asText(next.name), arrival: cancelled ? null : asText(next.arrival),
+      nextStop: cancelled || (operator !== 'renfe' && !independentAdif) ? null : asText(next.name),
+      arrival: cancelled || (operator !== 'renfe' && !independentAdif) ? null : asText(next.arrival),
     })
   }
   return { generatedAt, gpsAvailable: gps.available, attribution: asText(payload.attribution) ?? attributionDefault, trains: [...trains.values()] }

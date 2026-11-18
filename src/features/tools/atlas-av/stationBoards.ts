@@ -1,6 +1,6 @@
 import type { AtlasSnapshot, AtlasTrain, StationTimes } from './model.ts'
 import { simple } from './model.ts'
-import { asNumber, asRecord, asText, company, isCancelled, isFreshAt, point, readJson, serviceNumber, serviceRoute, stationCode } from './sourceFields.ts'
+import { asNumber, asRecord, asText, company, hasIndependentAdif, isCancelled, isFreshAt, point, readJson, serviceNumber, serviceRoute, stationCode } from './sourceFields.ts'
 import { atlasStations } from './stations.ts'
 
 type StationBoard = { code: string; data: unknown }
@@ -22,7 +22,7 @@ export function loadStationBoards() {
 
 const clockTime = (value: unknown) => typeof value === 'string' && /^(?:[01]\d|2[0-3]):[0-5]\d$/.test(value) ? value : undefined
 
-function boardTrain(row: Record<string, unknown>, code: string, reportedAt: number, kind: 'departure' | 'arrival'): AtlasTrain | null {
+function boardTrain(row: Record<string, unknown>, code: string, reportedAt: number, kind: 'departure' | 'arrival', independentAdif: boolean): AtlasTrain | null {
   // Renfe is already covered by the main service and GPS feeds.
   const operator = company(row)
   const number = asText(row.id)
@@ -36,7 +36,9 @@ function boardTrain(row: Record<string, unknown>, code: string, reportedAt: numb
   const scheduled = clockTime(row.scheduledTime)
   if (!scheduled) return null
   const cancelled = isCancelled(row)
-  const delay = arrivalRow && !cancelled && row.scheduled !== true && row.status === 'on_the_way'
+  // A merged board can read RadarDeTrenes for live status. Only its static GTFS rows are usable in that case.
+  if (!independentAdif && (row.scheduled !== true || cancelled)) return null
+  const delay = independentAdif && arrivalRow && !cancelled && row.scheduled !== true && row.status === 'on_the_way'
     && simple(asText(row.delaySource) ?? '') === 'adif' ? asNumber(row.delay) : null
   const eta = delay !== null ? clockTime(row.estimatedTime) : undefined
   const stationTimes: StationTimes = arrivalRow
@@ -83,11 +85,12 @@ export function supplementWithStationBoards(snapshot: AtlasSnapshot, boards: Sta
     const board = asRecord(data)
     const reportedAt = Date.parse(asText(board.generatedAt) ?? '')
     if (!Number.isFinite(reportedAt) || !isFreshAt(reportedAt, now) || stationCode(asRecord(board.station).code) !== code) continue
+    const independentAdif = hasIndependentAdif(board)
     let contributed = false
     for (const [kind, rows] of [['departure', board.departures], ['arrival', board.arrivals]] as const) {
       if (!Array.isArray(rows)) continue
       for (const row of rows) {
-        const train = boardTrain(asRecord(row), code, reportedAt, kind)
+        const train = boardTrain(asRecord(row), code, reportedAt, kind, independentAdif)
         if (!train) continue
         contributed = true
         const current = trains.get(train.key)

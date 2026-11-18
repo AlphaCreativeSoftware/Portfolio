@@ -2,6 +2,7 @@ import assert from 'node:assert/strict'
 import { test } from 'node:test'
 import { normalizeSnapshot } from '../src/features/tools/atlas-av/sources.ts'
 import { supplementWithStationBoards } from '../src/features/tools/atlas-av/stationBoards.ts'
+import { readGpsSpeeds } from '../src/features/tools/atlas-av/gpsSpeed.ts'
 import { matchesSearch, summarize, staleAfter } from '../src/features/tools/atlas-av/model.ts'
 
 const now = Date.parse('2026-11-18T18:39:30Z')
@@ -10,7 +11,7 @@ const barcelona = { code: 71801, name: 'Barcelona Sants' }
 const valencia = { code: '03216', name: 'València Joaquín Sorolla' }
 const sevilla = { code: 51003, name: 'Sevilla Santa Justa' }
 const base = { company: 'Renfe', id: '03111', product: 'AVE', group: 'ave', origin: madrid, dest: barcelona, live: true, estimated: false, scheduled: false, lat: 41.4, lon: 1.9, delay: 0, delaySource: 'renfe' }
-const feed = (...trains) => ({ generatedAt: new Date(now).toISOString(), trains, attribution: 'Fixture' })
+const feed = (...trains) => ({ generatedAt: new Date(now).toISOString(), trains, attribution: 'Fixture', sources: ['adif'] })
 const vehicle = (id = '03111', lon = 2.01, timestamp = now) => ({ vehicle: { vehicle: { label: id }, timestamp: timestamp / 1000, position: { latitude: 41.2, longitude: lon } } })
 const gps = (...entity) => ({ header: { timestamp: String(now / 1000) }, entity })
 
@@ -63,7 +64,7 @@ test('keeps the backup GPS reading distinct from direct coordinates and direct t
 const ouigo = { company: 'OUIGO', product: 'Ouigo', group: 'ouigo', id: 'TGV 6570', origin: barcelona, dest: madrid, scheduled: true }
 const board = (station, rows = {}, { at = now, code = station.code } = {}) => ({
   code: String(code).padStart(5, '0'),
-  data: { generatedAt: new Date(at).toISOString(), station, attribution: 'Panel de estación', ...rows },
+  data: { generatedAt: new Date(at).toISOString(), station, attribution: 'Panel de estación', sources: ['adif'], ...rows },
 })
 
 test('merges OUIGO aliases across both station boards without promoting timetables to live data', () => {
@@ -116,4 +117,56 @@ test('a bare board timetable preserves a measured delay and cannot revive a canc
   const snapshot = normalizeSnapshot(feed({ ...ouigo, scheduled: false, delay: 5, delaySource: 'adif' }, { ...ouigo, id: 'TGV 6571', cancelled: true }), null, now)
   const { trains } = supplementWithStationBoards(snapshot, [board(madrid, { arrivals: [arrival, { ...arrival, id: '06571' }] })], now)
   assert.deepEqual(trains.map(({ status, delay, position }) => [status, delay, position]), [['tracked', 5, null], ['cancelled', null, null]])
+})
+
+test('keeps static private-operator timetables but does not ingest RadarDeTrenes board updates', () => {
+  const scheduled = { ...ouigo, kind: 'arrival', scheduledTime: '20:42', minutes: 42 }
+  const operational = { ...scheduled, id: '6180', company: 'iryo', scheduled: false, status: 'on_the_way', delay: 10, delaySource: 'adif', estimatedTime: '20:52' }
+  const sources = ['trains', 'RadarDeTrenes', 'gtfs']
+  const snapshot = normalizeSnapshot({ ...feed(operational), sources }, null, now)
+  assert.equal(snapshot.trains.length, 0)
+  const { trains } = supplementWithStationBoards(snapshot, [board(madrid, { sources, arrivals: [operational, scheduled] })], now)
+  assert.deepEqual(trains.map(({ operator, status, delay, position }) => [operator, status, delay, position]), [['ouigo', 'scheduled', null, null]])
+})
+
+function telemetryVehicle(lon, timestamp, { tripId = '031112026-11-18', speed } = {}) {
+  const fixture = vehicle('03111', lon, timestamp)
+  fixture.vehicle.trip = { tripId }
+  fixture.vehicle.position.speed = speed
+  return fixture
+}
+
+test('uses km/h from verified Renfe GPS, preserving a genuine measured zero', () => {
+  for (const [mps, kmh] of [[65, 234], [0, 0]]) {
+    const snapshot = normalizeSnapshot(feed(base), gps(telemetryVehicle(2.01, now, { speed: mps })), now)
+    const [train] = readGpsSpeeds(snapshot.trains, new Map(), now).trains
+    assert.deepEqual(train.speed, { kmh, kind: 'reported', timestamp: now })
+  }
+  const bad = normalizeSnapshot(feed(base), gps(telemetryVehicle(2.01, now, { speed: 125 })), now)
+  assert.equal(readGpsSpeeds(bad.trains, new Map(), now).trains[0].speed, undefined)
+})
+
+test('estimates speed only after three different dated fixes of the same Renfe trip', () => {
+  const fix = (lon, age, tripId) => normalizeSnapshot(feed(base), gps(telemetryVehicle(lon, now - age, { tripId })), now).trains
+  const a = readGpsSpeeds(fix(2.01, 60_000), new Map(), now)
+  const b = readGpsSpeeds(fix(2.03, 30_000), a.history, now)
+  const cached = readGpsSpeeds(fix(2.03, 30_000), b.history, now)
+  assert.equal(cached.trains[0].speed, undefined)
+  const c = readGpsSpeeds(fix(2.05, 0), cached.history, now)
+  assert.deepEqual(c.trains[0].speed, { kmh: 200, kind: 'estimated', timestamp: now })
+  assert.equal(readGpsSpeeds(fix(2.05, 0, 'other-trip'), b.history, now).trains[0].speed, undefined)
+  assert.equal(readGpsSpeeds(fix(2.01, 0), b.history, now).trains[0].speed, undefined)
+  assert.equal(readGpsSpeeds(fix(2.25, 0), b.history, now).trains[0].speed, undefined)
+})
+
+test('does not estimate from feed timestamps or the GPS backup', () => {
+  const item = telemetryVehicle(2.01, now, { speed: 65 })
+  const backup = normalizeSnapshot(feed(base), null, now, gps(item))
+  assert.equal(readGpsSpeeds(backup.trains, new Map(), now).trains[0].speed, undefined)
+  delete item.vehicle.timestamp
+  const untimed = normalizeSnapshot(feed(base), gps(item), now)
+  const { history, trains } = readGpsSpeeds(untimed.trains, new Map(), now)
+  assert.equal(trains[0].position.timestampKind, 'feed')
+  assert.equal(trains[0].speed, undefined)
+  assert.equal(history.size, 0)
 })

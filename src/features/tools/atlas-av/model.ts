@@ -10,7 +10,15 @@ export type Corridor = keyof typeof corridors
 export type ServiceFamily = 'alta-velocidad' | 'larga-distancia' | 'regional'
 export type Coordinates = { lat: number; lon: number }
 
-export type TrainPosition = Coordinates & { kind: 'gps' | 'estimated'; source: 'Renfe' | 'Trenalia'; timestamp: number; timestampKind: 'vehicle' | 'feed' }
+export type TrainPosition = Coordinates & {
+  kind: 'gps' | 'estimated'
+  source: 'Renfe' | 'Trenalia'
+  timestamp: number
+  timestampKind: 'vehicle' | 'feed'
+  tripId?: string
+  reportedKmh?: number
+}
+export type TrainSpeed = { kmh: number; kind: 'reported' | 'estimated'; timestamp: number }
 export type StationTimes = {
   departure?: string
   arrival?: string
@@ -31,6 +39,7 @@ export type AtlasTrain = {
   delaySource: 'Renfe' | 'Adif' | null
   nextStop: string | null
   arrival: string | null
+  speed?: TrainSpeed
   stationTimes?: StationTimes
 }
 
@@ -44,6 +53,7 @@ export type AtlasSnapshot = {
 export const atlasEndpoint = '/api/atlas-av'
 export const refreshInterval = 30_000
 export const staleAfter = 120_000
+export const speedStaleAfter = 75_000
 
 export function simple(text: string) {
   return text.normalize('NFD').replace(/\p{Diacritic}/gu, '').toLowerCase().trim()

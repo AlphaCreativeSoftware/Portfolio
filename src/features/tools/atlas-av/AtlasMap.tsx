@@ -1,14 +1,50 @@
 import { Compass } from 'lucide-react'
+import { useCallback, useEffect, useRef, useState } from 'react'
+import type { ComponentType } from 'react'
 import { land, mapCities, mapSize, project, routeGuides } from './geography'
 import { corridors, operators, staleAfter } from './model'
 import type { AtlasTrain, Corridor } from './model'
 
-export function AtlasMap({ trains, corridor, selected, onSelect, now }: {
+export type AtlasMapProps = {
   trains: readonly AtlasTrain[]; corridor: Corridor | 'all'; selected: string | null; onSelect: (key: string) => void; now: number;
-}) {
+}
+
+export function AtlasMap(props: AtlasMapProps) {
+  const shell = useRef<HTMLDivElement>(null)
+  const [Map3D, setMap3D] = useState<ComponentType<AtlasMapProps & { onUnavailable: () => void }> | null>(null)
+  const [unavailable, setUnavailable] = useState(false)
+  const fallBack = useCallback(() => setUnavailable(true), [])
+
+  useEffect(() => {
+    let active = true
+    const load = () => {
+      void import('./AtlasMap3D').then(({ default: View }) => {
+        if (active) setMap3D(() => View)
+      }).catch(() => { if (active) fallBack() })
+    }
+    const root = shell.current
+    if (!root || typeof IntersectionObserver === 'undefined') {
+      load()
+      return () => { active = false }
+    }
+    const observer = new IntersectionObserver(([entry]) => {
+      if (!entry.isIntersecting) return
+      observer.disconnect()
+      load()
+    }, { rootMargin: '160px' })
+    observer.observe(root)
+    return () => { active = false; observer.disconnect() }
+  }, [fallBack])
+
+  return <div ref={shell} className="atlas-map-shell">
+    {Map3D && !unavailable ? <Map3D {...props} onUnavailable={fallBack} /> : <AtlasFlatMap {...props} />}
+  </div>
+}
+
+function AtlasFlatMap({ trains, corridor, selected, onSelect, now }: AtlasMapProps) {
   return (
     <div className="atlas-map">
-      <div className="atlas-map-label"><Compass size={15} aria-hidden="true" /> <span>España peninsular</span></div>
+      <div className="atlas-map-label"><Compass size={15} aria-hidden="true" /> <span>España peninsular · Vista 2D</span></div>
       <div className="atlas-map-stage">
         <svg className="atlas-basemap" viewBox={`0 0 ${mapSize.width} ${mapSize.height}`} aria-hidden="true">
           <polygon className="atlas-land atlas-land-neighbour" points={land.portugal} />

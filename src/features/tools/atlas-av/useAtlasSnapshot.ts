@@ -1,6 +1,8 @@
 import { useEffect, useRef, useState } from 'react'
 import { atlasEndpoint, refreshInterval } from './model'
 import type { AtlasSnapshot } from './model'
+import { readGpsSpeeds } from './gpsSpeed'
+import type { GpsHistory } from './gpsSpeed'
 
 export function useAtlasSnapshot() {
   const [snapshot, setSnapshot] = useState<AtlasSnapshot | null>(null)
@@ -13,6 +15,8 @@ export function useAtlasSnapshot() {
     let controller: AbortController | null = null
     let timer: ReturnType<typeof setTimeout> | undefined
     let stopped = false
+    let history: GpsHistory = new Map()
+    let lastSnapshotAt = 0
     async function update() {
       if (controller || stopped || document.hidden) return
       clearTimeout(timer)
@@ -25,7 +29,12 @@ export function useAtlasSnapshot() {
         const data = await response.json() as AtlasSnapshot
         if (!Array.isArray(data.trains) || !Number.isFinite(data.generatedAt)) throw new Error('Invalid snapshot')
         if (!stopped) {
-          setSnapshot((previous) => previous && previous.generatedAt > data.generatedAt ? previous : data)
+          if (data.generatedAt >= lastSnapshotAt) {
+            const reading = readGpsSpeeds(data.trains, history, Date.now())
+            history = reading.history
+            lastSnapshotAt = data.generatedAt
+            setSnapshot({ ...data, trains: reading.trains })
+          }
           setFailed(false)
         }
       } catch {

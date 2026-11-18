@@ -62,6 +62,11 @@ export function isCancelled(row: Record<string, unknown>) {
   return row.cancelled === true || [row.status, asRecord(row.advisory).kind].some((value) => value === 'canceled' || value === 'cancelled')
 }
 
+export function hasIndependentAdif(payload: Record<string, unknown>) {
+  const sources = Array.isArray(payload.sources) ? payload.sources.map((value) => simple(asText(value) ?? '').replace(/[^a-z]/g, '')) : []
+  return sources.includes('adif') && !sources.includes('radardetrenes')
+}
+
 export async function readJson(url: string, timeout = 5_000) {
   const response = await fetch(url, { headers: { Accept: 'application/json' }, signal: AbortSignal.timeout(timeout) })
   if (!response.ok) throw new Error(`Upstream ${response.status}`)
