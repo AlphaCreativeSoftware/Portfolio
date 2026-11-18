@@ -1,6 +1,7 @@
 import type { CSSProperties } from 'react'
 import { useOnceVisible } from '../../../shared/hooks/useOnceVisible'
 import { workMethodSteps } from '../data/about'
+import { currentExperience } from '../data/experience'
 import { SectionHeading } from '../../../shared/ui/SectionHeading'
 
 export function AboutSection() {
@@ -31,7 +32,7 @@ export function AboutSection() {
         ))}
       </div>
       <div className="about-now">
-        <span><i /> Ahora</span><p>Responsable de desarrollo y mantenimiento de aplicaciones en cliente bancario.</p><strong>Madrid · Software · Producto · IA aplicada</strong>
+        <span><i /> Ahora</span><p>{currentExperience.title} en el sector bancario, dedicado al desarrollo y mantenimiento de aplicaciones.</p><strong>Madrid · Software · Producto · IA aplicada</strong>
       </div>
     </section>
   )

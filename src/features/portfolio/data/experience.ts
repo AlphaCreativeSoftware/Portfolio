@@ -8,16 +8,18 @@ type Experience = {
   status?: string
 }
 
+export const currentExperience: Experience = {
+  id: 'avos-tech',
+  date: 'Feb. 2026 — Ahora',
+  company: 'Prosegur AVOS Tech · Sector banca',
+  title: 'Ingeniero de software',
+  description: 'Encargado del desarrollo y mantenimiento de aplicaciones con ASP.NET, React, TypeScript y Azure. Participo en la estimación y planificación del trabajo técnico y en el mantenimiento de componentes críticos de la red operativa del BPO y de sistemas heredados en Delphi, C y Windows Forms.',
+  variant: 'current',
+  status: 'Actual',
+}
+
 export const experience: Experience[] = [
-  {
-    id: 'avos-tech',
-    date: 'Feb. 2026 — Ahora',
-    company: 'Prosegur AVOS Tech · Sector banca',
-    title: 'Responsable de software',
-    description: 'Responsable líder de aplicaciones y soluciones con ASP.NET, React, TypeScript y Azure. Estimación y organización del trabajo técnico, junto con la gestión de aplicaciones y componentes críticos de la red operativa del BPO. Responsabilidad también sobre sistemas heredados en Delphi, C y Windows Forms.',
-    variant: 'current',
-    status: 'Actual',
-  },
+  currentExperience,
   {
     id: 'alpha-creative',
     date: '2020 — Actualidad',

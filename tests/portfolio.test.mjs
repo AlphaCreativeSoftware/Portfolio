@@ -64,6 +64,10 @@ for (const [theme, solar] of [['system', 'auto'], ['light', 'morning'], ['dark',
   test(`portfolio shell: landmarks, anchors, assets and lazy details (${theme}/${solar})`, () => {
     globalThis.localStorage = { getItem: (key) => key === 'portfolio-theme' ? theme : solar }
     const html = renderToStaticMarkup(createElement(MemoryRouter, { initialEntries: ['/portfolio'] }, createElement(AppearanceProvider, null, createElement(PortfolioPage))))
+    assert.match(html, /<h3>Ingeniero de software<\/h3>/)
+    assert.match(html, /Encargado del desarrollo y mantenimiento de aplicaciones/)
+    assert.match(html, /Ingeniero de software en el sector bancario/)
+    assert.doesNotMatch(html, /Responsable de software|Responsable líder/i)
     const header = html.match(/<header\b[\s\S]*?<\/header>/)[0]
     assert.ok(!header.includes('Disponible'))
     assert.match(header, /aria-label="Áreas de la web"/)
