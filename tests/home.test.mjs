@@ -104,14 +104,21 @@ test('route table separates home, lazy tools and portfolio, and a real not-found
   assert.equal(matchRoutes(routes, '/herramientas/no-publicada').at(-1).route, missing)
 })
 
-test('tools page has a real empty state and no placeholder tool links', async () => {
+test('tools page publishes Atlas AV and the tool is a lazy route', async () => {
   const route = matchRoutes(routes, '/herramientas').at(-1).route
   const { Component } = await route.lazy()
   const html = renderToStaticMarkup(createElement(MemoryRouter, { initialEntries: ['/herramientas'] }, createElement(AppearanceProvider, null, createElement(Component))))
   assert.match(html, /<h1 id="tools-title">Herramientas/)
-  assert.match(html, /Todavía no hay herramientas publicadas/)
+  assert.match(html, /href="\/herramientas\/atlas-av"[^>]*><h2>Atlas AV<\/h2>/)
   assert.equal((html.match(/aria-current="page"[^>]*href="\/herramientas"/g) ?? []).length, 2)
-  assert.doesNotMatch(html, /href="\/herramientas\/|En esta página/)
+  assert.doesNotMatch(html, /Todavía no hay herramientas|En esta página/)
+  assert.ok(matchRoutes(routes, '/herramientas/atlas-av').at(-1).route.lazy)
+})
+
+test('empty catalogs still offer the home and portfolio links', async () => {
+  const { ToolCatalog } = await server.ssrLoadModule('/src/features/tools/components/ToolCatalog.tsx')
+  const html = renderToStaticMarkup(createElement(MemoryRouter, null, createElement(ToolCatalog, { entries: [] })))
+  assert.match(html, /Todavía no hay herramientas publicadas/)
   const emptyActions = html.match(/<div class="tools-empty-actions">([\s\S]*?)<\/div>/)[1]
   assert.deepEqual([...emptyActions.matchAll(/href="([^"]+)"/g)].map((match) => match[1]), ['/', '/portfolio'])
 })

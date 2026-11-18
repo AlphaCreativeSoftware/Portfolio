@@ -9,7 +9,12 @@ export type ToolEntry = {
 }
 
 // Only published tools go here. One entry enables both its card and its route.
-export const toolCatalog: readonly ToolEntry[] = []
+export const toolCatalog: readonly ToolEntry[] = [{
+  slug: 'atlas-av',
+  title: 'Atlas AV',
+  description: 'Mapa y estado de la alta velocidad entre Madrid, Barcelona, Valencia y Sevilla.',
+  load: () => import('./atlas-av/AtlasAv'),
+}]
 
 export function toolPath(slug: string) {
   return `${siteAreas.tools.to}/${slug}`

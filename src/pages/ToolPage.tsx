@@ -11,7 +11,7 @@ export function ToolPage({ entry, children }: { entry: ToolEntry; children: Reac
   usePageMetadata({ title: `${entry.title} — Mikael Rodríguez`, description: entry.description, path: toolPath(entry.slug) })
 
   return (
-    <ToolsLayout>
+    <ToolsLayout detail>
       <div className="tools-intro">
         <Link className="tools-link" to={siteAreas.tools.to}><ArrowLeft size={15} aria-hidden="true" /> Todas las herramientas</Link>
         <h1 id="tools-title">{entry.title}</h1>
