@@ -29,10 +29,11 @@ function renderContext(page, section) {
     navIndicator: { x: 0, y: 0, width: 0, height: 0, visible: false, moving: false },
     navigateTo() {}, setMenuOpen() {}, closeMenu() {},
   }
-  return renderToStaticMarkup(createElement(MemoryRouter, { initialEntries: [page === 'home' ? '/' : '/portfolio'] }, createElement(AppearanceProvider, null, createElement(SiteHeader, { navigation, page }))))
+  const path = { home: '/', tools: '/herramientas', portfolio: '/portfolio' }[page]
+  return renderToStaticMarkup(createElement(MemoryRouter, { initialEntries: [path] }, createElement(AppearanceProvider, null, createElement(SiteHeader, { navigation, page }))))
 }
 
-for (const [page, area] of [['home', 'Web principal'], ['portfolio', 'Portfolio']]) {
+for (const [page, area] of [['home', 'Web principal'], ['tools', 'Herramientas'], ['portfolio', 'Portfolio']]) {
   test(`mobile context shows only ${area} in the opening hero`, () => {
     const html = renderContext(page)
     assert.ok(html.includes(`<strong class="mobile-area-label">${page === 'home' ? 'Principal' : area}</strong>`))
@@ -53,11 +54,11 @@ for (const [page, area, section] of [['portfolio', 'Portfolio', 'Proyectos'], ['
 }
 
 test('destination indicators are decorative; route links retain their own current-page semantics', () => {
-  for (const page of ['home', 'portfolio']) {
+  for (const page of ['home', 'tools', 'portfolio']) {
     const html = renderContext(page)
     assert.equal((html.match(/class="site-destination-indicator" aria-hidden="true"/g) ?? []).length, 2)
     assert.equal((html.match(/aria-current="page"/g) ?? []).length, 2)
-    for (const destination of ['/', '/portfolio']) assert.equal((html.match(new RegExp(`data-destination="${destination}"`, 'g')) ?? []).length, 2)
+    assert.deepEqual([...html.matchAll(/data-destination="([^"]+)"/g)].map((match) => match[1]), ['/', '/herramientas', '/portfolio', '/', '/herramientas', '/portfolio'])
   }
 })
 

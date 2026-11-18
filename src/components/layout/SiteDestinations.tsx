@@ -2,11 +2,9 @@ import { useLayoutEffect, useRef } from 'react'
 import { NavLink, useLocation } from 'react-router-dom'
 import { useDestinationMotion } from './DestinationMotionProvider'
 import { resolveDestinationSelection } from './destinationMotion'
+import { siteAreas } from '../../shared/config/areas'
 
-const destinations = [
-  { to: '/', label: 'Web principal' },
-  { to: '/portfolio', label: 'Portfolio' },
-] as const
+const destinations = Object.values(siteAreas)
 
 /** Page-level navigation stays separate from the current page's section links. */
 export function SiteDestinations({ onNavigate, placement = 'desktop', open = true }: { onNavigate?: () => void; placement?: 'desktop' | 'menu'; open?: boolean }) {
@@ -55,8 +53,8 @@ export function SiteDestinations({ onNavigate, placement = 'desktop', open = tru
   return (
     <nav ref={containerRef} className="site-destinations" aria-label="Áreas de la web">
       <span ref={indicatorRef} className="site-destination-indicator" aria-hidden="true" />
-      {destinations.map(({ to, label }) => (
-        <NavLink key={to} to={to} data-destination={to} end onClick={onNavigate} className={({ isActive }) => `site-destination${isActive ? ' site-destination-active' : ''}`}>
+      {destinations.map(({ to, label, exact }) => (
+        <NavLink key={to} to={to} data-destination={to} end={exact} onClick={onNavigate} className={({ isActive }) => `site-destination${isActive ? ' site-destination-active' : ''}`}>
           {label}
         </NavLink>
       ))}

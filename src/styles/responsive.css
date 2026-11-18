@@ -10,7 +10,7 @@
   .desktop-site-destinations { display: none; }
   .mobile-site-destinations { display: block; }
   .mobile-site-destinations .site-destinations { width: 100%; border-radius: 13px; }
-  .mobile-site-destinations .site-destination { flex: 1; min-height: 40px; border-radius: 10px; font-size: 12px; }
+  .mobile-site-destinations .site-destination { flex: 1; min-height: 40px; padding-inline: 7px; border-radius: 10px; font-size: 12px; }
   .mobile-site-destinations .site-destination-indicator { border-radius: 10px; }
   .site-menu-section-label { margin-top: 12px; padding-top: 14px; border-top: 1px solid var(--line); }
   .mobile-section-label { grid-column: 2; display: flex; align-items: center; gap: 6px; min-width: 0; overflow: hidden; color: var(--muted); font-size: 9px; line-height: 1.4; white-space: nowrap; }

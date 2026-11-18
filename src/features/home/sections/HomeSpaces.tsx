@@ -1,6 +1,12 @@
-import { ArrowUpRight } from 'lucide-react'
+import { ArrowUpRight, Wrench } from 'lucide-react'
 import { Link } from 'react-router-dom'
+import { siteAreas } from '../../../shared/config/areas'
 import { independentSpaces } from '../data/spaces'
+
+const internalSpaces = [
+  { ...siteAreas.portfolio, number: '01', category: 'Trabajo profesional', description: 'Proyectos de software, automatización, datos e IA, junto con mi experiencia y competencias técnicas.', action: 'Abrir portfolio', icon: ArrowUpRight },
+  { ...siteAreas.tools, number: '02', category: 'Utilidades web', description: 'Herramientas que desarrollo para automatizar tareas y resolver problemas concretos desde el navegador.', action: 'Ver herramientas', icon: Wrench },
+]
 
 export function HomeSpaces() {
   return (
@@ -10,18 +16,20 @@ export function HomeSpaces() {
           <p className="home-eyebrow">01 / Áreas de la web</p>
           <h2 id="home-spaces-title">Trabajo, producto<br /><em>y conocimiento.</em></h2>
         </div>
-        <p>Acceso al portfolio profesional, a mis productos independientes y a los recursos técnicos que comparto.</p>
+        <p>Explora mis proyectos profesionales, las herramientas que desarrollo y los productos de Alpha Creative.</p>
       </div>
       <div className="home-space-grid">
-        <Link className="home-space-card home-space-portfolio" to="/portfolio" aria-label="Abrir portfolio: proyectos, experiencia y competencias">
-          <div className="home-space-meta">
-            <span>01 / Trabajo profesional</span>
-            <span className="home-space-action"><ArrowUpRight size={18} /></span>
-          </div>
-          <h3>Portfolio.</h3>
-          <p>Una selección de proyectos de software, automatización, datos e IA, junto con mi experiencia y competencias técnicas.</p>
-          <span className="home-space-entry">Abrir portfolio<ArrowUpRight size={17} /></span>
-        </Link>
+        {internalSpaces.map(({ to, label, number, category, description, action, icon: Icon }) => (
+          <Link className="home-space-card home-space-internal" to={to} aria-label={action} key={to}>
+            <div className="home-space-meta">
+              <span>{number} / {category}</span>
+              <span className="home-space-action"><Icon size={17} aria-hidden="true" /></span>
+            </div>
+            <h3>{label}.</h3>
+            <p>{description}</p>
+            <span className="home-space-entry">{action}<ArrowUpRight size={17} aria-hidden="true" /></span>
+          </Link>
+        ))}
         {independentSpaces.map((space) => (
           <article className={'home-space-card home-space-' + space.id} key={space.id}>
             <div className="home-space-meta">

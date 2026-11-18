@@ -55,7 +55,8 @@ for (const theme of ['light', 'dark']) {
     assert.ok(!sectionLinks.includes('href="/portfolio"'), 'Page destinations must not be mixed into section links')
     assert.ok(!html.includes('<video'), 'Homepage must not preload the engine video')
     assert.ok(!html.includes('<canvas'), 'No frame sequence should be loaded without portrait assets')
-    assert.equal((html.match(/class="home-space-card\b/g) ?? []).length, 2)
+    assert.equal((html.match(/class="home-space-card\b/g) ?? []).length, 3)
+    assert.match(html, /href="\/herramientas"[^>]*>[\s\S]*?<h3>Herramientas\.<\/h3>/)
     assert.ok(!html.includes('home-space-open-work'), 'Publications must not duplicate Alpha Creative')
     const alpha = html.match(/<article class="home-space-card home-space-alpha-creative"[\s\S]*?<\/article>/)[0]
     assert.equal((alpha.match(/<a\b/g) ?? []).length, 4)
@@ -84,8 +85,9 @@ test('all home destinations have real, explicit links', () => {
   }
 })
 
-test('route table separates home, lazy portfolio and a real not-found page', async () => {
+test('route table separates home, lazy tools and portfolio, and a real not-found page', async () => {
   const home = matchRoutes(routes, '/').at(-1).route
+  const tools = matchRoutes(routes, '/herramientas').at(-1).route
   const portfolio = matchRoutes(routes, '/portfolio').at(-1).route
   const missing = matchRoutes(routes, '/does-not-exist').at(-1).route
   assert.ok(home.index)
@@ -94,6 +96,28 @@ test('route table separates home, lazy portfolio and a real not-found page', asy
   assert.notEqual(home, portfolio)
   assert.equal(missing.path, '*')
   assert.equal((await portfolio.lazy()).Component.name, 'PortfolioPage')
+  assert.equal((await tools.lazy()).Component.name, 'ToolsPage')
+  assert.equal(matchRoutes(routes, '/herramientas/no-publicada').at(-1).route, missing)
+})
+
+test('tools page has a real empty state and no placeholder tool links', async () => {
+  const route = matchRoutes(routes, '/herramientas').at(-1).route
+  const { Component } = await route.lazy()
+  const html = renderToStaticMarkup(createElement(MemoryRouter, { initialEntries: ['/herramientas'] }, createElement(AppearanceProvider, null, createElement(Component))))
+  assert.match(html, /<h1 id="tools-title">Herramientas/)
+  assert.match(html, /Todavía no hay herramientas publicadas/)
+  assert.equal((html.match(/aria-current="page"[^>]*href="\/herramientas"/g) ?? []).length, 2)
+  assert.doesNotMatch(html, /href="\/herramientas\/|En esta página/)
+})
+
+test('catalog cards use the same paths as the tool registry and do not load tools', async () => {
+  const { ToolCatalog } = await server.ssrLoadModule('/src/features/tools/components/ToolCatalog.tsx')
+  const { toolPath } = await server.ssrLoadModule('/src/features/tools/catalog.ts')
+  const entry = { slug: 'prueba', title: 'Utilidad de prueba', description: 'Ficha para la prueba del catálogo.', load: () => { throw new Error('Catalog must not load tool code') } }
+  const html = renderToStaticMarkup(createElement(MemoryRouter, null, createElement(ToolCatalog, { entries: [entry] })))
+  assert.ok(html.includes(`href="${toolPath(entry.slug)}"`))
+  assert.match(html, /<h2>Utilidad de prueba<\/h2>/)
+  assert.doesNotMatch(html, /Todavía no hay herramientas/)
 })
 
 test('previous portfolio bookmarks migrate without taking over homepage anchors', () => {

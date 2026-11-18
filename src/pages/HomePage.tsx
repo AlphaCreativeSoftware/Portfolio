@@ -12,7 +12,7 @@ export function HomePage() {
   const pageRef = useRef<HTMLElement>(null)
   const navigation = useSectionNavigation(homeNavigation)
   usePageAnimations(pageRef)
-  usePageMetadata({ title: 'Mikael Rodríguez — Software, producto y tecnología', description: 'Web personal de Mikael Rodríguez. Acceso al portfolio profesional, productos independientes y publicaciones sobre desarrollo y tecnología.', path: '/' })
+  usePageMetadata({ title: 'Mikael Rodríguez — Software, producto y tecnología', description: 'Proyectos de ingeniería de software, herramientas para el navegador y productos independientes de Mikael Rodríguez.', path: '/' })
 
   return (
     <SiteLayout navigation={navigation} page="home">

@@ -3,10 +3,12 @@ import type { SectionNavigation } from '../../shared/hooks/useSectionNavigation'
 import { AppearanceControls } from '../../features/appearance/AppearanceControls'
 import { Link } from 'react-router-dom'
 import { SiteDestinations } from './SiteDestinations'
+import { siteAreas } from '../../shared/config/areas'
+import type { SiteArea } from '../../shared/config/areas'
 
-export function SiteHeader({ navigation, page }: { navigation: SectionNavigation; page: 'home' | 'portfolio' }) {
+export function SiteHeader({ navigation, page }: { navigation: SectionNavigation; page: SiteArea }) {
   const { items, scrolled, menuOpen, scrollProgressRef, navigateTo, activeSection, isAtStart, currentSectionLabel, navRef, menuPanelRef, navIndicator, menuButtonRef, setMenuOpen, closeMenu } = navigation
-  const pageLabel = page === 'home' ? 'Web principal' : 'Portfolio'
+  const { label: pageLabel, shortLabel, sectionsLabel } = siteAreas[page]
   return (
     <header className={`topbar ${scrolled ? 'topbar-scrolled' : ''} ${menuOpen ? 'topbar-menu-open' : ''}`}>
       <span className="scroll-progress" ref={scrollProgressRef} />
@@ -15,7 +17,7 @@ export function SiteHeader({ navigation, page }: { navigation: SectionNavigation
         <div className="desktop-site-destinations"><SiteDestinations /></div>
       </div>
       <span className="mobile-section-label" aria-label={isAtStart ? pageLabel : `${pageLabel}: ${currentSectionLabel}`}>
-        <strong className="mobile-area-label">{page === 'home' ? 'Principal' : pageLabel}</strong>
+        <strong className="mobile-area-label">{shortLabel}</strong>
         {!isAtStart && (
           <span className="mobile-section-context">
             <span className="mobile-context-divider" aria-hidden="true" />
@@ -27,9 +29,9 @@ export function SiteHeader({ navigation, page }: { navigation: SectionNavigation
         <div className="mobile-site-destinations">
           <span className="site-menu-label">Áreas de la web</span>
           <SiteDestinations onNavigate={closeMenu} placement="menu" open={menuOpen} />
-          <span className="site-menu-label site-menu-section-label">En esta página</span>
+          {items.length > 0 && <span className="site-menu-label site-menu-section-label">En esta página</span>}
         </div>
-        <nav ref={navRef} className={menuOpen ? 'nav nav-open' : 'nav'} aria-label={page === 'home' ? 'Secciones de la web principal' : 'Secciones del portfolio'}>
+        {items.length > 0 && <nav ref={navRef} className={menuOpen ? 'nav nav-open' : 'nav'} aria-label={sectionsLabel}>
           <span
             className={`nav-indicator ${navIndicator.visible ? 'nav-indicator-visible' : ''} ${navIndicator.moving ? 'nav-indicator-moving' : ''}`}
             style={{
@@ -43,7 +45,7 @@ export function SiteHeader({ navigation, page }: { navigation: SectionNavigation
           {items.map(({ id, label, number }) => (
             <a key={id} className={activeSection === id ? 'active' : ''} aria-current={activeSection === id ? 'location' : undefined} href={'#' + id} onClick={() => navigateTo(id)}><span>{number}</span>{label}</a>
           ))}
-        </nav>
+        </nav>}
       </div>
       <div className="header-actions">
         <AppearanceControls />

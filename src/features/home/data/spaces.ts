@@ -5,7 +5,7 @@ import { site } from '../../../shared/config/site'
 export const independentSpaces = [
   {
     id: 'alpha-creative',
-    number: '02',
+    number: '03',
     category: 'Marca independiente',
     title: 'Alpha Creative.',
     description: 'Productos digitales, publicaciones y contenido técnico bajo mi marca independiente.',

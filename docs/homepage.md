@@ -11,8 +11,8 @@ capturas ni iconos de proyectos. Portfolio y Alpha Creative enlazan
 a productos y perfiles que ya existen. No hay destinos vacíos ni estadísticas inventadas.
 
 Los espaciados comparten una medida de contenido de 1.240 px y gutters fluidos.
-Las dos áreas tienen una jerarquía equilibrada, con dos columnas en escritorio y
-tableta y tarjetas apiladas en móvil. Alpha Creative reúne Google Play, Amazon,
+Portfolio, Herramientas y Alpha Creative comparten la cuadrícula de la portada,
+con tarjetas apiladas en móvil. Alpha Creative reúne Google Play, Amazon,
 GitHub y YouTube en dos grupos: productos/publicaciones y código/contenido. No hay
 una tarjeta de Publicaciones separada. El portfolio se presenta como un
 resumen con acceso a proyectos, experiencia y competencias; no se duplican los
@@ -24,7 +24,7 @@ permanecen exclusivamente en el portfolio.
 La cabecera utiliza el mismo estilo de ancho completo en ambas páginas. Se eliminó
 el estado «Disponible» y la variante flotante exclusiva de la portada.
 
-- `SiteDestinations`: selector global «Web principal / Portfolio», con `aria-current="page"`.
+- `SiteDestinations`: selector global «Web principal / Herramientas / Portfolio», con `aria-current="page"`.
 - Navegación local: enlaces a secciones de la página actual, con `aria-current="location"`.
 - Escritorio: selector global junto a la marca y enlaces locales en el centro.
 - Móvil: etiqueta de área compacta y discreta («Principal» / «Portfolio») y sección
@@ -58,6 +58,7 @@ ausencia de animación en móvil.
 ## Rutas y carga
 
 - `/`: `HomePage`, cargada en la entrada.
+- `/herramientas`: catálogo de utilidades con carga diferida. Véase [cómo publicar una herramienta](tools.md).
 - `/portfolio`: carga diferida por ruta, conservando sus casos interactivos y vídeo.
 - `/portfolio#experiencia`, etc.: enlaces profundos a secciones.
 - Las URLs desconocidas muestran una recuperación 404 en la aplicación.

@@ -1,0 +1,21 @@
+.tools-main { width: min(1080px, calc(100% - clamp(48px, 12vw, 160px))); min-height: calc(100svh - 96px); margin-inline: auto; padding-block: clamp(126px, 15vw, 190px) 96px; }
+.tools-intro { max-width: 65ch; margin-bottom: clamp(34px, 6vw, 62px); }
+.tools-eyebrow { margin: 0; color: var(--muted); font-size: 10px; font-weight: 600; letter-spacing: .14em; text-transform: uppercase; }
+.tools-intro h1 { margin: 14px 0 0; font: 600 clamp(39px, 8vw, 98px)/1.08 'Manrope', sans-serif; letter-spacing: -.07em; overflow-wrap: anywhere; }
+.tools-intro h1 span { color: var(--blue); }
+.tools-intro > p:not(.tools-eyebrow) { max-width: 49ch; margin: 20px 0 0; color: var(--muted); font-size: clamp(15px, 2vw, 18px); line-height: 1.7; }
+.tools-surface { border: 1px solid var(--line); border-radius: 24px; background: linear-gradient(125deg, color-mix(in srgb, var(--blue) 6%, transparent), transparent 64%), color-mix(in srgb, var(--surface) 88%, transparent); box-shadow: var(--shadow), var(--glass-highlight); padding: clamp(23px, 4vw, 42px); }
+.tools-empty { display: flex; align-items: flex-start; gap: 22px; }
+.tools-icon { display: grid; place-items: center; width: 46px; height: 46px; flex: none; border-radius: 14px; border: 1px solid var(--line); background: var(--soft-blue); color: var(--blue); }
+.tools-surface h2 { margin: 0; font: 600 clamp(20px, 3vw, 28px)/1.25 'Manrope', sans-serif; letter-spacing: -.04em; }
+.tools-surface p { max-width: 54ch; margin: 10px 0 0; color: var(--muted); line-height: 1.65; font-size: 14px; }
+.tools-link { display: inline-flex; align-items: center; gap: 8px; min-height: 44px; color: var(--blue); font-size: 13px; font-weight: 500; }
+.tools-empty .tools-link { margin-top: 12px; }
+.tools-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 265px), 1fr)); gap: 16px; list-style: none; margin: 0; padding: 0; }
+.tools-card { display: flex; flex-direction: column; height: 100%; transition: border-color .2s; }
+.tools-card .tools-link { margin-top: auto; padding-top: 12px; }
+.tools-card:hover { border-color: color-mix(in srgb, var(--blue) 45%, var(--line)); }
+
+@media (max-width: 480px) {
+  .tools-empty { flex-direction: column; gap: 16px; }
+}

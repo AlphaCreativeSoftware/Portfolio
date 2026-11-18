@@ -3,8 +3,9 @@ import type { SectionNavigation } from '../../shared/hooks/useSectionNavigation'
 import { AmbientScene } from '../../features/appearance/AmbientScene'
 import { SiteHeader } from './SiteHeader'
 import { SiteFooter } from './SiteFooter'
+import type { SiteArea } from '../../shared/config/areas'
 
-type SiteLayoutProps = { children: ReactNode; navigation: SectionNavigation; page?: 'home' | 'portfolio' }
+type SiteLayoutProps = { children: ReactNode; navigation: SectionNavigation; page?: SiteArea }
 
 export function SiteLayout({ children, navigation, page = 'portfolio' }: SiteLayoutProps) {
   return (
