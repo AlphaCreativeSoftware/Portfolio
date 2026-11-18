@@ -62,8 +62,43 @@
 .home-orbit-ring-one { width: 56%; background: radial-gradient(ellipse, color-mix(in srgb, var(--ambient-primary) 10%, transparent), transparent 70%); }
 .home-orbit-ring-two { width: 88%; border-color: color-mix(in srgb, var(--blue) 15%, transparent); }
 .home-orbit-ring-three { width: 122%; border-color: color-mix(in srgb, var(--text) 6%, transparent); }
-.home-orbit-sun { position: absolute; left: calc(var(--orbit-sun-x, 62) * 1%); top: calc(var(--orbit-sun-y, 21) * 1%); width: 67px; aspect-ratio: 1; border-radius: 50%; background: radial-gradient(circle at 38% 32%, var(--celestial-core), var(--celestial-edge) 70%); box-shadow: inset -8px -7px 14px color-mix(in srgb, var(--celestial-edge) 60%, transparent), 0 0 70px 18px color-mix(in srgb, var(--celestial-edge) 17%, transparent); transition: left 1.4s var(--ease-premium), top 1.4s var(--ease-premium), box-shadow 1.4s; }
-:root[data-atmosphere='night'] .home-orbit-sun { box-shadow: inset -14px -7px 16px color-mix(in srgb, var(--blue) 32%, transparent), 0 0 60px 12px color-mix(in srgb, var(--celestial-edge) 15%, transparent); }
+.home-orbit-sun { position: absolute; left: calc(var(--orbit-sun-x, 62) * 1%); top: calc(var(--orbit-sun-y, 21) * 1%); width: 67px; aspect-ratio: 1; transition: left 1.4s var(--ease-premium), top 1.4s var(--ease-premium); }
+.home-orbit-sun::before, .home-orbit-sun::after { content: ''; position: absolute; border-radius: 50%; }
+/* Scale the halo with the disc, and fade to zero before its painting edge. */
+.home-orbit-sun::before {
+  inset: -115%;
+  background:
+    radial-gradient(circle closest-side,
+      color-mix(in srgb, var(--celestial-core) 64%, transparent) 27%,
+      color-mix(in srgb, var(--celestial-edge) 55%, transparent) 33%,
+      color-mix(in srgb, var(--celestial-edge) 22%, transparent) 49%,
+      color-mix(in srgb, var(--celestial-edge) 6%, transparent) 73%, transparent 100%),
+    radial-gradient(ellipse 37% 28% at 50% 48%, color-mix(in srgb, var(--celestial-edge) 37%, transparent), transparent);
+}
+.home-orbit-sun::after {
+  inset: 0;
+  background: radial-gradient(circle farthest-corner at 30% 28%,
+    var(--celestial-core),
+    color-mix(in oklab, var(--celestial-core), var(--celestial-edge) 23%) 52%,
+    color-mix(in oklab, var(--celestial-core), var(--celestial-edge) 65%));
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--celestial-core) 43%, transparent);
+}
+:root[data-atmosphere='night'] .home-orbit-sun::before {
+  inset: -115%;
+  background: radial-gradient(circle closest-side,
+    color-mix(in srgb, var(--celestial-core) 47%, transparent) 28%,
+    color-mix(in srgb, var(--celestial-edge) 32%, transparent) 35%,
+    color-mix(in srgb, var(--celestial-edge) 13%, transparent) 51%, transparent 91%);
+}
+:root[data-atmosphere='night'] .home-orbit-sun::after {
+  /* Smooth glass: broad reflection and a soft edge, without surface detail. */
+  background:
+    radial-gradient(ellipse 71% 63% at 28% 18%, color-mix(in srgb, var(--celestial-core) 82%, transparent), transparent),
+    radial-gradient(ellipse 73% 42% at 75% 98%, color-mix(in srgb, var(--celestial-edge) 63%, transparent), transparent),
+    linear-gradient(145deg, var(--celestial-core), var(--celestial-edge) 54%, #527298 100%);
+  box-shadow: inset 0 1px 2px color-mix(in srgb, var(--celestial-core) 74%, transparent),
+    inset 0 0 0 1px color-mix(in srgb, var(--celestial-core) 30%, transparent);
+}
 .home-orbit-traveler { position: absolute; inset: 0; border-radius: 50%; animation: home-orbit-travel 72s linear infinite; }
 .home-orbit-traveler > i { position: absolute; top: 50%; left: 0; width: 6px; height: 6px; border: 1px solid color-mix(in srgb, var(--blue) 60%, transparent); border-radius: 50%; background: var(--page); transform: translate(-50%, -50%); box-shadow: 0 0 0 5px color-mix(in srgb, var(--blue) 5%, transparent); }
 .home-orbit-stage:not([data-onscreen='true']) .home-orbit-traveler { animation-play-state: paused; }

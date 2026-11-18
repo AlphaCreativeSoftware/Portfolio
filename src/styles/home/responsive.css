@@ -50,13 +50,19 @@
   .home-hero-actions .home-quiet-link { font-size: 12px; }
   /* Keep the solar scene with the opening identity, not in a separate row. */
   .home-orbit-stage { position: absolute; z-index: 0; top: -30px; right: calc(var(--home-gutter) * -2 - 20px); width: min(100vw, 420px); height: 320px; min-height: 0; margin: 0; pointer-events: none; }
-  .home-orbit-art { opacity: .62; }
+  .home-orbit-art::before, .home-orbit-ring, .home-orbit-track { opacity: .62; }
   .home-orbit-art::before { inset: -25% -50% -30% -40%; }
   .home-orbit-ring, .home-orbit-track { top: 45%; left: 59%; }
   .home-orbit-ring-one { width: 54%; }
   .home-orbit-ring-two, .home-orbit-track { width: 87%; }
   .home-orbit-ring-three { width: 123%; }
-  .home-orbit-sun { top: calc((var(--orbit-sun-y, 21) - 3) * 1%); left: calc((var(--orbit-sun-x, 62) + 5) * 1%); width: 38px; }
+  .home-orbit-sun {
+    --orbit-mobile-disc: 38px;
+    top: calc((var(--orbit-sun-y, 21) - 3) * 1%);
+    /* The scene extends past the viewport; let the halo bleed, not the disc. */
+    left: min(calc((var(--orbit-sun-x, 62) + 5) * 1%), calc(100% - var(--home-gutter) - 32px - var(--orbit-mobile-disc)));
+    width: var(--orbit-mobile-disc);
+  }
   .home-orbit-cross-one { left: 8%; top: 14%; }
   .home-orbit-cross-two { left: 91%; top: 53%; }
   .home-orbit-coordinate, .home-orbit-period, .home-orbit-signature { display: none; }
