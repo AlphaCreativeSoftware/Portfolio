@@ -39,6 +39,10 @@ for (const theme of ['light', 'dark']) {
     assert.match(html, /Ingeniero de Software,<br[^>]*\/> Emprendedor y diseño de producto/)
     assert.match(html, /Construyo software para que el trabajo complejo deje de ser manual/)
     assert.ok(!html.includes('Mi web personal reúne'))
+    const hero = html.match(/<section class="home-hero\b[\s\S]*?<\/section>/)[0]
+    assert.equal((hero.match(/<a\b/g) ?? []).length, 1)
+    assert.match(hero, /href="#espacios"/)
+    assert.doesNotMatch(hero, /home-hero-caption|Ver portfolio/)
     assert.match(html, /href="\/portfolio"/)
     assert.ok(!html.includes('sector bancario'), 'Current employment belongs in the portfolio')
     assert.ok(!html.includes('/projects/'), 'Homepage must not include individual project artwork')
@@ -108,6 +112,8 @@ test('tools page has a real empty state and no placeholder tool links', async ()
   assert.match(html, /Todavía no hay herramientas publicadas/)
   assert.equal((html.match(/aria-current="page"[^>]*href="\/herramientas"/g) ?? []).length, 2)
   assert.doesNotMatch(html, /href="\/herramientas\/|En esta página/)
+  const emptyActions = html.match(/<div class="tools-empty-actions">([\s\S]*?)<\/div>/)[1]
+  assert.deepEqual([...emptyActions.matchAll(/href="([^"]+)"/g)].map((match) => match[1]), ['/', '/portfolio'])
 })
 
 test('catalog cards use the same paths as the tool registry and do not load tools', async () => {

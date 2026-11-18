@@ -32,7 +32,6 @@ export function HomeOrbit() {
         <time dateTime={localTime.toISOString()}>{formattedTime}</time>
       </div>
       <p className="home-orbit-period"><span />{period}</p>
-      <span className="home-orbit-signature" aria-hidden="true">Mikael Rodríguez · Software & producto</span>
     </div>
   )
 }

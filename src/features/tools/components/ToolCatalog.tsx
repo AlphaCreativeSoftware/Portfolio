@@ -1,4 +1,4 @@
-import { ArrowUpRight, Wrench } from 'lucide-react'
+import { ArrowLeft, ArrowUpRight, Wrench } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { siteAreas } from '../../../shared/config/areas'
 import { toolPath } from '../catalog'
@@ -11,7 +11,10 @@ export function ToolCatalog({ entries }: { entries: readonly ToolEntry[] }) {
       <div>
         <h2>Todavía no hay herramientas publicadas</h2>
         <p>Las herramientas estarán disponibles aquí a medida que las publique. Mientras tanto, puedes explorar los proyectos del portfolio.</p>
-        <Link className="tools-link" to={siteAreas.portfolio.to}>Ver portfolio <ArrowUpRight size={15} aria-hidden="true" /></Link>
+        <div className="tools-empty-actions">
+          <Link className="tools-link tools-link-back" to={siteAreas.home.to}><ArrowLeft size={15} aria-hidden="true" /> Volver al inicio</Link>
+          <Link className="tools-link" to={siteAreas.portfolio.to}>Ver portfolio <ArrowUpRight size={15} aria-hidden="true" /></Link>
+        </div>
       </div>
     </div>
   )

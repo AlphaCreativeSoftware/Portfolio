@@ -10,7 +10,9 @@
 .tools-surface h2 { margin: 0; font: 600 clamp(20px, 3vw, 28px)/1.25 'Manrope', sans-serif; letter-spacing: -.04em; }
 .tools-surface p { max-width: 54ch; margin: 10px 0 0; color: var(--muted); line-height: 1.65; font-size: 14px; }
 .tools-link { display: inline-flex; align-items: center; gap: 8px; min-height: 44px; color: var(--blue); font-size: 13px; font-weight: 500; }
-.tools-empty .tools-link { margin-top: 12px; }
+.tools-empty-actions { display: flex; flex-wrap: wrap; gap: 0 18px; margin-top: 12px; }
+.tools-link-back { color: var(--text-2); }
+.tools-link-back:hover { color: var(--blue); }
 .tools-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 265px), 1fr)); gap: 16px; list-style: none; margin: 0; padding: 0; }
 .tools-card { display: flex; flex-direction: column; height: 100%; transition: border-color .2s; }
 .tools-card .tools-link { margin-top: auto; padding-top: 12px; }
@@ -18,4 +20,6 @@
 
 @media (max-width: 480px) {
   .tools-empty { flex-direction: column; gap: 16px; }
+  .tools-empty-actions { column-gap: 12px; }
+  .tools-empty-actions .tools-link { font-size: 12px; }
 }

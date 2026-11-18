@@ -1,4 +1,4 @@
-.home-hero { padding-top: clamp(144px, 11.5vw, 180px); }
+.home-hero { padding-top: clamp(144px, 11.5vw, 180px); border-bottom: 1px solid var(--line); }
 .home-hero-grid { display: grid; grid-template-columns: 1.08fr .92fr; align-items: center; gap: 30px; }
 .home-hero-copy { position: relative; z-index: 2; min-width: 0; padding-block: 16px 32px; }
 .home-hero-eyebrow { display: flex; align-items: center; gap: 10px; animation: home-enter .8s .05s var(--ease-premium) both; }
@@ -40,13 +40,7 @@
 }
 .home-statement { margin: 34px 0 0; color: var(--text); font: 500 clamp(22px, 2vw, 28px)/1.45 'Manrope', sans-serif; letter-spacing: -.035em; animation: home-enter .85s .35s var(--ease-premium) both; }
 .home-hero-intro { max-width: 43ch; margin: 20px 0 0; color: var(--muted); font-size: 16px; line-height: 1.8; letter-spacing: -.01em; animation: home-enter .85s .43s var(--ease-premium) both; }
-.home-hero-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 24px; margin-top: 32px; animation: home-enter .85s .52s var(--ease-premium) both; }
-.home-hero-actions .button { min-height: 48px; padding: 14px 23px; font-size: 13px; }
-.home-hero-caption { display: flex; justify-content: space-between; align-items: center; gap: 24px; margin-top: 36px; padding-block: 24px; border-top: 1px solid var(--line); color: var(--muted); font-size: 11px; }
-.home-hero-caption p { display: flex; align-items: center; gap: 26px; margin: 0; }
-.home-caption-index { flex: none; color: var(--text-2); font-size: 9px; letter-spacing: .1em; }
-.home-hero-caption > a { display: inline-flex; align-items: center; gap: 13px; min-height: 36px; transition: color .2s; }
-.home-hero-caption > a:hover { color: var(--blue); }
+.home-hero-action.button { min-height: 48px; margin-top: 32px; padding: 14px 23px; font-size: 13px; animation: home-enter .85s .52s var(--ease-premium) both; }
 
 .home-orbit-stage { position: relative; min-width: 0; align-self: stretch; min-height: 570px; isolation: isolate; animation: home-orbit-enter 1.5s .2s var(--ease-premium) both; }
 .home-orbit-art { position: absolute; inset: 0; pointer-events: none; }
@@ -113,7 +107,6 @@
 .home-orbit-coordinate time { margin-left: 15px; color: var(--text-2); font-variant-numeric: tabular-nums; }
 .home-orbit-period { position: absolute; top: 49%; left: 61%; display: flex; gap: 6px; align-items: center; margin: 0; color: var(--muted); font-size: 9px; white-space: nowrap; }
 .home-orbit-period span { width: 4px; height: 4px; border-radius: 50%; background: var(--celestial-edge); }
-.home-orbit-signature { position: absolute; left: 12%; right: 0; bottom: 40px; color: var(--faint); font-size: 9px; letter-spacing: .13em; text-transform: uppercase; }
 @media (hover: hover) and (pointer: fine) {
   .home-quiet-link:hover svg { transform: translate(2px, -2px); }
 }
