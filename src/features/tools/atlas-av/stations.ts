@@ -1,11 +1,85 @@
-export const atlasStations = [
-  { code: '60000', city: 'madrid', label: 'Madrid Atocha', slug: '60000-madrid-pta-de-atocha' },
-  { code: '17000', city: 'madrid', label: 'Madrid Chamartín', slug: '17000-madrid-chamartin' },
-  { code: '71801', city: 'barcelona', label: 'Barcelona Sants', slug: '71801-barcelona-sants' },
-  { code: '03216', city: 'valencia', label: 'València Joaquín Sorolla', slug: '03216-valencia-joaquin-sorolla' },
-  { code: '51003', city: 'sevilla', label: 'Sevilla Santa Justa', slug: '51003-sevilla-sta.-justa' },
-] as const
+type StationExtras = { aliases?: readonly string[]; alsoCodes?: readonly string[]; adif?: string }
+const station = (code: string, label: string, lon: number, lat: number, extras: StationExtras = {}) => ({ code, label, lon, lat, ...extras })
 
-export function adifArrivals(station: (typeof atlasStations)[number]) {
-  return `https://www.adif.es/w/${station.slug}?tipoBusqueda=proximasLlegadas`
+// Codes and coordinates: Renfe Data's AV/LD/MD and full station catalogues.
+export const atlasStations = {
+  atocha: station('60000', 'Madrid Atocha', -3.690, 40.406, { adif: '60000-madrid-pta-de-atocha', alsoCodes: ['18000'], aliases: ['Madrid', 'Atocha', 'Madrid Pta. Atocha', 'Madrid Puerta de Atocha', 'Madrid Atocha Cerc.', 'Madrid Pta. Atocha Almudena Grandes', 'Madrid Puerta de Atocha Almudena Grandes'] }),
+  chamartin: station('17000', 'Madrid Chamartín', -3.683, 40.472, { adif: '17000-madrid-chamartin', aliases: ['Chamartín', 'Madrid Chamartín Clara Campoamor'] }),
+  ciudadReal: station('37200', 'Ciudad Real', -3.913, 38.985),
+  puertollano: station('37300', 'Puertollano', -4.112, 38.691, { alsoCodes: ['37700'], aliases: ['Puertollano AV'] }),
+  villanueva: station('37704', 'Villanueva de Córdoba', -4.571, 38.255, { aliases: ['Villanueva de Córdoba-Los Pedroches'] }),
+  cordoba: station('50500', 'Córdoba', -4.790, 37.888, { aliases: ['Córdoba Central'] }),
+  sevilla: station('51003', 'Sevilla Santa Justa', -5.975, 37.392, { adif: '51003-sevilla-sta.-justa', aliases: ['Sevilla', 'Sevilla S.J.', 'Sevilla Sta. Justa'] }),
+  puenteGenil: station('02002', 'Puente Genil-Herrera', -4.822, 37.360),
+  santaAna: station('02003', 'Antequera Santa Ana', -4.719, 37.070),
+  antequera: station('02030', 'Antequera AV', -4.561, 37.028, { aliases: ['Antequera Alta Velocidad'] }),
+  malaga: station('54413', 'Málaga María Zambrano', -4.433, 36.712, { aliases: ['Málaga', 'Málaga M. Zambrano'] }),
+  loja: station('05012', 'Loja', -4.157, 37.168, { alsoCodes: ['05013'], aliases: ['Loja San Francisco'] }),
+  granada: station('05000', 'Granada', -3.609, 37.184, { adif: '05000-granada' }),
+  cuenca: station('03208', 'Cuenca Fernando Zóbel', -2.144, 40.035, { aliases: ['Cuenca F. Zóbel'] }),
+  requena: station('03213', 'Requena Utiel', -1.135, 39.522),
+  valencia: station('03216', 'València Joaquín Sorolla', -.381, 39.460, { adif: '03216-valencia-joaquin-sorolla', aliases: ['Valencia', 'Valencia J. Sorolla'] }),
+  valenciaNord: station('65000', 'València Nord', -.378, 39.466, { aliases: ['València Estació del Nord', 'Valencia Estación del Norte'] }),
+  castellon: station('65300', 'Castelló de la Plana', -.052, 39.988, { aliases: ['Castelló', 'Castellón', 'Castellón de la Plana', 'Castelló/Castellón'] }),
+  albacete: station('60600', 'Albacete Los Llanos', -1.849, 39.000, { aliases: ['Albacete'] }),
+  villena: station('03309', 'Villena AV', -.873, 38.585, { aliases: ['Villena Alta Velocidad'] }),
+  alicante: station('60911', 'Alicante Terminal', -.496, 38.345, { aliases: ['Alicante', 'Alicante-Alacant', 'Alacant Terminal', 'Alicante/Alacant Terminal'] }),
+  elche: station('03410', 'Elx AV', -.778, 38.243, { aliases: ['Elche AV', 'Elche Alta Velocidad', 'Elche/Elx AV'] }),
+  orihuela: station('62002', 'Orihuela Miguel Hernández', -.946, 38.080, { aliases: ['Orihuela'] }),
+  murcia: station('61200', 'Murcia del Carmen', -1.131, 37.976, { aliases: ['Murcia'] }),
+  segovia: station('08004', 'Segovia Guiomar', -4.095, 40.910, { aliases: ['Segovia AV'] }),
+  valladolid: station('10600', 'Valladolid Campo Grande', -4.727, 41.642, { adif: '10600-valladolid-campo-grande', aliases: ['Valladolid', 'Valladolid C. G.'] }),
+  burgos: station('11014', 'Burgos Rosa Manzano', -3.666, 42.371, { adif: '11014-burgos-r.-manzano', aliases: ['Burgos', 'Burgos Rosa de Lima', 'Burgos R. Manzano'] }),
+  palencia: station('14100', 'Palencia', -4.534, 42.016),
+  leon: station('15100', 'León', -5.583, 42.596),
+  pola: station('15122', 'Pola de Lena', -5.831, 43.159, { aliases: ['La Pola', 'Pola de Lena/La Pola'] }),
+  mieres: station('15203', 'Mieres Puente', -5.782, 43.250, { aliases: ['Mieres del Camín'] }),
+  oviedo: station('15211', 'Oviedo', -5.854, 43.366, { adif: '15211-oviedo', aliases: ['Uviéu', 'Oviedo/Uviéu'] }),
+  gijon: station('15410', 'Gijón Sanz Crespo', -5.678, 43.538, { aliases: ['Gijón', 'Gijón/Xixón'] }),
+  medina: station('08240', 'Medina del Campo AV', -4.923, 41.291, { aliases: ['Medina del Campo A.V.', 'Medina del Campo Alta Velocidad'] }),
+  zamora: station('30200', 'Zamora', -5.740, 41.516),
+  sanabria: station('08247', 'Sanabria AV', -6.566, 42.045, { aliases: ['Sanabria Alta Velocidad'] }),
+  gudina: station('08251', 'A Gudiña Porta de Galicia', -7.136, 42.064),
+  ourense: station('22100', 'Ourense', -7.873, 42.350, { adif: '22100-ourense', aliases: ['Orense', 'Ourense Empalme'] }),
+  santiago: station('31400', 'Santiago de Compostela', -8.545, 42.871, { adif: '31400-santiago-compost.', aliases: ['Santiago', 'Santiago de Compostela Daniel Castelao'] }),
+  coruna: station('31412', 'A Coruña', -8.410, 43.352, { adif: '31412-a-coruna', aliases: ['La Coruña', 'A Coruña San Cristóbal'] }),
+  vilagarcia: station('23008', 'Vilagarcía de Arousa', -8.762, 42.602, { aliases: ['Villagarcía de Arosa'] }),
+  pontevedra: station('23004', 'Pontevedra', -8.636, 42.422),
+  vigo: station('08223', 'Vigo Urzáiz', -8.713, 42.234, { adif: '08223-vigo-urzaiz', aliases: ['Vigo'] }),
+  yebes: station('04007', 'Guadalajara Yebes', -3.125, 40.588),
+  calatayud: station('70600', 'Calatayud', -1.639, 41.347),
+  zaragoza: station('04040', 'Zaragoza Delicias', -.912, 41.659, { adif: '04040-zaragoza-delicias', aliases: ['Zaragoza'] }),
+  tardienta: station('78200', 'Tardienta', -.538, 41.976),
+  huesca: station('74200', 'Huesca', -.410, 42.133),
+  lleida: station('78400', 'Lleida Pirineus', .633, 41.621, { aliases: ['Lleida', 'Lérida'] }),
+  camp: station('04104', 'Camp de Tarragona', 1.274, 41.192),
+  barcelona: station('71801', 'Barcelona Sants', 2.140, 41.379, { adif: '71801-barcelona-sants', aliases: ['Barcelona'] }),
+  girona: station('79300', 'Girona', 2.817, 41.979, { aliases: ['Gerona'] }),
+  figueres: station('04307', 'Figueres Vilafant', 2.945, 42.258),
+  tarragona: station('71500', 'Tarragona', 1.253, 41.112),
+  aldea: station('65402', 'L’Aldea Amposta Tortosa', .614, 40.754, { aliases: ["L'Aldea Amposta", 'L’Aldea'] }),
+  vinaros: station('65312', 'Vinaròs', .456, 40.472),
+  benicarlo: station('65311', 'Benicarló Peñíscola', .415, 40.428),
+  oropesaMar: station('65304', 'Orpesa', .140, 40.092, { aliases: ['Oropesa del Mar', 'Orpesa/Oropesa del Mar'] }),
+  benicassim: station('65318', 'Benicàssim', .058, 40.058),
+  sagunt: station('65200', 'Sagunt', -.272, 39.676, { aliases: ['Sagunto'] }),
+  toledo: station('92102', 'Toledo', -4.011, 39.862, { adif: '92102-toledo' }),
+  torrijos: station('35105', 'Torrijos', -4.283, 39.979),
+  talavera: station('35200', 'Talavera de la Reina', -4.827, 39.971),
+  oropesaToledo: station('35203', 'Oropesa de Toledo', -5.186, 39.922),
+  navalmoral: station('35206', 'Navalmoral de la Mata', -5.546, 39.895),
+  plasencia: station('30002', 'Plasencia', -6.099, 40.022, { adif: '30002-plasencia' }),
+  caceres: station('35400', 'Cáceres', -6.386, 39.461),
+  merida: station('37500', 'Mérida', -6.343, 38.921),
+  badajoz: station('37606', 'Badajoz', -6.982, 38.891, { adif: '37606-badajoz' }),
+}
+
+export type StationId = keyof typeof atlasStations
+export type AtlasStation = (typeof atlasStations)[StationId]
+
+// Only hubs with relevant private-operator schedules need a server-side board request.
+export const boardStations = ['atocha', 'chamartin', 'barcelona', 'valencia', 'sevilla', 'malaga', 'alicante', 'murcia'] as const satisfies readonly StationId[]
+
+export function adifArrivals({ adif }: AtlasStation) {
+  return adif ? `https://www.adif.es/w/${adif}?tipoBusqueda=proximasLlegadas` : null
 }

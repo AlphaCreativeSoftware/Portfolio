@@ -4,6 +4,8 @@ import { normalizeSnapshot } from '../src/features/tools/atlas-av/sources.ts'
 import { supplementWithStationBoards } from '../src/features/tools/atlas-av/stationBoards.ts'
 import { readGpsSpeeds } from '../src/features/tools/atlas-av/gpsSpeed.ts'
 import { matchesSearch, summarize, staleAfter } from '../src/features/tools/atlas-av/model.ts'
+import { corridorIds } from '../src/features/tools/atlas-av/network.ts'
+import { atlasStations, boardStations } from '../src/features/tools/atlas-av/stations.ts'
 
 const now = Date.parse('2026-11-18T18:39:30Z')
 const madrid = { code: 60000, name: 'Madrid Atocha' }
@@ -21,14 +23,55 @@ test('filters both directions by terminals and does not infer corridors from GPS
     { ...base, id: '02', origin: valencia, dest: madrid },
     { ...base, id: '03', dest: sevilla },
     { ...base, id: '04', origin: barcelona, dest: sevilla, next: madrid },
-    { ...base, id: '05', dest: { name: 'Málaga María Zambrano' }, next: sevilla },
+    { ...base, id: '05', dest: { name: 'Almería' }, next: sevilla },
     { ...base, id: '06', product: 'Cercanías', group: 'cercanias' },
   ), gps(vehicle()), now)
-  assert.deepEqual(data.trains.map((train) => train.corridor), ['barcelona', 'valencia', 'sevilla'])
+  assert.deepEqual(data.trains.map((train) => train.corridor), ['aragon-cataluna', 'levante', 'andalucia'])
   assert.equal(data.trains[0].position.kind, 'gps')
   assert.equal(data.trains[0].position.lon, 2.01)
   assert.equal(data.trains[1].position, null)
   assert.equal(matchesSearch(data.trains[1], 'valencia'), true)
+})
+
+test('classifies the seven corridors in both directions, including partial journeys and services that skip Madrid', () => {
+  const routes = [
+    ['atocha', 'malaga', 'andalucia'], ['sevilla', 'granada', 'andalucia'], ['cordoba', 'malaga', 'andalucia'],
+    ['chamartin', 'alicante', 'levante'], ['cuenca', 'murcia', 'levante'], ['alicante', 'murcia', 'levante'], ['atocha', 'castellon', 'levante'],
+    ['chamartin', 'burgos', 'norte'], ['valladolid', 'gijon', 'norte'], ['chamartin', 'segovia', 'norte'],
+    ['chamartin', 'zamora', 'galicia'], ['segovia', 'ourense', 'galicia'], ['coruna', 'vigo', 'galicia'],
+    ['atocha', 'zaragoza', 'aragon-cataluna'], ['zaragoza', 'huesca', 'aragon-cataluna'], ['lleida', 'barcelona', 'aragon-cataluna'], ['barcelona', 'figueres', 'aragon-cataluna'],
+    ['barcelona', 'valencia', 'mediterraneo'], ['camp', 'alicante', 'mediterraneo'], ['valencia', 'castellon', 'mediterraneo'],
+    ['atocha', 'toledo', 'toledo-extremadura'], ['atocha', 'badajoz', 'toledo-extremadura'], ['caceres', 'badajoz', 'toledo-extremadura'],
+  ]
+  assert.equal(new Set(routes.map(([, , group]) => group)).size, corridorIds.length)
+  const stop = (id) => ({ code: Number(atlasStations[id].code), name: atlasStations[id].label })
+  const input = routes.flatMap(([a, b], index) => [
+    { ...base, id: String(100 + index), origin: stop(a), dest: stop(b) },
+    { ...base, id: String(100 + index), origin: stop(b), dest: stop(a) },
+  ])
+  const { trains } = normalizeSnapshot(feed(...input), null, now)
+  assert.deepEqual(trains.map(({ corridor }) => corridor), routes.flatMap(([, , group]) => [group, group]))
+  assert.equal(new Set(trains.map(({ key }) => key)).size, input.length)
+})
+
+test('does not mistake a conventional station for an AV terminal, assume a connection, or include suburban services', () => {
+  const data = normalizeSnapshot(feed(
+    { ...base, id: '1', origin: barcelona, dest: { code: 79309, name: 'Figueres Vilafant' } },
+    { ...base, id: '2', dest: { code: 70200, name: 'Guadalajara Yebes' } },
+    { ...base, id: '3', dest: { code: 66100, name: 'Cuenca Fernando Zóbel' } },
+    { ...base, id: '4', origin: sevilla, dest: { code: 61200, name: 'Murcia' } },
+    { ...base, id: '5', group: 'rodalies', product: 'Rodalies', dest: { code: 79300, name: 'Girona' } },
+    { ...base, id: '6', origin: { name: 'Madrid Pta. Atocha – Almudena Grandes' }, dest: { name: 'Málaga-María Zambrano' } },
+  ), null, now)
+  assert.deepEqual(data.trains.map(({ number, corridor }) => [number, corridor]), [['6', 'andalucia']])
+})
+
+test('the station catalogue has unambiguous codes and a bounded board poll list', () => {
+  const codes = Object.values(atlasStations).flatMap(({ code, alsoCodes = [] }) => [code, ...alsoCodes])
+  assert.ok(codes.every((code) => /^\d{5}$/.test(code)))
+  assert.equal(codes.length, new Set(codes).size)
+  assert.equal(boardStations.length, 8)
+  assert.equal(new Set(boardStations).size, boardStations.length)
 })
 
 test('preserves officially sourced delays without treating timetables or predictions as measurements', () => {
@@ -127,6 +170,15 @@ test('keeps static private-operator timetables but does not ingest RadarDeTrenes
   assert.equal(snapshot.trains.length, 0)
   const { trains } = supplementWithStationBoards(snapshot, [board(madrid, { sources, arrivals: [operational, scheduled] })], now)
   assert.deepEqual(trains.map(({ operator, status, delay, position }) => [operator, status, delay, position]), [['ouigo', 'scheduled', null, null]])
+})
+
+test('a new Alicante board adds OUIGO to Levante, without inferring a position or doubling its entry', () => {
+  const alicante = { code: 60911, name: 'Alicante' }
+  const service = { ...ouigo, id: 'TGV 6501', origin: madrid, dest: alicante }
+  const arrival = { ...service, id: '06501', kind: 'arrival', scheduledTime: '22:14', estimated: true, position: { lat: 38.5, lon: -.79 } }
+  const snapshot = normalizeSnapshot(feed(service), null, now)
+  const { trains } = supplementWithStationBoards(snapshot, [board(alicante, { arrivals: [arrival], sources: ['gtfs', 'radardetrenes'] })], now)
+  assert.deepEqual(trains.map(({ corridor, status, position, stationTimes }) => [corridor, status, position, stationTimes?.arrival]), [['levante', 'scheduled', null, '22:14']])
 })
 
 function telemetryVehicle(lon, timestamp, { tripId = '031112026-11-18', speed } = {}) {

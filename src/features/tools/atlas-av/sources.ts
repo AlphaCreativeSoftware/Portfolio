@@ -1,6 +1,6 @@
 import { simple } from './model.ts'
 import type { AtlasSnapshot, AtlasTrain, Operator, ServiceFamily, TrainPosition } from './model.ts'
-import { asNumber, asRecord, asText, company, hasIndependentAdif, isCancelled, isFreshAt, point, readJson, serviceNumber, serviceRoute, trainNumber } from './sourceFields.ts'
+import { asNumber, asRecord, asText, company, hasIndependentAdif, isCancelled, isFreshAt, point, readJson, serviceKey, serviceRoute, trainNumber } from './sourceFields.ts'
 import { loadStationBoards, supplementWithStationBoards } from './stationBoards.ts'
 
 const sourceLookup = 'https://trenalia.org/api/v1/trains?group=ave,avlo,avant,alvia,euromed,intercity,regional,md,ouigo,iryo&limit=1000'
@@ -71,7 +71,7 @@ export function normalizeSnapshot(trenalia: unknown, renfe: unknown, now = Date.
     if (!family) continue
     const route = serviceRoute(row)
     if (!route) continue
-    const { corridor, direction, origin, destination } = route
+    const { corridor, origin, destination } = route
 
     const cancelled = isCancelled(row)
     const scheduled = row.scheduled === true
@@ -84,7 +84,7 @@ export function normalizeSnapshot(trenalia: unknown, renfe: unknown, now = Date.
     const observed = operator === 'renfe' && row.live === true && row.estimated === false && isFreshAt(generatedAt, now)
       ? gps.positions.get(trainNumber(number)) : null
     const position = cancelled || scheduled ? null : observed ?? (estimate ? { ...estimate, kind: 'estimated', source: 'Trenalia', timestamp: generatedAt, timestampKind: 'feed' } as const : null)
-    const key = `${operator}:${serviceNumber(operator, number)}:${corridor}:${direction}`
+    const key = serviceKey(operator, number, route)
     if (trains.has(key)) continue
     trains.set(key, {
       key, number, operator, service: operator === 'renfe' ? service : operator === 'ouigo' ? 'OUIGO' : 'iryo', family,

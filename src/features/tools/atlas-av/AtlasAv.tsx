@@ -3,7 +3,7 @@ import { Radio, RefreshCw, Search, X } from 'lucide-react'
 import { AtlasMap } from './AtlasMap'
 import { corridors, matchesSearch, operators, speedStaleAfter, staleAfter, summarize } from './model'
 import type { AtlasTrain, Corridor, Operator, ServiceFamily } from './model'
-import { adifArrivals, atlasStations } from './stations'
+import { adifArrivals, atlasStations, boardStations } from './stations'
 import { useAtlasSnapshot } from './useAtlasSnapshot'
 import './atlas.css'
 
@@ -29,10 +29,13 @@ function expectedArrival(train: AtlasTrain, now: number, stale: boolean) {
 }
 
 function StationLinks({ corridor }: { corridor: Corridor | 'all' }) {
+  const ids = corridor === 'all' ? boardStations : corridors[corridor].panels
   return <ul className="atlas-station-links" aria-label="Paneles de llegadas de Adif">
-    {atlasStations.filter(({ city }) => corridor === 'all' || city === 'madrid' || city === corridor).map((station) => <li key={station.code}>
-      <a href={adifArrivals(station)} target="_blank" rel="noreferrer">{station.label}</a>
-    </li>)}
+    {ids.map((id) => {
+      const station = atlasStations[id]
+      const url = adifArrivals(station)
+      return url && <li key={id}><a href={url} target="_blank" rel="noreferrer">{station.label}</a></li>
+    })}
   </ul>
 }
 
@@ -78,7 +81,8 @@ export default function AtlasAv() {
   const [selectedKey, setSelectedKey] = useState<string | null>(null)
   const stale = !!snapshot && now - snapshot.generatedAt > staleAfter
   const trains = snapshot?.trains ?? noTrains
-  const missingOperator = !!snapshot && (operator === 'ouigo' || operator === 'iryo') && !trains.some((train) => train.operator === operator)
+  const missingOperator = !!snapshot && (operator === 'ouigo' || operator === 'iryo')
+    && !trains.some((train) => train.operator === operator && (corridor === 'all' || train.corridor === corridor))
   const results = useMemo(() => trains.filter((train) =>
     (corridor === 'all' || train.corridor === corridor)
     && (operator === 'all' || train.operator === operator)
@@ -128,7 +132,7 @@ export default function AtlasAv() {
               )
             })}
           </ul> : <div className="atlas-list-empty">
-            <p>{!snapshot ? (failed ? 'No se han podido obtener datos. Prueba a actualizar.' : 'Esperando la primera lectura…') : missingOperator ? `Las fuentes no devolvieron datos de ${operators[operator]} en la última lectura. Puede haber trenes en circulación.` : 'No hay servicios que coincidan con los filtros en la última lectura.'}</p>
+            <p>{!snapshot ? (failed ? 'No se han podido obtener datos. Prueba a actualizar.' : 'Esperando la primera lectura…') : missingOperator ? `Las fuentes no devolvieron datos de ${operators[operator]}${corridor === 'all' ? '' : ' en este corredor'} en la última lectura. Puede haber trenes en circulación.` : 'No hay servicios que coincidan con los filtros en la última lectura.'}</p>
             {missingOperator && <><p>Consultar llegadas en Adif:</p><StationLinks corridor={corridor} /></>}
           </div>}
         </div>
@@ -137,9 +141,10 @@ export default function AtlasAv() {
         <div className="atlas-operators" aria-label="Colores de operadores">{Object.entries(operators).map(([key, name]) => <span key={key}><i className="atlas-operator-dot" data-operator={key} />{name}</span>)}</div>
         {snapshot && <small className="atlas-credit">Datos de <a href="https://trenalia.org/api" target="_blank" rel="noreferrer">Trenalia</a>, a partir de Renfe y Adif</small>}
         <details><summary>Fuentes y cobertura</summary>
-          <p>Atlas AV se actualiza cada 30 segundos con la página visible. Un horario programado no confirma que el tren esté en marcha. Solo se muestra una llegada prevista cuando el origen del dato de Adif está verificado. Una posición estimada no es GPS; los servicios programados no tienen marcador.</p>
+          <p>Atlas AV cubre siete corredores peninsulares. El filtro de corredor agrupa trayectos; el de servicio distingue alta velocidad, larga distancia y regional. No se incluyen Cercanías ni Rodalies.</p>
+          <p>La vista se actualiza cada 30 segundos con la página visible. Un horario programado no confirma que el tren esté en marcha. Solo se muestra una llegada prevista cuando el origen del dato de Adif está verificado. Una posición estimada no es GPS; los servicios programados no tienen marcador.</p>
           <p>La velocidad estimada se calcula a partir de tres lecturas GPS recientes del mismo viaje, solo cuando Renfe publica la hora de cada lectura. Las vías del mapa son cartografía y no se usan para desplazar el marcador GPS.</p>
-          <p>Fuentes: <a href="https://trenalia.org/api" target="_blank" rel="noreferrer">Trenalia</a> (trayectos, paneles de estación y respaldo GPS procesado), <a href="https://data.renfe.com/es/dataset/posicion-vehiculos-av-ld-md" target="_blank" rel="noreferrer">Renfe Operadora</a> (GPS directo, CC BY 4.0), <a href="https://www.ign.es/web/ign/portal/estilos-de-los-servicios-de-teselas-vectoriales" target="_blank" rel="noreferrer">IGN/CNIG</a> (cartografía), <a href="https://mapterhorn.com/attribution/" target="_blank" rel="noreferrer">Mapterhorn</a> (relieve) y <a href="https://www.naturalearthdata.com/" target="_blank" rel="noreferrer">Natural Earth</a> (vista 2D alternativa).</p>
+          <p>Fuentes: <a href="https://trenalia.org/api" target="_blank" rel="noreferrer">Trenalia</a> (trayectos, paneles de estación y respaldo GPS procesado), <a href="https://data.renfe.com/es/dataset/posicion-vehiculos-av-ld-md" target="_blank" rel="noreferrer">Renfe Data</a> (GPS directo y <a href="https://data.renfe.com/es/dataset/listado-estaciones-de-alta-velocidad-larga-distancia-y-media-distancia" target="_blank" rel="noreferrer">catálogo de estaciones</a>, CC BY 4.0), <a href="https://www.ign.es/web/ign/portal/estilos-de-los-servicios-de-teselas-vectoriales" target="_blank" rel="noreferrer">IGN/CNIG</a> (cartografía), <a href="https://mapterhorn.com/attribution/" target="_blank" rel="noreferrer">Mapterhorn</a> (relieve) y <a href="https://www.naturalearthdata.com/" target="_blank" rel="noreferrer">Natural Earth</a> (vista 2D alternativa).</p>
           {snapshot && <p>{snapshot.attribution}</p>}
           <p>Información orientativa. Para viajar, confirma los datos con tu operador o en los paneles oficiales de Adif:</p>
           <StationLinks corridor={corridor} />

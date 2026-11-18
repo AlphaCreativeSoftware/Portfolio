@@ -1,6 +1,8 @@
 import { simple, staleAfter } from './model.ts'
-import type { Coordinates, Corridor, Operator } from './model.ts'
+import type { Coordinates, Operator } from './model.ts'
+import { corridorFor, routeNode } from './network.ts'
 import { atlasStations } from './stations.ts'
+import type { StationId } from './stations.ts'
 
 export const asRecord = (value: unknown): Record<string, unknown> => value && typeof value === 'object' ? value as Record<string, unknown> : {}
 export const asText = (value: unknown) => typeof value === 'string' && value.trim() ? value.trim() : null
@@ -19,20 +21,20 @@ export function stationCode(value: unknown) {
   return String(value).padStart(5, '0')
 }
 
-// Match terminals, not arbitrary trains that happen to pass through their cities.
-const madridNames = /^(madrid )?(puerta de )?atocha\b|^(madrid )?chamartin\b/
-const cities = new Map<string, 'madrid' | Corridor>(atlasStations.map(({ code, city }) => [code, city]))
-cities.set('18000', 'madrid')
+const stationName = (value: string) => simple(value).replace(/[^a-z0-9]+/g, ' ').trim()
+const byCode = new Map<string, StationId>()
+const byName = new Map<string, StationId>()
+for (const id of Object.keys(atlasStations) as StationId[]) {
+  const { code, label, aliases = [], alsoCodes = [] } = atlasStations[id]
+  for (const value of [code, ...alsoCodes]) byCode.set(value, id)
+  for (const value of [label, ...aliases]) byName.set(stationName(value), id)
+}
 
-export function terminal(stop: Record<string, unknown>): 'madrid' | Corridor | null {
-  const city = cities.get(stationCode(stop.code) ?? '')
-  if (city) return city
-  const name = simple(asText(stop.name) ?? '')
-  if (madridNames.test(name) || name === 'madrid') return 'madrid'
-  if (/^barcelona(\s+-)?\s+sants$|^barcelona$/.test(name)) return 'barcelona'
-  if (/^valencia$|^valencia[\s.-]+(j\.?|joaquin)\s+sorolla$/.test(name)) return 'valencia'
-  if (/^sevilla(\s+-)?\s+santa justa$|^sevilla$/.test(name)) return 'sevilla'
-  return null
+function terminal(stop: Record<string, unknown>) {
+  const code = stationCode(stop.code)
+  // An explicit code is authoritative. For example, the conventional Figueres
+  // station is not Figueres-Vilafant, even when both are abbreviated as Figueres.
+  return code ? byCode.get(code) : byName.get(stationName(asText(stop.name) ?? ''))
 }
 
 export function company(row: Record<string, unknown>): Operator | null {
@@ -46,17 +48,21 @@ export function company(row: Record<string, unknown>): Operator | null {
 export function serviceRoute(row: Record<string, unknown>) {
   const from = asRecord(row.origin)
   const to = asRecord(row.dest)
-  const a = terminal(from)
-  const b = terminal(to)
-  const corridor = a === 'madrid' ? b : b === 'madrid' ? a : null
-  const origin = asText(from.name)
-  const destination = asText(to.name)
-  if (!corridor || corridor === 'madrid' || !origin || !destination) return null
-  return { corridor, origin, destination, direction: a === 'madrid' ? 'madrid' : corridor, from, to }
+  const start = terminal(from)
+  const end = terminal(to)
+  if (!start || !end) return null
+  const a = routeNode(start)
+  const b = routeNode(end)
+  const corridor = corridorFor(a, b)
+  if (!corridor) return null
+  return { corridor, origin: atlasStations[start].label, destination: atlasStations[end].label, a, b, from, to }
 }
 
 export const trainNumber = (id: string) => /^\d+$/.test(id) ? id.replace(/^0+(?=\d)/, '') : id.toLowerCase()
-export const serviceNumber = (operator: Operator, id: string) => trainNumber(operator === 'ouigo' ? id.replace(/^TGV\s+(?=\d)/i, '') : id)
+export function serviceKey(operator: Operator, id: string, { a, b }: NonNullable<ReturnType<typeof serviceRoute>>) {
+  const number = trainNumber(operator === 'ouigo' ? id.replace(/^TGV\s+(?=\d)/i, '') : id)
+  return `${operator}:${number}:${a}:${b}`
+}
 
 export function isCancelled(row: Record<string, unknown>) {
   return row.cancelled === true || [row.status, asRecord(row.advisory).kind].some((value) => value === 'canceled' || value === 'cancelled')

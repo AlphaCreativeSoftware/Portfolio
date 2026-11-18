@@ -1,10 +1,10 @@
 import { useEffect, useRef, useState } from 'react'
 import { Compass, House, Minus, Plus } from 'lucide-react'
 import { Map as LibreMap, Marker } from 'maplibre-gl'
-import type { LngLatBoundsLike, MapSourceDataEvent } from 'maplibre-gl'
+import type { GeoJSONSource, LngLatBoundsLike, MapSourceDataEvent } from 'maplibre-gl'
 import { corridors, operators } from './model'
 import type { AtlasMapProps } from './AtlasMap'
-import { atlasLayers, atlasMapStyle, atlasRelief } from './mapStyle'
+import { atlasLayers, atlasMapStyle, atlasRelief, mapCityFeatures } from './mapStyle'
 import 'maplibre-gl/dist/maplibre-gl.css'
 
 const peninsula: LngLatBoundsLike = [[-9.58, 35.97], [3.36, 43.85]]
@@ -30,7 +30,7 @@ function createMarker(key: string, onSelect: (key: string) => void): TrainMarker
   return { button, label, marker: new Marker({ element: button, subpixelPositioning: true }) }
 }
 
-export default function AtlasMap3D({ trains, selected, onSelect, onUnavailable }: AtlasMapProps & { onUnavailable: () => void }) {
+export default function AtlasMap3D({ trains, corridor, selected, onSelect, onUnavailable }: AtlasMapProps & { onUnavailable: () => void }) {
   const host = useRef<HTMLDivElement>(null)
   const mapRef = useRef<LibreMap | null>(null)
   const markers = useRef(new Map<string, TrainMarker>())
@@ -124,6 +124,10 @@ export default function AtlasMap3D({ trains, selected, onSelect, onUnavailable }
   useEffect(() => { latestTrains.current = trains; selectRef.current = onSelect }, [trains, onSelect])
 
   useEffect(() => {
+    if (ready) mapRef.current?.getSource<GeoJSONSource>('station-cities')?.setData(mapCityFeatures(corridor))
+  }, [ready, corridor])
+
+  useEffect(() => {
     const map = mapRef.current
     if (!map || !ready) return
     const active = new Set<string>()
@@ -141,7 +145,7 @@ export default function AtlasMap3D({ trains, selected, onSelect, onUnavailable }
       }
       item.button.dataset.operator = operator
       item.button.dataset.kind = position.kind
-      item.button.setAttribute('aria-label', `${operators[operator]} ${number}, ${corridors[corridor].label}, ${position.kind === 'gps' ? 'GPS' : 'posición estimada'}`)
+      item.button.setAttribute('aria-label', `${operators[operator]} ${number}, ${corridors[corridor]?.label ?? 'trayecto'}, ${position.kind === 'gps' ? 'GPS' : 'posición estimada'}`)
       item.button.setAttribute('aria-pressed', String(key === selected))
       item.label.textContent = `${operators[operator]} ${number}`
     }
@@ -186,7 +190,7 @@ export default function AtlasMap3D({ trains, selected, onSelect, onUnavailable }
   return <div className="atlas-map atlas-map-live">
     <div className="atlas-map-scene" role="region" aria-label="Visor interactivo de Atlas AV" aria-busy={!ready}>
       <div ref={host} className="atlas-map-canvas" />
-      <span className="atlas-map-chip"><Compass size={14} aria-hidden="true" /> España peninsular</span>
+      <span className="atlas-map-chip"><Compass size={14} aria-hidden="true" /> {corridor === 'all' ? 'España peninsular' : corridors[corridor].label}</span>
       {!ready && <div className="atlas-map-loading" role="status">Cargando cartografía…</div>}
       <div className="atlas-map-controls" role="group" aria-label="Controles del mapa">
         <button type="button" aria-label="Acercar mapa" title="Acercar" disabled={!ready} onClick={() => zoom(1)}><Plus size={16} /></button>

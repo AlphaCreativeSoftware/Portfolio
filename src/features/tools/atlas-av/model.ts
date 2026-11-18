@@ -1,12 +1,9 @@
+import type { Corridor } from './network.ts'
+export { corridors } from './network.ts'
+export type { Corridor } from './network.ts'
+
 export const operators = { renfe: 'Renfe', ouigo: 'OUIGO', iryo: 'iryo' } as const
 export type Operator = keyof typeof operators
-
-export const corridors = {
-  barcelona: { label: 'Madrid–Barcelona', city: 'Barcelona' },
-  valencia: { label: 'Madrid–Valencia', city: 'Valencia' },
-  sevilla: { label: 'Madrid–Sevilla', city: 'Sevilla' },
-} as const
-export type Corridor = keyof typeof corridors
 export type ServiceFamily = 'alta-velocidad' | 'larga-distancia' | 'regional'
 export type Coordinates = { lat: number; lon: number }
 

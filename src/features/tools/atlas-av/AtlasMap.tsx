@@ -1,7 +1,7 @@
 import { Compass } from 'lucide-react'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import type { ComponentType } from 'react'
-import { land, mapCities, mapSize, project, routeGuides } from './geography'
+import { citiesForMap, land, mapSize, project, routeGuides } from './geography'
 import { corridors, operators, staleAfter } from './model'
 import type { AtlasTrain, Corridor } from './model'
 
@@ -44,17 +44,17 @@ export function AtlasMap(props: AtlasMapProps) {
 function AtlasFlatMap({ trains, corridor, selected, onSelect, now }: AtlasMapProps) {
   return (
     <div className="atlas-map">
-      <div className="atlas-map-label"><Compass size={15} aria-hidden="true" /> <span>España peninsular · Vista 2D</span></div>
+      <div className="atlas-map-label"><Compass size={15} aria-hidden="true" /> <span>{corridor === 'all' ? 'España peninsular' : corridors[corridor].label} · Vista 2D</span></div>
       <div className="atlas-map-stage">
         <svg className="atlas-basemap" viewBox={`0 0 ${mapSize.width} ${mapSize.height}`} aria-hidden="true">
           <polygon className="atlas-land atlas-land-neighbour" points={land.portugal} />
           <polygon className="atlas-land" points={land.spain} />
           <text className="atlas-land-label" x="166" y="173">PORTUGAL</text>
           <text className="atlas-land-label" x="256" y="338">ESPAÑA</text>
-          {Object.entries(routeGuides).map(([id, points]) => (
-            <polyline key={id} className="atlas-track" data-muted={corridor !== 'all' && corridor !== id} points={points} />
+          {routeGuides.map(({ id, d }) => (
+            <path key={id} className="atlas-track" data-muted={corridor !== 'all' && corridor !== id} d={d} />
           ))}
-          {mapCities.map(({ name, dx, dy, anchor, ...coordinates }) => {
+          {citiesForMap(corridor).map(({ name, dx, dy, anchor, ...coordinates }) => {
             const { x, y } = project(coordinates)
             return <g key={name}><circle className="atlas-station" cx={x} cy={y} r={4} /><text className="atlas-city" x={x + dx} y={y + dy} textAnchor={anchor}>{name}</text></g>
           })}
@@ -65,7 +65,7 @@ function AtlasFlatMap({ trains, corridor, selected, onSelect, now }: AtlasMapPro
           return (
             <button key={key} type="button" className="atlas-marker" data-operator={operator} data-kind={position.kind}
               style={{ left: `${100 * x / mapSize.width}%`, top: `${100 * y / mapSize.height}%` }}
-              aria-label={`${operators[operator]} ${number}, ${corridors[corridor].label}, ${position.kind === 'gps' ? 'GPS' : 'posición estimada'}`}
+              aria-label={`${operators[operator]} ${number}, ${corridors[corridor]?.label ?? 'trayecto'}, ${position.kind === 'gps' ? 'GPS' : 'posición estimada'}`}
               aria-pressed={key === selected} onClick={() => onSelect(key)}><span aria-hidden="true" /></button>
           )
         })}

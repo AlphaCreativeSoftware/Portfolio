@@ -1,4 +1,8 @@
-import type { Coordinates, Corridor } from './model'
+import type { Coordinates } from './model'
+import { corridorIds, corridors, routeNode } from './network'
+import type { Corridor, RouteNode } from './network'
+import { atlasStations } from './stations'
+import type { StationId } from './stations'
 
 export const mapSize = { width: 720, height: 562 }
 const west = -10
@@ -23,16 +27,47 @@ function points(line: string) {
 
 export const land = { spain: points(mainland.spain), portugal: points(mainland.portugal) }
 
-// Geographic station guides, NOT surveyed track geometry or GPS interpolation.
-export const routeGuides: Record<Corridor, string> = {
-  barcelona: points('-3.691,40.407 -3.125,40.587 -1.970,41.336 -0.911,41.659 0.632,41.620 1.273,41.193 2.140,41.379'),
-  valencia: points('-3.682,40.472 -3.691,40.407 -3.633,40.298 -2.144,40.035 -1.281,39.485 -0.382,39.460'),
-  sevilla: points('-3.691,40.407 -3.956,38.985 -4.108,38.688 -4.789,37.888 -5.975,37.392'),
+// The 2D fallback uses station-to-station guides, never these as GPS corrections.
+const pointFor = (node: RouteNode) => project(atlasStations[node === 'madrid' ? 'atocha' : node])
+export const routeGuides = corridorIds.map((id) => {
+  const seen = new Set<string>()
+  const paths: string[] = []
+  for (const path of corridors[id].paths) {
+    for (let i = 1; i < path.length; i++) {
+      const key = [path[i - 1], path[i]].sort().join(':')
+      if (seen.has(key)) continue
+      seen.add(key)
+      const a = pointFor(path[i - 1])
+      const b = pointFor(path[i])
+      paths.push(`M${a.x},${a.y}L${b.x},${b.y}`)
+    }
+  }
+  return { id, d: paths.join(' ') }
+})
+
+const nodesByCorridor = corridorIds.map((id) => ({ id, nodes: new Set<RouteNode>(corridors[id].paths.flat()) }))
+const city = (id: StationId, name: string, dx: number, dy: number, overview = true) => {
+  const { lat, lon } = atlasStations[id]
+  return { id, name, lat, lon, dx, dy, overview, anchor: dx < 0 ? 'end' as const : 'start' as const,
+    corridors: nodesByCorridor.filter(({ nodes }) => nodes.has(routeNode(id))).map(({ id: group }) => group) }
 }
 
 export const mapCities = [
-  { name: 'Madrid', lat: 40.407, lon: -3.691, dx: -12, dy: -11, anchor: 'end' },
-  { name: 'Barcelona', lat: 41.379, lon: 2.140, dx: -8, dy: -13, anchor: 'end' },
-  { name: 'Valencia', lat: 39.460, lon: -0.382, dx: 12, dy: 16, anchor: 'start' },
-  { name: 'Sevilla', lat: 37.392, lon: -5.975, dx: -12, dy: 17, anchor: 'end' },
-] as const
+  city('atocha', 'Madrid', -12, -11), city('barcelona', 'Barcelona', -10, -13),
+  city('valencia', 'València', 12, -7), city('sevilla', 'Sevilla', -10, -10),
+  city('zaragoza', 'Zaragoza', 12, -10), city('valladolid', 'Valladolid', 12, -10),
+  city('oviedo', 'Oviedo', 12, -8), city('coruna', 'A Coruña', 12, -9),
+  city('badajoz', 'Badajoz', -10, 17), city('malaga', 'Málaga', 12, 17),
+  city('granada', 'Granada', 12, -8, false), city('cordoba', 'Córdoba', -12, -7, false),
+  city('murcia', 'Murcia', -10, 17, false), city('alicante', 'Alicante', 12, 13, false),
+  city('albacete', 'Albacete', -9, -10, false), city('castellon', 'Castelló', 12, -8, false),
+  city('burgos', 'Burgos', 12, -8, false), city('leon', 'León', -11, 16, false),
+  city('ourense', 'Ourense', 12, 17, false), city('vigo', 'Vigo', -12, 16, false),
+  city('zamora', 'Zamora', -11, -8, false), city('huesca', 'Huesca', -10, -8, false),
+  city('girona', 'Girona', 11, -7, false), city('toledo', 'Toledo', 12, 13, false),
+  city('caceres', 'Cáceres', 12, -8, false),
+]
+
+export function citiesForMap(corridor: Corridor | 'all') {
+  return mapCities.filter((city) => corridor === 'all' ? city.overview : city.corridors.includes(corridor))
+}

@@ -1,5 +1,7 @@
 import type { LayerSpecification, StyleSpecification } from 'maplibre-gl'
-import { mapCities } from './geography'
+import type { FeatureCollection, Point } from 'geojson'
+import { citiesForMap } from './geography'
+import type { Corridor } from './network'
 
 const base = 'cnig'
 const palette = {
@@ -43,12 +45,16 @@ export function atlasMapStyle(dark: boolean): StyleSpecification {
     glyphs: 'https://vt-mapabase.idee.es/files/styles/fonts/pbf/{fontstack}/{range}.pbf',
     sources: {
       [base]: { type: 'vector', tiles: ['https://vt-mapabase.idee.es/1.0.0/mapabase/{z}/{x}/{y}.pbf'], maxzoom: 14 },
-      'station-cities': { type: 'geojson', data: {
-        type: 'FeatureCollection',
-        features: mapCities.map(({ name, lat, lon }) => ({ type: 'Feature', properties: { name }, geometry: { type: 'Point', coordinates: [lon, lat] } })),
-      } },
+      'station-cities': { type: 'geojson', data: mapCityFeatures('all') },
     },
     layers: atlasLayers(dark),
+  }
+}
+
+export function mapCityFeatures(corridor: Corridor | 'all'): FeatureCollection<Point> {
+  return {
+    type: 'FeatureCollection',
+    features: citiesForMap(corridor).map(({ name, lat, lon }) => ({ type: 'Feature', properties: { name }, geometry: { type: 'Point', coordinates: [lon, lat] } })),
   }
 }
 

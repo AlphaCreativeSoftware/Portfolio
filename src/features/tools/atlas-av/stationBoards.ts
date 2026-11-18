@@ -1,7 +1,7 @@
 import type { AtlasSnapshot, AtlasTrain, StationTimes } from './model.ts'
 import { simple } from './model.ts'
-import { asNumber, asRecord, asText, company, hasIndependentAdif, isCancelled, isFreshAt, point, readJson, serviceNumber, serviceRoute, stationCode } from './sourceFields.ts'
-import { atlasStations } from './stations.ts'
+import { asNumber, asRecord, asText, company, hasIndependentAdif, isCancelled, isFreshAt, point, readJson, serviceKey, serviceRoute, stationCode } from './sourceFields.ts'
+import { atlasStations, boardStations } from './stations.ts'
 
 type StationBoard = { code: string; data: unknown }
 const boardCacheDuration = 50_000
@@ -10,10 +10,10 @@ let pending: Promise<StationBoard[]> | undefined
 
 export function loadStationBoards() {
   if (cached && Date.now() - cached.at < boardCacheDuration) return Promise.resolve(cached.boards)
-  pending ??= Promise.all(atlasStations.map(async ({ code }) => ({
-    code,
-    data: await readJson(`https://trenalia.org/api/v1/stations/${code}/board?type=all&limit=120&horizon=120`, 3_500).catch(() => null),
-  }))).then((boards) => {
+  pending ??= Promise.all(boardStations.map(async (id) => {
+    const { code } = atlasStations[id]
+    return { code, data: await readJson(`https://trenalia.org/api/v1/stations/${code}/board?type=all&limit=120&horizon=120`, 3_500).catch(() => null) }
+  })).then((boards) => {
     cached = { boards, at: Date.now() }
     return boards
   }).finally(() => { pending = undefined })
@@ -47,7 +47,7 @@ function boardTrain(row: Record<string, unknown>, code: string, reportedAt: numb
   const rawPosition = asRecord(row.position)
   const estimate = delay !== null && row.estimated === true ? point(rawPosition.lat, rawPosition.lon) : null
   return {
-    key: `${operator}:${serviceNumber(operator, number)}:${route.corridor}:${route.direction}`,
+    key: serviceKey(operator, number, route),
     number, operator, service: operator === 'ouigo' ? 'OUIGO' : 'iryo', family: 'alta-velocidad',
     corridor: route.corridor, origin: route.origin, destination: route.destination,
     position: estimate ? { ...estimate, kind: 'estimated', source: 'Trenalia', timestamp: reportedAt, timestampKind: 'feed' } : null,
