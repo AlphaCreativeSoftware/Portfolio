@@ -5,31 +5,43 @@ export function useHeroMotion() {
 
   const orbitTwoRef = useRef<HTMLDivElement>(null)
   useEffect(() => {
+    const orbits = [orbitOneRef.current, orbitTwoRef.current]
+    const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)')
+    const coarsePointer = window.matchMedia('(hover: none) and (pointer: coarse)')
     let frame = 0
     let lastHeroTravel = -1
-    const mobileDevice = window.matchMedia('(hover: none) and (pointer: coarse)').matches
     const update = () => {
       frame = 0
       const heroTravel = Math.min(window.scrollY, window.innerHeight)
-      if (!mobileDevice && heroTravel !== lastHeroTravel) {
-        lastHeroTravel = heroTravel
-        if (orbitOneRef.current) orbitOneRef.current.style.transform = `translate3d(0, ${heroTravel * -.15}px, 0)`
-        if (orbitTwoRef.current) orbitTwoRef.current.style.transform = `translate3d(0, ${heroTravel * -.3}px, 0)`
-        document.documentElement.style.setProperty('--hero-word-shift', `${(heroTravel / window.innerHeight) * 70}%`)
-      }
-
+      if (heroTravel === lastHeroTravel) return
+      lastHeroTravel = heroTravel
+      orbits.forEach((orbit, i) => {
+        if (orbit) orbit.style.transform = `translate3d(0, ${heroTravel * -.15 * (i + 1)}px, 0)`
+      })
     }
     const scheduleUpdate = () => { if (!frame) frame = window.requestAnimationFrame(update) }
-    update()
-    const observer = new ResizeObserver(scheduleUpdate)
-    observer.observe(document.documentElement)
-    window.addEventListener('scroll', scheduleUpdate, { passive: true })
-    window.addEventListener('resize', scheduleUpdate)
-    return () => {
+    const stop = () => {
       if (frame) window.cancelAnimationFrame(frame)
-      observer.disconnect()
+      frame = 0
+      lastHeroTravel = -1
       window.removeEventListener('scroll', scheduleUpdate)
       window.removeEventListener('resize', scheduleUpdate)
+      orbits.forEach((orbit) => orbit?.style.removeProperty('transform'))
+    }
+    const sync = () => {
+      stop()
+      if (reducedMotion.matches || coarsePointer.matches) return
+      update()
+      window.addEventListener('scroll', scheduleUpdate, { passive: true })
+      window.addEventListener('resize', scheduleUpdate)
+    }
+    sync()
+    reducedMotion.addEventListener('change', sync)
+    coarsePointer.addEventListener('change', sync)
+    return () => {
+      stop()
+      reducedMotion.removeEventListener('change', sync)
+      coarsePointer.removeEventListener('change', sync)
     }
   }, [])
   return { orbitOneRef, orbitTwoRef }

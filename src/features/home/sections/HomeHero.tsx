@@ -1,9 +1,9 @@
 import { ArrowDown } from 'lucide-react'
+import { useHeroLightSweep } from '../../../shared/hooks/useHeroLightSweep'
 import { HomeOrbit } from '../components/HomeOrbit'
-import { useHeroNameGradient } from '../hooks/useHeroNameGradient'
 
 export function HomeHero({ navigateTo }: { navigateTo: (id: string) => void }) {
-  const nameRef = useHeroNameGradient()
+  const nameRef = useHeroLightSweep()
   return (
     <section className="home-hero home-container" id="inicio" aria-labelledby="home-title">
       <div className="home-hero-grid">

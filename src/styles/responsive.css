@@ -53,9 +53,10 @@
   .nav-indicator i { border: 0; border-radius: 99px; background: var(--blue); box-shadow: 0 0 10px color-mix(in srgb, var(--blue) 30%, transparent); animation: none; }
   .nav-backdrop { position: fixed; z-index: 3; inset: var(--topbar-h, 64px) 0 0; display: block; border: 0; background: rgba(0,0,0,.2); opacity: 0; visibility: hidden; pointer-events: none; transition: opacity .3s, visibility .3s; }
   .nav-backdrop-open { opacity: 1; visibility: visible; pointer-events: auto; }
-  .hero { min-height: 0; height: auto; max-height: none; grid-template-columns: 1fr; grid-template-rows: auto auto auto auto; padding-top: 95px; }
-  .hero-copy { padding-top: 95px; }
-  .hero-actions { padding: 55px 0; }
+  .hero { min-height: 0; grid-template-rows: auto auto auto; padding-top: 95px; }
+  .hero-copy { padding-block: clamp(34px, 8vw, 68px) clamp(36px, 7vw, 55px); }
+  .hero-details { grid-template-columns: minmax(0, 1fr); }
+  .hero-actions { gap: 15px; }
   .hero-stats { gap: 18px; }
   .hero-stats div { flex-direction: column; align-items: flex-start; gap: 7px; }
   .fruit-content { min-height: 0; }
@@ -101,8 +102,8 @@
   .hero-background-time { --time-opacity: .12; right: 22px; top: 88px; font-size: 16px; }
   .ambient-celestial { width: 145px; height: 145px; }
   h1 { font-size: clamp(48px, 15vw, 67px); }
-  .hero-copy { padding-top: 78px; }
-  .hero-copy > p { font-size: 14px; }
+  .portfolio-title { font-size: clamp(43px, calc(30px + 4vw), 54px); }
+  .hero-details > p { font-size: 15px; }
   .hero-stats strong { font-size: 24px; }
   .hero-stats small { font-size: 8px; }
   .project-card { padding: 26px; min-height: 490px; border-radius: 22px; }
@@ -296,6 +297,7 @@
   .topbar { padding-inline: 8px; gap: 4px; }
   .mobile-section-label, .mobile-section-context { gap: 4px; }
   .mobile-area-label { font-size: 7.5px; }
+  .hero-background-time { top: 122px; }
 }
 
 @media (prefers-reduced-motion: reduce) {
